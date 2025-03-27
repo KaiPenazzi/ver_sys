@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 pub struct GameScores {
     scores: HashMap<String, i32>,
 }
