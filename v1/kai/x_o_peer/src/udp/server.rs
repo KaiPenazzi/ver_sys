@@ -24,8 +24,8 @@ impl Server {
 
         let mut buf = [0; 1024];
         loop {
-            let (_len, _addr) = socket.recv_from(&mut buf).await?;
-            self.handle_message(&buf).await;
+            let (len, _addr) = socket.recv_from(&mut buf).await?;
+            self.handle_message(&buf[..len]).await;
         }
     }
 
