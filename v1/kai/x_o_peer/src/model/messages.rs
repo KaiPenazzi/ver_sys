@@ -9,12 +9,12 @@ pub struct Message {
 #[derive(Debug, Deserialize)]
 pub struct InitData {
     pub field: Vec<Vec<String>>,
-    pub k: usize,
+    pub k: u32,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct ActionData {
     pub usr: String,
-    pub x: usize,
-    pub y: usize,
+    pub x: u32,
+    pub y: u32,
 }

@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
+use druid::Data;
+
 pub struct GameScores {
-    scores: HashMap<String, i32>,
+    scores: HashMap<String, u32>,
 }
 
 impl GameScores {
@@ -16,7 +18,7 @@ impl GameScores {
         *entry += 1;
     }
 
-    pub fn get(&self, player: &str) -> Option<&i32> {
+    pub fn get(&self, player: &str) -> Option<&u32> {
         self.scores.get(player)
     }
 }

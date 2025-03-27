@@ -1,6 +1,6 @@
 pub struct Peer {
     ip: String,
-    port: i32,
+    port: u32,
 }
 
 pub struct Client {
