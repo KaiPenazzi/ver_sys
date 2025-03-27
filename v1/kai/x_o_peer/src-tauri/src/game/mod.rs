@@ -1,4 +1,8 @@
-use crate::model::game_structs::{GameField, GameScores};
+mod field;
+mod scores;
+
+use field::GameField;
+use scores::GameScores;
 
 pub struct Game {
     pub scores: GameScores,

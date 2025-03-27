@@ -2,9 +2,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod game;
-mod model;
-mod udp;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     app_lib::run();
 }
