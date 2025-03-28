@@ -1,7 +1,6 @@
 pub mod field;
 pub mod scores;
 
-use druid::Data;
 use field::GameField;
 use scores::GameScores;
 

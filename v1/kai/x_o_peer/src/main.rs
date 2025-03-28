@@ -36,6 +36,4 @@ async fn main() {
         .log_to_console()
         .launch(app_data)
         .expect("launch failed");
-
-    manager.lock().unwrap().stop();
 }

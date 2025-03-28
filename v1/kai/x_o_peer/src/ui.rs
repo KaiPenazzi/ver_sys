@@ -60,7 +60,6 @@ pub async fn ui_builder() -> impl Widget<AppData> {
         Button::new("create").on_click(|_ctx, data: &mut AppData, _env| {
             let mut manager = data.manager.lock().unwrap();
             manager.start_game(
-                data.input_port.parse::<i32>().unwrap(),
                 data.input_x.parse::<u32>().unwrap(),
                 data.input_y.parse::<u32>().unwrap(),
                 data.input_k.parse::<u32>().unwrap(),
