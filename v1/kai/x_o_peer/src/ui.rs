@@ -1,11 +1,18 @@
 use druid::{
-    widget::{Button, Flex, Label, TextBox},
-    Widget, WidgetExt,
+    widget::{Button, Flex, Label, List, TextBox},
+    LensExt, Widget, WidgetExt,
 };
 
-use crate::AppData;
+use crate::{
+    game::{
+        field::{Cell, GameField, Row},
+        Game,
+    },
+    manager::Manager,
+    AppData,
+};
 
-pub async fn ui_builder() -> impl Widget<AppData> {
+pub fn ui_builder() -> impl Widget<AppData> {
     let mut root = Flex::column();
 
     {
@@ -56,40 +63,13 @@ pub async fn ui_builder() -> impl Widget<AppData> {
         root.add_child(row);
     }
 
-    root.add_child(
-        Button::new("create").on_click(|_ctx, data: &mut AppData, _env| {
-            let mut manager = data.manager.lock().unwrap();
-            manager.start_game(
-                data.input_x.parse::<u32>().unwrap(),
-                data.input_y.parse::<u32>().unwrap(),
-                data.input_k.parse::<u32>().unwrap(),
-            )
-        }),
-    );
+    let list_cols = List::new(|| {
+        let list_rows =
+            List::new(|| TextBox::new().lens(Cell::text).on_click(Cell::on_click)).lens(Row::cells);
+        Flex::column().with_child(list_rows)
+    })
+    .horizontal()
+    .lens(AppData::manager.then(Manager::game.then(Game::field.then(GameField::cols))));
 
-    root.add_child(
-        Button::new("test").on_click(|_ctx, data: &mut AppData, _env| {
-            let mut manager = data.manager.lock().unwrap();
-            manager.action(1, 2);
-        }),
-    );
-
-    for y in 0..3 {
-        let mut row = Flex::row();
-        for x in 0..3 {
-            let mut column = Flex::column();
-            let x2 = x.clone();
-            let y2 = y.clone();
-            column.add_child(Button::new("None".to_string()).on_click(
-                move |_ctx, data: &mut AppData, _env| {
-                    let mut manager = data.manager.lock().unwrap();
-                    manager.action(x2.clone(), y2.clone())
-                },
-            ));
-            row.add_child(column)
-        }
-        root.add_child(row)
-    }
-
-    root
+    root.with_child(list_cols)
 }

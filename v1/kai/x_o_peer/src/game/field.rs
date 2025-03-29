@@ -1,26 +1,59 @@
-use crate::model::messages::ActionData;
+use druid::{im::Vector, Data, Env, EventCtx, Lens};
 
+#[derive(Clone, Data, Lens)]
 pub struct GameField {
-    pub field: Vec<Vec<String>>,
-    k: u32,
+    pub cols: Vector<Row>,
+    pub k: u32,
+}
+impl GameField {
+    pub fn init(x: u32, y: u32, k: u32) -> Self {
+        let mut field = Self {
+            k: k,
+            cols: Vector::new(),
+        };
+
+        for _ in 0..x {
+            field.cols.push_back(Row::new(y));
+        }
+
+        field
+    }
 }
 
-impl GameField {
-    pub fn new(field: Vec<Vec<String>>, k: u32) -> Self {
-        Self { field: field, k: k }
-    }
+#[derive(Clone, Data, Lens)]
+pub struct Row {
+    pub cells: Vector<Cell>,
+}
+impl Row {
+    fn new(y: u32) -> Self {
+        let mut row = Self {
+            cells: Vector::new(),
+        };
 
-    pub fn init(x: u32, y: u32, k: u32) -> Self {
+        for _ in 0..y {
+            row.cells.push_back(Cell::new());
+        }
+
+        row
+    }
+}
+
+#[derive(Clone, Data, Lens)]
+pub struct Cell {
+    pub text: String,
+}
+impl Cell {
+    fn new() -> Self {
         Self {
-            field: vec![vec!["None".to_string(); y.try_into().unwrap()]; x.try_into().unwrap()],
-            k: k,
+            text: "None".to_string(),
         }
     }
 
-    pub fn set(&mut self, action: &ActionData) {
-        let x: usize = action.x.try_into().unwrap();
-        let y: usize = action.y.try_into().unwrap();
+    fn click(&mut self) {
+        self.text = "click".to_string();
+    }
 
-        self.field[x][y] = action.usr.clone();
+    pub fn on_click(ctx: &mut EventCtx, data: &mut Cell, _env: &Env) {
+        data.click()
     }
 }
