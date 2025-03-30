@@ -5,32 +5,24 @@ use druid::{Data, Lens};
 use field::GameField;
 use scores::GameScores;
 
-use crate::model::messages::ActionData;
-
 #[derive(Clone, Data, Lens)]
 pub struct Game {
     pub field: GameField,
+    pub scores: GameScores,
 }
 
 impl Game {
-    pub fn new(x: u32, y: u32, k: u32) -> Self {
+    pub fn new(usr: &String, x: u32, y: u32, k: u32) -> Self {
         Self {
-            field: GameField::init(x, y, k),
+            field: GameField::init(usr, x, y, k),
+            scores: GameScores::new(),
+        }
+    }
+
+    pub fn check(&mut self) {
+        match self.field.check() {
+            Some(usr) => self.scores.add_point(usr),
+            None => (),
         }
     }
 }
-
-//#[cfg(test)]
-//mod test_game {
-//    use super::Game;
-//
-//    #[test]
-//    fn test_new() {
-//        let game = Game::new(3, 3, 3);
-//
-//        assert_eq!(game.field.field.len(), 3);
-//        for x in game.field.field {
-//            assert_eq!(x.len(), 3);
-//        }
-//    }
-//}

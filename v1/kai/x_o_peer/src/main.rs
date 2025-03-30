@@ -1,4 +1,5 @@
 mod coroutine;
+pub mod eve;
 pub mod game;
 pub mod manager;
 pub mod model;
@@ -10,9 +11,11 @@ use std::{
     thread,
 };
 
+const PORT: u32 = 1234;
+
 use coroutine::run_server;
 use druid::{AppLauncher, Data, Lens, WindowDesc};
-use game::Game;
+use eve::Delegate;
 use manager::Manager;
 use ui::ui_builder;
 
@@ -44,6 +47,7 @@ async fn main() {
     tokio::spawn(run_server(event_sink));
 
     launcher
+        .delegate(Delegate)
         .log_to_console()
         .launch(app_data)
         .expect("launch failed");

@@ -1,11 +1,12 @@
 use druid::{
     widget::{Button, Flex, Label, List, TextBox},
-    LensExt, Widget, WidgetExt,
+    Env, LensExt, Widget, WidgetExt,
 };
 
 use crate::{
     game::{
         field::{Cell, GameField, Row},
+        scores::{GameScores, Score},
         Game,
     },
     manager::Manager,
@@ -70,6 +71,19 @@ pub fn ui_builder() -> impl Widget<AppData> {
     })
     .horizontal()
     .lens(AppData::manager.then(Manager::game.then(Game::field.then(GameField::cols))));
+    root.add_child(Flex::column().with_child(list_cols));
 
-    root.with_child(list_cols)
+    let list_scores = List::new(|| {
+        let mut row = Flex::row();
+        row.add_child(Label::new(|data: &Score, _env: &Env| data.usr.clone()));
+        row.add_child(Label::new(|data: &Score, _env: &Env| {
+            data.points.to_string()
+        }));
+
+        row
+    })
+    .lens(AppData::manager.then(Manager::game.then(Game::scores.then(GameScores::scores))));
+    root.add_child(Flex::column().with_child(list_scores));
+
+    root
 }
