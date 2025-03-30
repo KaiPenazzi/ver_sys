@@ -14,7 +14,7 @@ pub struct Manager {
 impl Manager {
     pub fn new(usr: String) -> Self {
         Self {
-            game: Game::new(&usr, 3, 3, 3),
+            game: Game::new(&usr, 4, 4, 3),
             usr: usr,
         }
     }

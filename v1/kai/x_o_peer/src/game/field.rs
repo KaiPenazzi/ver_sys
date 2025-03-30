@@ -37,10 +37,7 @@ impl GameField {
         }
     }
 
-    pub fn get(&self, x: u32, y: u32) -> Option<&Cell> {
-        let x = x as usize;
-        let y = y as usize;
-
+    pub fn get(&self, x: usize, y: usize) -> Option<&Cell> {
         if let Some(row) = self.cols.get(x) {
             if let Some(cell) = row.cells.get(y) {
                 return Some(cell);
@@ -124,6 +121,7 @@ impl GameField {
                     .clone();
                 if cell.text != "None" && cell.text == start_name {
                     count += 1;
+                    cells.push(cell)
                 } else {
                     start_name = cell.text.clone();
                     count = 1;
@@ -205,60 +203,49 @@ impl GameField {
 
     fn check_diagonal_rl(&mut self) -> Option<String> {
         for x in (0..self.x).rev() {
-            let mut count = 0;
-            let mut start_name = "".to_string();
-            let mut cells: Vec<Cell> = vec![];
-            for y in (0..self.y).filter(|y| x - y >= 0) {
-                let cell = self
-                    .get(
-                        (x - y).try_into().unwrap(),
-                        (self.y - y).try_into().unwrap(),
-                    )
-                    .unwrap()
-                    .clone();
-                if cell.text != "None" && cell.text == start_name {
-                    count += 1;
-                    cells.push(cell);
-                } else {
-                    start_name = cell.text.clone();
-                    count = 1;
-                    cells.clear();
-                    cells.push(cell);
-                }
+            let mut cells = vec![Cell::new(&"".to_string(), 0, 0)];
+            for y in 0..self.y {
+                if x >= y {
+                    let cell = self.get(x - y, y).unwrap().clone();
 
-                if count == self.k {
-                    for cell in cells {
-                        self.reset(cell.x, cell.y)
+                    if cell.text != "None" && cells[0].text == cell.text {
+                        cells.push(cell);
+                    } else {
+                        cells.clear();
+                        cells.push(cell);
                     }
-                    return Some(start_name);
+
+                    if cells.len() == self.k as usize {
+                        for cell_tmp in &cells {
+                            self.reset(cell_tmp.x, cell_tmp.y)
+                        }
+
+                        return Some(cells[0].text.clone());
+                    }
                 }
             }
         }
 
-        for y in (0..self.y).rev() {
-            let mut count = 0;
-            let mut start_name = "".to_string();
-            let mut cells: Vec<Cell> = vec![];
-            for x in (0..self.x).filter(|x| y - x <= 0) {
-                let cell = self
-                    .get((y - x).try_into().unwrap(), (x).try_into().unwrap())
-                    .unwrap()
-                    .clone();
-                if cell.text != "None" && cell.text == start_name {
-                    count += 1;
-                    cells.push(cell);
-                } else {
-                    start_name = cell.text.clone();
-                    count = 1;
-                    cells.clear();
-                    cells.push(cell);
-                }
+        for y in 1..self.y {
+            let mut cells = vec![Cell::new(&"".to_string(), 0, 0)];
+            for i in 0..self.x {
+                if y + i < self.y {
+                    let cell = self.get(self.x - 1 - i, y + i).unwrap().clone();
 
-                if count == self.k {
-                    for cell in cells {
-                        self.reset(cell.x, cell.y)
+                    if cell.text != "None" && cells[0].text == cell.text {
+                        cells.push(cell);
+                    } else {
+                        cells.clear();
+                        cells.push(cell);
                     }
-                    return Some(start_name);
+
+                    if cells.len() == self.k as usize {
+                        for cell_tmp in &cells {
+                            self.reset(cell_tmp.x, cell_tmp.y)
+                        }
+
+                        return Some(cells[0].text.clone());
+                    }
                 }
             }
         }
