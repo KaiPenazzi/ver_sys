@@ -22,14 +22,14 @@ pub async fn run_server(event_sink: druid::ExtEventSink) -> std::io::Result<()> 
 }
 
 pub async fn run_cleint(msg_queue: mpsc::Receiver<SendMsg>) -> tokio::io::Result<()> {
+    let socket = UdpSocket::bind("0.0.0.0:0").await.unwrap();
+
     loop {
         let udp_msg = msg_queue.recv().unwrap();
-        let socket = UdpSocket::bind("0.0.0.0:0").await.unwrap();
         let json = serde_json::to_string(&udp_msg.msg).unwrap();
 
         for peer in udp_msg.send_to {
             socket.send_to(json.as_bytes(), &peer.to_url()).await?;
-            println!("msg send");
         }
     }
 }

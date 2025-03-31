@@ -1,4 +1,4 @@
-use druid::{im::Vector, Data, Env, EventCtx, Lens, Target};
+use druid::{im::Vector, Data, Env, EventCtx, Lens};
 
 use crate::{eve::FIELD_CLICKED, model::messages::ActionData};
 
@@ -44,7 +44,22 @@ impl GameField {
             }
         }
 
+        println!("got none");
         None
+    }
+
+    pub fn to_vec(&self) -> Vec<Vec<String>> {
+        let mut col = vec![];
+
+        for x in self.cols.clone() {
+            let mut row = vec![];
+            for y in x.cells {
+                row.push(y.text)
+            }
+            col.push(row)
+        }
+
+        col
     }
 
     pub fn reset(&mut self, x: u32, y: u32) {
@@ -308,7 +323,7 @@ mod test_field {
 
     #[test]
     fn test_col() {
-        let mut field = GameField::init(&"kai".to_string(), 3, 3, 2);
+        let mut field = GameField::init(3, 3, 2);
         field.set(&ActionData {
             usr: "tim".to_string(),
             x: 1,
@@ -326,7 +341,7 @@ mod test_field {
 
     #[test]
     fn test_row() {
-        let mut field = GameField::init(&"kai".to_string(), 3, 3, 2);
+        let mut field = GameField::init(3, 3, 2);
         field.set(&ActionData {
             usr: "tim".to_string(),
             x: 1,
@@ -344,7 +359,7 @@ mod test_field {
 
     #[test]
     fn test_diag_lr() {
-        let mut field = GameField::init(&"kai".to_string(), 3, 3, 2);
+        let mut field = GameField::init(3, 3, 2);
         field.set(&ActionData {
             usr: "tim".to_string(),
             x: 1,
@@ -362,7 +377,7 @@ mod test_field {
 
     #[test]
     fn test_diag_rl() {
-        let mut field = GameField::init(&"kai".to_string(), 4, 4, 3);
+        let mut field = GameField::init(4, 4, 3);
         field.set(&ActionData {
             usr: "tim".to_string(),
             x: 2,
@@ -382,5 +397,37 @@ mod test_field {
         });
 
         assert_eq!(field.check(), Some("tim".to_string()))
+    }
+
+    #[test]
+    fn test_to_vec() {
+        let mut field = GameField::init(2, 4, 3);
+        field.set(&ActionData {
+            usr: "test".to_string(),
+            x: 1,
+            y: 2,
+        });
+        let expected = vec![
+            vec!["None", "None", "None", "None"],
+            vec!["None", "None", "test", "None"],
+        ];
+
+        assert_eq!(field.to_vec(), expected)
+    }
+
+    #[test]
+    fn get_set() {
+        let mut field = GameField::init(2, 4, 3);
+        field.set(&ActionData {
+            usr: "test".to_string(),
+            x: 1,
+            y: 3,
+        });
+
+        let cell = field.get(1, 3).unwrap();
+
+        assert_eq!(cell.x, 1);
+        assert_eq!(cell.y, 3);
+        assert_eq!(cell.text, "test");
     }
 }

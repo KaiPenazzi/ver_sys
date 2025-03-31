@@ -11,7 +11,7 @@ use std::{
     thread,
 };
 
-const PORT: u32 = 1234;
+const PORT: u32 = 1225;
 
 use coroutine::{run_cleint, run_server};
 use druid::{AppLauncher, Data, Lens, WindowDesc};
@@ -33,7 +33,7 @@ struct AppData {
 async fn main() {
     let (tx, mut rx) = mpsc::channel::<SendMsg>();
     let tx_arc = Arc::new(Mutex::new(tx));
-    let manager = Manager::new("kai".to_string(), tx_arc);
+    let manager = Manager::new("marius".to_string(), tx_arc);
     let app_data = AppData {
         manager: manager,
         input_port: "1234".to_string(),
@@ -45,14 +45,19 @@ async fn main() {
     let main_window = WindowDesc::new(ui_builder());
     let launcher = AppLauncher::with_window(main_window);
 
-    let event_sink = launcher.get_external_handle();
-    tokio::spawn(run_server(event_sink));
+    let mut tasks = vec![];
 
-    tokio::spawn(run_cleint(rx));
+    let event_sink = launcher.get_external_handle();
+    tasks.push(tokio::spawn(run_server(event_sink)));
+    tasks.push(tokio::spawn(run_cleint(rx)));
 
     launcher
         .delegate(Delegate)
         .log_to_console()
         .launch(app_data)
         .expect("launch failed");
+
+    for task in tasks {
+        task.abort();
+    }
 }

@@ -16,17 +16,17 @@ use crate::{
 pub fn ui_builder() -> impl Widget<AppData> {
     let mut root = Flex::column();
 
-    {
-        let mut row = Flex::row();
-        row.add_child(Label::new("port: "));
-        row.add_child(
-            TextBox::new()
-                .with_placeholder("port")
-                .lens(AppData::input_port)
-                .fix_width(200.0),
-        );
-        root.add_child(row);
-    }
+    //{
+    //    let mut row = Flex::row();
+    //    row.add_child(Label::new("port: "));
+    //    row.add_child(
+    //        TextBox::new()
+    //            .with_placeholder("port")
+    //            .lens(AppData::input_port)
+    //            .fix_width(200.0),
+    //    );
+    //    root.add_child(row);
+    //}
 
     {
         let mut row = Flex::row();
@@ -34,7 +34,7 @@ pub fn ui_builder() -> impl Widget<AppData> {
         row.add_child(
             TextBox::new()
                 .with_placeholder("x-size")
-                .lens(AppData::input_x)
+                .lens(AppData::manager.then(Manager::x_size))
                 .fix_width(200.0),
         );
         root.add_child(row);
@@ -46,7 +46,7 @@ pub fn ui_builder() -> impl Widget<AppData> {
         row.add_child(
             TextBox::new()
                 .with_placeholder("y-size")
-                .lens(AppData::input_y)
+                .lens(AppData::manager.then(Manager::y_size))
                 .fix_width(200.0),
         );
         root.add_child(row);
@@ -58,10 +58,18 @@ pub fn ui_builder() -> impl Widget<AppData> {
         row.add_child(
             TextBox::new()
                 .with_placeholder("k")
-                .lens(AppData::input_k)
+                .lens(AppData::manager.then(Manager::k_size))
                 .fix_width(200.0),
         );
         root.add_child(row);
+    }
+    {
+        let mut row = Flex::row();
+        row.add_child(
+            Button::new("Create new Game")
+                .on_click(|_ev, appdata: &mut AppData, _env| appdata.manager.new_game()),
+        );
+        root.add_child(row)
     }
 
     let list_cols = List::new(|| {
