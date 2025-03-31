@@ -44,7 +44,6 @@ impl Manager {
             self.k_size.parse::<u32>().unwrap(),
         );
         let tx = self.msg_q.lock().unwrap();
-        println!("send init");
         tx.send(SendMsg {
             msg: Message::init(InitData {
                 field: self.game.field.to_vec(),
