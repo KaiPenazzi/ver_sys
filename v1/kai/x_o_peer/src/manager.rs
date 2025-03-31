@@ -10,6 +10,7 @@ use crate::{
         com::{Peer, SendMsg},
         messages::{ActionData, InitData, Message},
     },
+    PORT_A,
 };
 
 #[derive(Clone, Data, Lens)]
@@ -49,7 +50,7 @@ impl Manager {
                 field: self.game.field.to_vec(),
                 k: self.game.field.k,
             }),
-            send_to: vec![Peer::new("127.0.0.1".to_string(), 1234)],
+            send_to: vec![Peer::new("127.0.0.1".to_string(), PORT_A)],
         })
         .unwrap();
     }
@@ -65,7 +66,7 @@ impl Manager {
         let tx = self.msg_q.lock().unwrap();
         tx.send(SendMsg {
             msg: Message::action(action),
-            send_to: vec![Peer::new("127.0.0.1".to_string(), 1234)],
+            send_to: vec![Peer::new("127.0.0.1".to_string(), PORT_A)],
         })
         .unwrap();
     }
@@ -78,7 +79,8 @@ impl Manager {
         match msg.r#type.as_str() {
             "init" => {
                 if let Ok(init) = serde_json::from_value::<InitData>(msg.data.clone()) {
-                    println!("Init Data: {:?}", init);
+                    println!("{}", msg.data);
+                    self.game = Game::from_init(init);
                 } else {
                     eprintln!("Fehler beim Parsen von 'init' Daten");
                 }

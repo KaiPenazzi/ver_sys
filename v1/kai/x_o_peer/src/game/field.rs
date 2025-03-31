@@ -26,6 +26,22 @@ impl GameField {
         field
     }
 
+    pub fn init_with_fields(field: Vec<Vec<String>>, k: u32) -> Self {
+        let mut grid = Self {
+            x: field.len(),
+            y: field[0].len(),
+            k: k,
+            cols: Vector::new(),
+        };
+
+        for (x_t, vec) in field.iter().enumerate() {
+            grid.cols
+                .push_back(Row::from_vec(vec, x_t.try_into().unwrap()))
+        }
+
+        grid
+    }
+
     pub fn set(&mut self, action: &ActionData) {
         let x = action.x as usize;
         let y = action.y as usize;
@@ -285,6 +301,19 @@ impl Row {
 
         row
     }
+
+    fn from_vec(vec: &Vec<String>, x: u32) -> Self {
+        let mut row = Self {
+            cells: Vector::new(),
+        };
+
+        for (y_t, text) in vec.iter().enumerate() {
+            row.cells
+                .push_back(Cell::new_text(text.to_string(), x, y_t.try_into().unwrap()))
+        }
+
+        row
+    }
 }
 
 #[derive(Clone, Data, Lens)]
@@ -297,6 +326,14 @@ impl Cell {
     fn new(x: u32, y: u32) -> Self {
         Self {
             text: "None".to_string(),
+            x: x,
+            y: y,
+        }
+    }
+
+    fn new_text(text: String, x: u32, y: u32) -> Self {
+        Self {
+            text: text,
             x: x,
             y: y,
         }

@@ -6,12 +6,10 @@ pub mod model;
 pub mod udp;
 mod ui;
 
-use std::{
-    sync::{mpsc, Arc, Mutex},
-    thread,
-};
+use std::sync::{mpsc, Arc, Mutex};
 
 const PORT: u32 = 1225;
+const PORT_A: u32 = 1234;
 
 use coroutine::{run_cleint, run_server};
 use druid::{AppLauncher, Data, Lens, WindowDesc};

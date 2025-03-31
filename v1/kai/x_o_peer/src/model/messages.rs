@@ -9,14 +9,14 @@ pub struct Message {
 impl Message {
     pub fn action(action: ActionData) -> Self {
         Self {
-            r#type: "init".to_string(),
+            r#type: "action".to_string(),
             data: json!(action),
         }
     }
 
     pub fn init(init: InitData) -> Self {
         Self {
-            r#type: "action".to_string(),
+            r#type: "init".to_string(),
             data: json!(init),
         }
     }
