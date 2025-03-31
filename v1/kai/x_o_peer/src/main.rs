@@ -7,16 +7,17 @@ pub mod udp;
 mod ui;
 
 use std::{
-    sync::{Arc, Mutex},
+    sync::{mpsc, Arc, Mutex},
     thread,
 };
 
 const PORT: u32 = 1234;
 
-use coroutine::run_server;
+use coroutine::{run_cleint, run_server};
 use druid::{AppLauncher, Data, Lens, WindowDesc};
 use eve::Delegate;
 use manager::Manager;
+use model::messages::SendMsg;
 use ui::ui_builder;
 
 #[derive(Clone, Data, Lens)]
@@ -30,7 +31,9 @@ struct AppData {
 
 #[tokio::main]
 async fn main() {
-    let manager = Manager::new("kai".to_string());
+    let (tx, mut rx) = mpsc::channel::<SendMsg>();
+    let tx_arc = Arc::new(Mutex::new(tx));
+    let manager = Manager::new("kai".to_string(), tx_arc);
     let app_data = AppData {
         manager: manager,
         input_port: "1234".to_string(),
@@ -40,11 +43,12 @@ async fn main() {
     };
 
     let main_window = WindowDesc::new(ui_builder());
-
     let launcher = AppLauncher::with_window(main_window);
 
     let event_sink = launcher.get_external_handle();
     tokio::spawn(run_server(event_sink));
+
+    tokio::spawn(run_cleint(rx));
 
     launcher
         .delegate(Delegate)

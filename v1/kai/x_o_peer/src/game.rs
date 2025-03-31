@@ -12,9 +12,9 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(usr: &String, x: u32, y: u32, k: u32) -> Self {
+    pub fn new(x: u32, y: u32, k: u32) -> Self {
         Self {
-            field: GameField::init(usr, x, y, k),
+            field: GameField::init(x, y, k),
             scores: GameScores::new(),
         }
     }

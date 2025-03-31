@@ -1,6 +1,6 @@
 use druid::{im::Vector, Data, Env, EventCtx, Lens, Target};
 
-use crate::{eve::CHECK_FIELD, model::messages::ActionData};
+use crate::{eve::FIELD_CLICKED, model::messages::ActionData};
 
 #[derive(Clone, Data, Lens)]
 pub struct GameField {
@@ -11,7 +11,7 @@ pub struct GameField {
 }
 
 impl GameField {
-    pub fn init(usr: &String, x: u32, y: u32, k: u32) -> Self {
+    pub fn init(x: u32, y: u32, k: u32) -> Self {
         let mut field = Self {
             x: x as usize,
             y: y as usize,
@@ -20,19 +20,19 @@ impl GameField {
         };
 
         for x_t in 0..x {
-            field.cols.push_back(Row::new(x_t, y, usr));
+            field.cols.push_back(Row::new(x_t, y));
         }
 
         field
     }
 
-    pub fn set(&mut self, action: ActionData) {
+    pub fn set(&mut self, action: &ActionData) {
         let x = action.x as usize;
         let y = action.y as usize;
 
         if let Some(row) = self.cols.get_mut(x) {
             if let Some(cell) = row.cells.get_mut(y) {
-                cell.click(Some(&action.usr));
+                cell.set(&action.usr);
             }
         }
     }
@@ -203,7 +203,7 @@ impl GameField {
 
     fn check_diagonal_rl(&mut self) -> Option<String> {
         for x in (0..self.x).rev() {
-            let mut cells = vec![Cell::new(&"".to_string(), 0, 0)];
+            let mut cells = vec![Cell::new(0, 0)];
             for y in 0..self.y {
                 if x >= y {
                     let cell = self.get(x - y, y).unwrap().clone();
@@ -227,7 +227,7 @@ impl GameField {
         }
 
         for y in 1..self.y {
-            let mut cells = vec![Cell::new(&"".to_string(), 0, 0)];
+            let mut cells = vec![Cell::new(0, 0)];
             for i in 0..self.x {
                 if y + i < self.y {
                     let cell = self.get(self.x - 1 - i, y + i).unwrap().clone();
@@ -259,13 +259,13 @@ pub struct Row {
     pub cells: Vector<Cell>,
 }
 impl Row {
-    fn new(x: u32, y: u32, usr: &String) -> Self {
+    fn new(x: u32, y: u32) -> Self {
         let mut row = Self {
             cells: Vector::new(),
         };
 
         for y_t in 0..y {
-            row.cells.push_back(Cell::new(usr, x, y_t));
+            row.cells.push_back(Cell::new(x, y_t));
         }
 
         row
@@ -274,31 +274,25 @@ impl Row {
 
 #[derive(Clone, Data, Lens)]
 pub struct Cell {
-    usr: String,
     pub text: String,
     pub x: u32,
     pub y: u32,
 }
 impl Cell {
-    fn new(usr: &String, x: u32, y: u32) -> Self {
+    fn new(x: u32, y: u32) -> Self {
         Self {
-            usr: usr.to_string(),
             text: "None".to_string(),
             x: x,
             y: y,
         }
     }
 
-    pub fn click(&mut self, name: Option<&String>) {
-        match name {
-            Some(name) => self.text = name.to_string(),
-            None => self.text = self.usr.clone(),
-        }
+    pub fn set(&mut self, name: &String) {
+        self.text = name.clone();
     }
 
     pub fn on_click(_ctx: &mut EventCtx, data: &mut Cell, _env: &Env) {
-        data.click(None);
-        _ctx.submit_command(CHECK_FIELD);
+        _ctx.submit_command(FIELD_CLICKED.with(data.clone()));
     }
 
     pub fn reset(&mut self) {
@@ -315,13 +309,13 @@ mod test_field {
     #[test]
     fn test_col() {
         let mut field = GameField::init(&"kai".to_string(), 3, 3, 2);
-        field.set(ActionData {
+        field.set(&ActionData {
             usr: "tim".to_string(),
             x: 1,
             y: 0,
         });
 
-        field.set(ActionData {
+        field.set(&ActionData {
             usr: "tim".to_string(),
             x: 1,
             y: 1,
@@ -333,13 +327,13 @@ mod test_field {
     #[test]
     fn test_row() {
         let mut field = GameField::init(&"kai".to_string(), 3, 3, 2);
-        field.set(ActionData {
+        field.set(&ActionData {
             usr: "tim".to_string(),
             x: 1,
             y: 0,
         });
 
-        field.set(ActionData {
+        field.set(&ActionData {
             usr: "tim".to_string(),
             x: 2,
             y: 0,
@@ -351,13 +345,13 @@ mod test_field {
     #[test]
     fn test_diag_lr() {
         let mut field = GameField::init(&"kai".to_string(), 3, 3, 2);
-        field.set(ActionData {
+        field.set(&ActionData {
             usr: "tim".to_string(),
             x: 1,
             y: 0,
         });
 
-        field.set(ActionData {
+        field.set(&ActionData {
             usr: "tim".to_string(),
             x: 2,
             y: 1,
@@ -369,19 +363,19 @@ mod test_field {
     #[test]
     fn test_diag_rl() {
         let mut field = GameField::init(&"kai".to_string(), 4, 4, 3);
-        field.set(ActionData {
+        field.set(&ActionData {
             usr: "tim".to_string(),
             x: 2,
             y: 1,
         });
 
-        field.set(ActionData {
+        field.set(&ActionData {
             usr: "tim".to_string(),
             x: 1,
             y: 1,
         });
 
-        field.set(ActionData {
+        field.set(&ActionData {
             usr: "tim".to_string(),
             x: 0,
             y: 2,
