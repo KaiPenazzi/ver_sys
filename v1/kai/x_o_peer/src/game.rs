@@ -24,7 +24,7 @@ impl Game {
     pub fn from_init(init: InitData) -> Self {
         Self {
             field: GameField::init_with_fields(init.field, init.k),
-            scores: GameScores::new(),
+            scores: GameScores::from_vec(init.scores),
         }
     }
 

@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
+use crate::game::scores::Score;
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Message {
     pub r#type: String,
@@ -20,11 +22,19 @@ impl Message {
             data: json!(init),
         }
     }
+
+    pub fn join() -> Self {
+        Self {
+            r#type: "join".to_string(),
+            data: json!(""),
+        }
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct InitData {
     pub field: Vec<Vec<String>>,
+    pub scores: Vec<Score>,
     pub k: u32,
 }
 

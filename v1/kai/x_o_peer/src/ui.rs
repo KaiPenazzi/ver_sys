@@ -63,11 +63,15 @@ pub fn ui_builder() -> impl Widget<AppData> {
         );
         root.add_child(row);
     }
+
     {
         let mut row = Flex::row();
         row.add_child(
             Button::new("Create new Game")
                 .on_click(|_ev, appdata: &mut AppData, _env| appdata.manager.new_game()),
+        );
+        row.add_child(
+            Button::new("Join").on_click(|_ev, appdata: &mut AppData, _env| appdata.manager.join()),
         );
         root.add_child(row)
     }

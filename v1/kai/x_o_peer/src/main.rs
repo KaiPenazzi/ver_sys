@@ -29,7 +29,7 @@ struct AppData {
 
 #[tokio::main]
 async fn main() {
-    let (tx, mut rx) = mpsc::channel::<SendMsg>();
+    let (tx, rx) = mpsc::channel::<SendMsg>();
     let tx_arc = Arc::new(Mutex::new(tx));
     let manager = Manager::new("marius".to_string(), tx_arc);
     let app_data = AppData {

@@ -48,6 +48,7 @@ impl Manager {
         tx.send(SendMsg {
             msg: Message::init(InitData {
                 field: self.game.field.to_vec(),
+                scores: self.game.scores.to_vec(),
                 k: self.game.field.k,
             }),
             send_to: vec![Peer::new("127.0.0.1".to_string(), PORT_A)],
@@ -66,6 +67,15 @@ impl Manager {
         let tx = self.msg_q.lock().unwrap();
         tx.send(SendMsg {
             msg: Message::action(action),
+            send_to: vec![Peer::new("127.0.0.1".to_string(), PORT_A)],
+        })
+        .unwrap();
+    }
+
+    pub fn join(&self) {
+        let tx = self.msg_q.lock().unwrap();
+        tx.send(SendMsg {
+            msg: Message::join(),
             send_to: vec![Peer::new("127.0.0.1".to_string(), PORT_A)],
         })
         .unwrap();
@@ -92,6 +102,19 @@ impl Manager {
                 } else {
                     eprintln!("Fehler beim Parsen von 'action' Daten");
                 }
+            }
+            "join" => {
+                let tx = self.msg_q.lock().unwrap();
+                println!("send init");
+                tx.send(SendMsg {
+                    msg: Message::init(InitData {
+                        field: self.game.field.to_vec(),
+                        k: self.game.field.k,
+                        scores: self.game.scores.to_vec(),
+                    }),
+                    send_to: vec![Peer::new("127.0.0.1".to_string(), PORT_A)],
+                })
+                .unwrap();
             }
             _ => {
                 eprintln!("Unbekannter Nachrichtentyp: {}", msg.r#type);
