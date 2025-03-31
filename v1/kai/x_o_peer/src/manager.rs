@@ -1,4 +1,4 @@
-use druid::{Data, Lens};
+use druid::{im::Vector, Data, Lens};
 use std::sync::{
     mpsc::{Receiver, Sender},
     Arc, Mutex,
@@ -6,7 +6,10 @@ use std::sync::{
 
 use crate::{
     game::Game,
-    model::messages::{ActionData, InitData, Message, Peer, SendMsg},
+    model::{
+        com::{Peer, SendMsg},
+        messages::{ActionData, InitData, Message},
+    },
 };
 
 #[derive(Clone, Data, Lens)]
@@ -14,6 +17,7 @@ pub struct Manager {
     pub usr: String,
     pub game: Game,
     pub msg_q: Arc<Mutex<Sender<SendMsg>>>,
+    pub peers: Vector<Peer>,
 }
 
 impl Manager {
@@ -22,6 +26,7 @@ impl Manager {
             game: Game::new(4, 4, 3),
             usr: usr,
             msg_q: rx,
+            peers: Vector::new(),
         }
     }
 

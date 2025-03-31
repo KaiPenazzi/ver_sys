@@ -17,7 +17,7 @@ use coroutine::{run_cleint, run_server};
 use druid::{AppLauncher, Data, Lens, WindowDesc};
 use eve::Delegate;
 use manager::Manager;
-use model::messages::SendMsg;
+use model::com::SendMsg;
 use ui::ui_builder;
 
 #[derive(Clone, Data, Lens)]

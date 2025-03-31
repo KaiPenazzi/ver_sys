@@ -1,10 +1,13 @@
 use std::sync::mpsc;
 
-use crate::model::messages::SendMsg;
 use druid::Target;
 use tokio::net::UdpSocket;
 
-use crate::{eve::UDP_MSG_RECV, model::messages::Message, AppData, PORT};
+use crate::{
+    eve::UDP_MSG_RECV,
+    model::{com::SendMsg, messages::Message},
+    AppData, PORT,
+};
 
 pub async fn run_server(event_sink: druid::ExtEventSink) -> std::io::Result<()> {
     let socket = UdpSocket::bind(format!("0.0.0.0:{}", PORT)).await?;
