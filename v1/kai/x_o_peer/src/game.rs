@@ -34,4 +34,12 @@ impl Game {
             None => (),
         }
     }
+
+    pub fn to_init(&self) -> InitData {
+        InitData {
+            field: self.field.to_vec(),
+            scores: self.scores.to_vec(),
+            k: self.field.k,
+        }
+    }
 }

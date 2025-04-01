@@ -1,14 +1,16 @@
+use std::net::IpAddr;
+
 use druid::{Data, Lens};
 
 use super::messages::Message;
 
 #[derive(Debug, Clone, Data, Lens)]
 pub struct Peer {
-    ip: String,
-    port: u32,
+    pub ip: IpAddr,
+    pub port: u32,
 }
 impl Peer {
-    pub fn new(id: String, port: u32) -> Self {
+    pub fn new(id: IpAddr, port: u32) -> Self {
         Self { ip: id, port: port }
     }
     pub fn to_url(self) -> String {
@@ -19,4 +21,9 @@ impl Peer {
 pub struct SendMsg {
     pub msg: Message,
     pub send_to: Vec<Peer>,
+}
+
+pub struct RecvMsg {
+    pub msg: Message,
+    pub from: IpAddr,
 }

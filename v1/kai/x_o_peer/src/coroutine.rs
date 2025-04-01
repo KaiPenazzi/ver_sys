@@ -5,7 +5,10 @@ use tokio::net::UdpSocket;
 
 use crate::{
     eve::UDP_MSG_RECV,
-    model::{com::SendMsg, messages::Message},
+    model::{
+        com::{RecvMsg, SendMsg},
+        messages::Message,
+    },
     AppData, PORT,
 };
 
@@ -15,9 +18,16 @@ pub async fn run_server(event_sink: druid::ExtEventSink) -> std::io::Result<()> 
 
     let mut buf: [u8; 1024] = [0; 1024];
     loop {
-        let len = socket.recv(&mut buf).await?;
+        let (len, addr) = socket.recv_from(&mut buf).await?;
         let message: Message = serde_json::from_slice(&buf[..len])?;
-        let _ = event_sink.submit_command(UDP_MSG_RECV, message, Target::Global);
+        let _ = event_sink.submit_command(
+            UDP_MSG_RECV,
+            RecvMsg {
+                msg: message,
+                from: addr.ip(),
+            },
+            Target::Global,
+        );
     }
 }
 

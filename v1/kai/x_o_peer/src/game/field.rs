@@ -1,6 +1,9 @@
 use druid::{im::Vector, Data, Env, EventCtx, Lens};
 
-use crate::{eve::FIELD_CLICKED, model::messages::ActionData};
+use crate::{
+    eve::FIELD_CLICKED,
+    model::messages::{ActionData, InitData},
+};
 
 #[derive(Clone, Data, Lens)]
 pub struct GameField {

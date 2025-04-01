@@ -4,11 +4,14 @@ use druid::{AppDelegate, Command, DelegateCtx, Env, Handled, Selector, Target};
 
 use crate::{
     game::field::Cell,
-    model::messages::{ActionData, Message},
+    model::{
+        com::RecvMsg,
+        messages::{ActionData, Message},
+    },
     AppData,
 };
 
-pub const UDP_MSG_RECV: Selector<Message> = Selector::new("udp.rec");
+pub const UDP_MSG_RECV: Selector<RecvMsg> = Selector::new("udp.rec");
 pub const FIELD_CLICKED: Selector<Cell> = Selector::new("field.check");
 
 pub struct Delegate;
