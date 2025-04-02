@@ -5,7 +5,13 @@ public class Player
     private static String username;
     private static int port;
 
-    public static void get_player()
+    public Player(String username, int port)
+    {
+        this.username = username;
+        this.port = port;
+    }
+
+    public static Player get_player()
     {
         Scanner scanner = new Scanner(System.in);
 
@@ -14,6 +20,8 @@ public class Player
 
         System.out.println("Gib deinen Port an: ");
         port = scanner.nextInt();
+
+        return new Player(username, port);
     }
 
     public static String getUsername() {

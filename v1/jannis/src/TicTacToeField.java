@@ -35,8 +35,10 @@ public class TicTacToeField
         }
     }
 
-    public static boolean set_cross(int row, int col, String username)
+    public static boolean set_cross(int row, int col)
     {
+        Player player = Spiellogik.getPlayer();
+
         if (row < 0 || row >= height || col < 0 || col >= width)
         {
             return false;
@@ -46,7 +48,7 @@ public class TicTacToeField
         {
             return false;
         }
-        TicTacToeField.getField()[row][col] = username;
+        TicTacToeField.getField()[row][col] = player.getUsername();
         Json_converter.create_JSON(Json_converter.Message_type.ACTION);
         return true;
     }
