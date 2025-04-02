@@ -54,7 +54,7 @@ public class Board {
 
     public void printBoardTest(){
         for (int i = 0; i < FIELDSIZE; i++) {
-            System.out.print("|\n----------------\n");
+            System.out.print("\n----------------\n");
             for (int j = 0; j < FIELDSIZE; j++) {
                 System.out.print("|");
                 if (this.getBoard()[i][j].getNickname().equals("none")) {
@@ -62,10 +62,11 @@ public class Board {
                 }else {
                     System.out.print(this.getBoard()[i][j].getNickname());
                 }
-
+                if(j == FIELDSIZE -1)
+                    System.out.print("|");
             }
         }
-        System.out.print("|\n----------------\n");
+        System.out.print("\n----------------\n");
     }
 
 }

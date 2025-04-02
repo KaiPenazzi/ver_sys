@@ -10,7 +10,7 @@ public class Main {
 
 //        System.out.println("gib deinen Port an");
 //        int port = s.nextInt();
-String nickname = " X ";
+String nickname = "Leon";
 
         //UDP_Com.recv_UDP();
         //UDP_Com.send_UDP();

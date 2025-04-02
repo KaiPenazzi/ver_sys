@@ -13,9 +13,9 @@ public class Game {
 
     public void move( int x, int y, String username){
 
-        System.out.println(this.getGameBoard().getBoard()[x][y].getNickname());
-        if(this.getGameBoard().getBoard()[x][y].getNickname().equals("none")){
-            this.getGameBoard().getBoard()[x][y].setNickname(username);
+
+        if(this.getGameBoard().getBoard()[y][x].getNickname().equals("none")){
+            this.getGameBoard().getBoard()[y][x].setNickname(username);
         }
 
 
