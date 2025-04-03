@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Scanner;
 
 public class TicTacToeGUI {
     private JButton neuesSpielButton;
@@ -47,6 +48,7 @@ public class TicTacToeGUI {
             public void actionPerformed(ActionEvent e) {
                 updateWinCondition(); // Gewinnbedingung updaten
                 erstelleSpielfeld();
+                Spiellogik.start_new_Game(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
             }
         });
 
@@ -112,8 +114,7 @@ public class TicTacToeGUI {
     private void onFieldClicked(int row, int col, JButton feld) {
         System.out.println("Feld geklickt: Zeile " + row + ", Spalte " + col);
 
-        // Beispiel: Setze ein "X" oder "O", wenn das Feld leer ist
-        TicTacToeField.set_cross(row, col);
+        TicTacToeField.set_cross(row, col, true);
         feld.setText(Spiellogik.getPlayer().getUsername());
     }
 
@@ -126,7 +127,15 @@ public class TicTacToeGUI {
     }
 
     public static void main(String[] args) {
-        Player.get_player();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Gib deinen Usernamen an: ");
+        String username = scanner.nextLine();
+
+        System.out.println("Gib deinen Port an: ");
+        int port = scanner.nextInt();
+
+        Spiellogik.setPlayer(new Player(username, port));
         SwingUtilities.invokeLater(TicTacToeGUI::new);
     }
 }

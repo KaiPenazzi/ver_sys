@@ -7,20 +7,11 @@ public class TicTacToeField
     private static int k;
     private static String[][] field;
 
-    public static void get_field()
+    public static void createField(int row, int col)
     {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Gebe die Breite des Spielfelds an.");
-        width = scanner.nextInt();
-
-        System.out.println("Gebe die Höhe des Spielfelds an.");
-        height = scanner.nextInt();
-
-        System.out.println("Gebe die Anzahl an Steine in einer Reihe an.");
-        k = scanner.nextInt();
-
-        field = new String[height][width];
+        width = row;
+        height = col;
+        field = new String[row][col];
         fill_field();
     }
 
@@ -35,7 +26,7 @@ public class TicTacToeField
         }
     }
 
-    public static boolean set_cross(int row, int col)
+    public static boolean set_cross(int row, int col, boolean jsonMSG)
     {
         Player player = Spiellogik.getPlayer();
 
@@ -49,8 +40,23 @@ public class TicTacToeField
             return false;
         }
         TicTacToeField.getField()[row][col] = player.getUsername();
-        Json_converter.create_JSON(Json_converter.Message_type.ACTION);
+        if(jsonMSG)
+        {
+            Json_converter.create_JSON(Json_converter.Message_type.ACTION);
+        }
         return true;
+    }
+
+    public static void print_field()
+    {
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                System.out.print(field[i][j] + " ");
+            }
+            System.out.println("");
+        }
     }
 
     public static int getWidth() {

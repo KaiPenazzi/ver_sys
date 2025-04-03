@@ -23,6 +23,7 @@ public class Json_converter
                 break;
             case ACTION:
                 obj.put("type", "action");
+                TicTacToeField.print_field();
                 break;
             case JOIN:
                 obj.put("type", "join");
