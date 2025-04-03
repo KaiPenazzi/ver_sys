@@ -13,7 +13,7 @@ impl Peer {
     pub fn new(id: IpAddr, port: u32) -> Self {
         Self { ip: id, port: port }
     }
-    pub fn to_url(self) -> String {
+    pub fn to_url(&self) -> String {
         return format!("{}:{}", self.ip, self.port.to_string());
     }
 }
