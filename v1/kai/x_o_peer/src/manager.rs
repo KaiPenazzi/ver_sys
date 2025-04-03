@@ -25,11 +25,11 @@ pub struct Manager {
 }
 
 impl Manager {
-    pub fn new(usr: String, tx: Arc<Mutex<Sender<SendMsg>>>) -> Self {
+    pub fn new(usr: String, urls: Vec<String>, tx: Arc<Mutex<Sender<SendMsg>>>) -> Self {
         Self {
             game: Game::new(0, 0, 0),
             usr: usr,
-            msq_client: Client::new(tx),
+            msq_client: Client::new(tx, urls),
             x_size: 3.to_string(),
             y_size: 3.to_string(),
             k_size: 3.to_string(),

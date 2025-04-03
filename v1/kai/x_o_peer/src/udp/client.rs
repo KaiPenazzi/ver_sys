@@ -20,11 +20,15 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn new(tx: Arc<Mutex<Sender<SendMsg>>>) -> Self {
+    pub fn new(tx: Arc<Mutex<Sender<SendMsg>>>, urls: Vec<String>) -> Self {
         let mut client = Self {
             peers: Vector::new(),
             msg_q: tx,
         };
+
+        for url in urls {
+            client.peers.push_back(Peer::from_url(url))
+        }
 
         client.peers.push_back(Peer {
             ip: "127.0.0.1".parse().unwrap(),

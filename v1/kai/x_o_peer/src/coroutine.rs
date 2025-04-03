@@ -12,8 +12,8 @@ use crate::{
     AppData, PORT,
 };
 
-pub async fn run_server(event_sink: druid::ExtEventSink) -> std::io::Result<()> {
-    let socket = UdpSocket::bind(format!("0.0.0.0:{}", PORT)).await?;
+pub async fn run_server(event_sink: druid::ExtEventSink, port: String) -> std::io::Result<()> {
+    let socket = UdpSocket::bind(format!("0.0.0.0:{}", port)).await?;
     println!("server is running");
 
     let mut buf: [u8; 1024] = [0; 1024];
