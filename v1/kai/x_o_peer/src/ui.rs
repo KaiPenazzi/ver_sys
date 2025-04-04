@@ -78,7 +78,9 @@ pub fn ui_builder() -> impl Widget<AppData> {
 
     let list_cols = List::new(|| {
         let list_rows = List::new(|| {
-            Button::dynamic(|cell: &Cell, _env: &Env| cell.text.clone()).on_click(Cell::on_click)
+            Button::dynamic(|cell: &Cell, _env: &Env| cell.text.clone())
+                .on_click(Cell::on_click)
+                .fix_size(60., 60.)
         })
         .lens(Row::cells);
         Flex::column().with_child(list_rows)
