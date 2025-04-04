@@ -2,6 +2,7 @@ use druid::{
     widget::{BackgroundBrush, Button, Flex, Label, List, TextBox},
     Color, Env, LensExt, Widget, WidgetExt,
 };
+use ui_cell::UiCell;
 
 use crate::{
     game::{
@@ -12,6 +13,8 @@ use crate::{
     manager::Manager,
     AppData,
 };
+
+mod ui_cell;
 
 pub fn ui_builder() -> impl Widget<AppData> {
     let mut root = Flex::column();
@@ -78,9 +81,10 @@ pub fn ui_builder() -> impl Widget<AppData> {
 
     let list_cols = List::new(|| {
         let list_rows = List::new(|| {
-            Button::dynamic(|cell: &Cell, _env: &Env| cell.text.clone())
-                .on_click(Cell::on_click)
-                .fix_size(60., 60.)
+            //Button::dynamic(|cell: &Cell, _env: &Env| cell.text.clone())
+            //    .on_click(Cell::on_click)
+            //    .fix_size(60., 60.)
+            UiCell::new().on_click(Cell::on_click)
         })
         .lens(Row::cells);
         Flex::column().with_child(list_rows)

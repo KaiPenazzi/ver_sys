@@ -33,6 +33,8 @@ struct AppData {
 async fn main() {
     let args = Args::parse();
 
+    println!("{:?}", args);
+
     let (tx, rx) = mpsc::channel::<SendMsg>();
     let tx_arc = Arc::new(Mutex::new(tx));
     let manager = Manager::new(args.usr, args.urls, tx_arc);
