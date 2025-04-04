@@ -1,4 +1,4 @@
-use druid::{im::Vector, Data, Env, EventCtx, Lens};
+use druid::{im::Vector, Color, Data, Env, EventCtx, Lens};
 
 use crate::{
     eve::FIELD_CLICKED,
@@ -51,7 +51,7 @@ impl GameField {
 
         if let Some(row) = self.cols.get_mut(x) {
             if let Some(cell) = row.cells.get_mut(y) {
-                if cell.text != "None" {
+                if cell.text == "None" {
                     cell.set(&action.usr);
                 }
             }
@@ -326,6 +326,7 @@ pub struct Cell {
     pub text: String,
     pub x: u32,
     pub y: u32,
+    pub color: Color,
 }
 impl Cell {
     fn new(x: u32, y: u32) -> Self {
@@ -333,6 +334,7 @@ impl Cell {
             text: "None".to_string(),
             x: x,
             y: y,
+            color: Color::BLACK,
         }
     }
 
@@ -341,6 +343,7 @@ impl Cell {
             text: text,
             x: x,
             y: y,
+            color: Color::BLACK,
         }
     }
 

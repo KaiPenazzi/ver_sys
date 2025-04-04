@@ -1,6 +1,6 @@
 use druid::{
-    widget::{Button, Flex, Label, List, TextBox},
-    Env, LensExt, Widget, WidgetExt,
+    widget::{BackgroundBrush, Button, Flex, Label, List, TextBox},
+    Color, Env, LensExt, Widget, WidgetExt,
 };
 
 use crate::{
@@ -77,8 +77,10 @@ pub fn ui_builder() -> impl Widget<AppData> {
     }
 
     let list_cols = List::new(|| {
-        let list_rows =
-            List::new(|| TextBox::new().lens(Cell::text).on_click(Cell::on_click)).lens(Row::cells);
+        let list_rows = List::new(|| {
+            Button::dynamic(|cell: &Cell, _env: &Env| cell.text.clone()).on_click(Cell::on_click)
+        })
+        .lens(Row::cells);
         Flex::column().with_child(list_rows)
     })
     .horizontal()
