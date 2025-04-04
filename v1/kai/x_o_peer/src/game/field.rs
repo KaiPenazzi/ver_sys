@@ -51,7 +51,9 @@ impl GameField {
 
         if let Some(row) = self.cols.get_mut(x) {
             if let Some(cell) = row.cells.get_mut(y) {
-                cell.set(&action.usr);
+                if cell.text != "None" {
+                    cell.set(&action.usr);
+                }
             }
         }
     }
