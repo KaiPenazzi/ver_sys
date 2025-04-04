@@ -1,13 +1,9 @@
-use std::sync::Mutex;
 
 use druid::{AppDelegate, Command, DelegateCtx, Env, Handled, Selector, Target};
 
 use crate::{
     game::field::Cell,
-    model::{
-        com::RecvMsg,
-        messages::{ActionData, Message},
-    },
+    model::com::RecvMsg,
     AppData,
 };
 

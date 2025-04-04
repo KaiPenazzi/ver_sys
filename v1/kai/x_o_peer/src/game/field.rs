@@ -2,7 +2,7 @@ use druid::{im::Vector, Color, Data, Env, EventCtx, Lens};
 
 use crate::{
     eve::FIELD_CLICKED,
-    model::messages::{ActionData, InitData},
+    model::messages::ActionData,
 };
 
 #[derive(Clone, Data, Lens)]

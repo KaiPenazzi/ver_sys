@@ -1,17 +1,16 @@
-use druid::{im::Vector, Data, Env, EventCtx, Lens};
+use druid::{Data, Lens};
 use std::sync::{
-    mpsc::{Receiver, Sender},
+    mpsc::Sender,
     Arc, Mutex,
 };
 
 use crate::{
     game::Game,
     model::{
-        com::{Peer, RecvMsg, SendMsg},
-        messages::{ActionData, InitData, Message},
+        com::{RecvMsg, SendMsg},
+        messages::{ActionData, InitData},
     },
     udp::client::Client,
-    PORT_A,
 };
 
 #[derive(Clone, Data, Lens)]

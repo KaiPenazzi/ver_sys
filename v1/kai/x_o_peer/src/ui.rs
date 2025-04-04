@@ -1,6 +1,5 @@
 use druid::{
-    widget::{BackgroundBrush, Button, Flex, Label, List, TextBox},
-    Color, Env, LensExt, Widget, WidgetExt,
+    widget::{Button, Flex, Label, List, TextBox}, Env, LensExt, Widget, WidgetExt,
 };
 use ui_cell::UiCell;
 

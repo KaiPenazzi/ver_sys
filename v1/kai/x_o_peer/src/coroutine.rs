@@ -9,7 +9,6 @@ use crate::{
         com::{RecvMsg, SendMsg},
         messages::Message,
     },
-    AppData, PORT,
 };
 
 pub async fn run_server(event_sink: druid::ExtEventSink, port: String) -> std::io::Result<()> {
