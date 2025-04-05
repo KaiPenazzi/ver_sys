@@ -26,29 +26,26 @@ public class Board {
         return this.board;
     }
 
-    public boolean checkBoard(){
-        boolean pointScored = false;
-        if(this.checkRow()) {
-            pointScored = true;
-
-        }
+    public void checkBoard(){
+         int pointsScored = 0;
 
 
-        return false;
+
+
     }
-    public boolean checkRow(){
-        return false;
+    public int checkRow(){
+        return 0;
     }
 
-    public boolean checkColumn(){
-        return false;
+    public int checkColumn(){
+        return 0;
     }
 
-    public boolean checkDiagonal(){
-        return false;
+    public int checkDiagonal(){
+        return 0;
     }
 
-    public void removeRow(){
+    public void removeRows(){
 
     }
 
