@@ -1,5 +1,6 @@
+import org.json.JSONArray;
+
 import java.net.SocketException;
-import java.util.Scanner;
 
 public class TicTacToeField
 {
@@ -26,6 +27,24 @@ public class TicTacToeField
                 TicTacToeField.getField()[i][j] = "empty";
             }
         }
+    }
+
+    public static void set_game(JSONArray sended_field, int row, int col, int val)
+    {
+        createField(row, col, val);
+
+        for (int i = 0; i < height; i++){
+                JSONArray temp = sended_field.getJSONArray(i);
+            for (int j = 0; j < width; j++){
+                field[i][j] = temp.getString(j);
+            }
+        }
+        print_field();
+        width = col;
+        height = row;
+        k = val;
+
+        TicTacToeGUI.instance.setzeFeldMitDaten(field);
     }
 
     public static boolean set_cross(String username, int row, int col, boolean jsonMSG) throws SocketException {

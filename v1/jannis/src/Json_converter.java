@@ -54,7 +54,7 @@ public class Json_converter
                     cols = field.getJSONArray(0).length(); // Anzahl der Spalten in der ersten Zeile
                 }
 
-                Spiellogik.start_new_Game(rows, cols, obj.getInt("k"), false);
+                TicTacToeField.set_game(field, rows, cols, obj.getInt("k"));
                 break;
             case "action":
                 System.out.println("Action Message detected");

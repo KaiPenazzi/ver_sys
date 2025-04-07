@@ -6,6 +6,8 @@ import java.net.SocketException;
 import java.util.Scanner;
 
 public class TicTacToeGUI {
+    public static TicTacToeGUI instance;
+
     private JButton neuesSpielButton;
     private JButton joinButton;
     private JPanel spielfeld;
@@ -16,6 +18,7 @@ public class TicTacToeGUI {
     private int winCondition = 3; // Standardwert für Gewinnbedingung
 
     public TicTacToeGUI() {
+        instance = this;
         frame = new JFrame("Tic Tac Toe");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 500);
@@ -112,6 +115,41 @@ public class TicTacToeGUI {
             JOptionPane.showMessageDialog(frame, "Bitte gültige Zahlen für Breite und Höhe eingeben!", "Fehler", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    public void setzeFeldMitDaten(String[][] daten) {
+        int h = daten.length;
+        int w = daten[0].length;
+
+        spielfeld.removeAll();  // Altes Feld löschen
+        spielfeld.setLayout(new GridLayout(h, w));
+
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                JButton feld = new JButton();
+                feld.setFont(new Font("Arial", Font.PLAIN, 40));
+                feld.setFocusPainted(false);
+                feld.setPreferredSize(new Dimension(80, 80));
+                feld.setText(daten[i][j].equals("empty") ? "" : daten[i][j]);
+
+                final int row = i;
+                final int col = j;
+                feld.addActionListener(e -> {
+                    try {
+                        onFieldClicked(row, col, feld);
+                    } catch (SocketException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                });
+
+                spielfeld.add(feld);
+            }
+        }
+
+        spielfeld.revalidate();
+        spielfeld.repaint();
+    }
+
+
 
     private void updateWinCondition() {
         try {
