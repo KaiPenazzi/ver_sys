@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.SocketException;
 import java.util.Scanner;
 
 public class TicTacToeGUI {
@@ -48,7 +49,11 @@ public class TicTacToeGUI {
             public void actionPerformed(ActionEvent e) {
                 updateWinCondition(); // Gewinnbedingung updaten
                 erstelleSpielfeld();
-                Spiellogik.start_new_Game(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
+                try {
+                    Spiellogik.start_new_Game(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()), Integer.parseInt(value.getText()), true);
+                } catch (SocketException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
 
@@ -56,7 +61,11 @@ public class TicTacToeGUI {
         joinButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                onJoinClicked();
+                try {
+                    onJoinClicked();
+                } catch (SocketException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
 
@@ -84,7 +93,13 @@ public class TicTacToeGUI {
                     // MouseListener hinzufügen
                     final int row = i;
                     final int col = j;
-                    feld.addActionListener(e -> onFieldClicked(row, col, feld));
+                    feld.addActionListener(e -> {
+                        try {
+                            onFieldClicked(row, col, feld);
+                        } catch (SocketException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    });
 
                     spielfeld.add(feld);
                 }
@@ -111,22 +126,34 @@ public class TicTacToeGUI {
         }
     }
 
-    private void onFieldClicked(int row, int col, JButton feld) {
+    private void onFieldClicked(int row, int col, JButton feld) throws SocketException {
         System.out.println("Feld geklickt: Zeile " + row + ", Spalte " + col);
 
-        TicTacToeField.set_cross(row, col, true);
+        TicTacToeField.set_cross(Spiellogik.getPlayer().getUsername(), row, col, true);
         feld.setText(Spiellogik.getPlayer().getUsername());
     }
 
-    private void onJoinClicked() {
-        JOptionPane.showMessageDialog(frame, "Join-Funktion noch nicht implementiert!", "Info", JOptionPane.INFORMATION_MESSAGE);
+    private void onJoinClicked() throws SocketException {
+        Json_converter.create_JSON(Json_converter.Message_type.JOIN, 0, 0);
+        erstelleSpielfeld();
     }
 
     public int getWinCondition() {
         return winCondition;
     }
 
+
     public static void main(String[] args) {
+
+        new Thread(() -> {
+            try
+            {
+                UDP_communication.receive_udp();
+            } catch (SocketException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Gib deinen Usernamen an: ");

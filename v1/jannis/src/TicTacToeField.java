@@ -1,3 +1,4 @@
+import java.net.SocketException;
 import java.util.Scanner;
 
 public class TicTacToeField
@@ -7,10 +8,11 @@ public class TicTacToeField
     private static int k;
     private static String[][] field;
 
-    public static void createField(int row, int col)
+    public static void createField(int row, int col, int val)
     {
-        width = row;
-        height = col;
+        width = col;
+        height = row;
+        k = val;
         field = new String[row][col];
         fill_field();
     }
@@ -26,8 +28,7 @@ public class TicTacToeField
         }
     }
 
-    public static boolean set_cross(int row, int col, boolean jsonMSG)
-    {
+    public static boolean set_cross(String username, int row, int col, boolean jsonMSG) throws SocketException {
         Player player = Spiellogik.getPlayer();
 
         if (row < 0 || row >= height || col < 0 || col >= width)
@@ -39,10 +40,10 @@ public class TicTacToeField
         {
             return false;
         }
-        TicTacToeField.getField()[row][col] = player.getUsername();
+        TicTacToeField.getField()[row][col] = username;
         if(jsonMSG)
         {
-            Json_converter.create_JSON(Json_converter.Message_type.ACTION);
+            Json_converter.create_JSON(Json_converter.Message_type.ACTION, row, col);
         }
         return true;
     }

@@ -2,19 +2,17 @@ import java.io.IOException;
 import java.net.*;
 public class UDP_communication {
 
-    String addresses [] = {"192.168.5.2", "192.168.5.8"}; // todo check IP Adresses in Lab
+    //String addresses [] = {"192.168.5.2", "192.168.5.8"}; // todo check IP Adresses in Lab
 
-    public static void send_udp() throws SocketException {
-        String address = "192.168.5.2";
-        int port = 12345;
-        String message = "Hallo Leon";
+    public static void send_udp(String message) throws SocketException {
+        String address = "127.0.0.1";
 
         try(DatagramSocket socket = new DatagramSocket())
         {
             InetAddress serverIp = InetAddress.getByName(address);
             byte[] sendData = message.getBytes();
 
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverIp, port);
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverIp, Spiellogik.getPlayer().getPort());
             socket.send(sendPacket);
 
             System.out.println("Gesendete Nachricht: " + message);;
@@ -24,7 +22,7 @@ public class UDP_communication {
     }
 
     public static void receive_udp() throws SocketException {
-        int port = 12345;
+        int port = 54321;
         byte[] receive_buf  = new byte[1024];
 
         try(DatagramSocket socket = new DatagramSocket(port))
@@ -37,6 +35,7 @@ public class UDP_communication {
                 socket.receive(receivePacket);
 
                 String receiveData = new String (receivePacket.getData(), 0, receivePacket.getLength());
+                Json_converter.receive_JSON(receiveData);
                 System.out.println("Empfangene Daten : " + receiveData);
             }
 

@@ -1,5 +1,7 @@
 import org.json.*;
 
+import java.net.SocketException;
+
 public class Json_converter
 {
     public enum Message_type
@@ -9,8 +11,7 @@ public class Json_converter
         JOIN
     }
 
-    public static void create_JSON(Message_type type)
-    {
+    public static void create_JSON(Message_type type, int row, int col) throws SocketException {
         JSONObject obj = new JSONObject();
 
         switch (type)
@@ -23,6 +24,9 @@ public class Json_converter
                 break;
             case ACTION:
                 obj.put("type", "action");
+                obj.put("username", Spiellogik.getPlayer().getUsername());
+                obj.put("row", row);
+                obj.put("col", col);
                 TicTacToeField.print_field();
                 break;
             case JOIN:
@@ -31,13 +35,38 @@ public class Json_converter
             default:
                 break;
         }
+        UDP_communication.send_udp(obj.toString());
         System.out.println(obj.toString());
     }
 
-    public static void receive_JSON(String message)
-    {
+    public static void receive_JSON(String message) throws SocketException {
         JSONObject obj = new JSONObject(new JSONTokener(message));
 
+        switch (obj.getString("type"))
+        {
+            case "init":
+                System.out.println("Init Message detected");
+                JSONArray field = obj.getJSONArray("field");
 
+                int rows = field.length(); // Anzahl der Zeilen
+                int cols = 0;
+                if (rows > 0) {
+                    cols = field.getJSONArray(0).length(); // Anzahl der Spalten in der ersten Zeile
+                }
+
+                Spiellogik.start_new_Game(rows, cols, obj.getInt("k"), false);
+                break;
+            case "action":
+                System.out.println("Action Message detected");
+                TicTacToeField.set_cross(obj.getString("username"), obj.getInt("row"), obj.getInt("col"), false);
+                TicTacToeField.print_field();
+                break;
+            case "join":
+                System.out.println("Join Message detected");
+                create_JSON(Message_type.INIT, 0, 0); // row und col werden nicht verwendet
+                break;
+            default:
+                break;
+        }
     }
 }
