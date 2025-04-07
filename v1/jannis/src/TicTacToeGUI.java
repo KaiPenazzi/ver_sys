@@ -13,9 +13,11 @@ public class TicTacToeGUI {
     private JPanel spielfeld;
     private JTextField width;
     private JTextField height;
-    private JTextField value; // Textfeld für die Gewinnbedingung
+    private JTextField value;
     private JFrame frame;
-    private int winCondition = 3; // Standardwert für Gewinnbedingung
+    private int winCondition = 3;
+
+    private JButton[][] buttons; // Matrix zur Verwaltung der Spielfelder
 
     public TicTacToeGUI() {
         instance = this;
@@ -28,7 +30,7 @@ public class TicTacToeGUI {
         JPanel controlPanel = new JPanel();
         width = new JTextField("3", 3);
         height = new JTextField("3", 3);
-        value = new JTextField("3", 3); // Standardwert für Gewinnbedingung
+        value = new JTextField("3", 3);
 
         neuesSpielButton = new JButton("Neues Spiel");
         joinButton = new JButton("Join");
@@ -42,37 +44,32 @@ public class TicTacToeGUI {
         controlPanel.add(neuesSpielButton);
         controlPanel.add(joinButton);
 
-        // Spielfeld-Panel
         spielfeld = new JPanel();
         spielfeld.setLayout(new GridLayout(3, 3)); // Standardgröße
 
-        // ActionListener für den "Neues Spiel"-Button
-        neuesSpielButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateWinCondition(); // Gewinnbedingung updaten
-                erstelleSpielfeld();
-                try {
-                    Spiellogik.start_new_Game(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()), Integer.parseInt(value.getText()), true);
-                } catch (SocketException ex) {
-                    throw new RuntimeException(ex);
-                }
+        neuesSpielButton.addActionListener(e -> {
+            updateWinCondition();
+            erstelleSpielfeld(); // Nur leere Felder erzeugen
+            try {
+                Spiellogik.start_new_Game(
+                        Integer.parseInt(width.getText()),
+                        Integer.parseInt(height.getText()),
+                        Integer.parseInt(value.getText()),
+                        true
+                );
+            } catch (SocketException ex) {
+                throw new RuntimeException(ex);
             }
         });
 
-        // ActionListener für den "Join"-Button
-        joinButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    onJoinClicked();
-                } catch (SocketException ex) {
-                    throw new RuntimeException(ex);
-                }
+        joinButton.addActionListener(e -> {
+            try {
+                onJoinClicked();
+            } catch (SocketException ex) {
+                throw new RuntimeException(ex);
             }
         });
 
-        // Komponenten zum Frame hinzufügen
         frame.add(controlPanel, BorderLayout.NORTH);
         frame.add(spielfeld, BorderLayout.CENTER);
         frame.setVisible(true);
@@ -83,8 +80,9 @@ public class TicTacToeGUI {
             int w = Integer.parseInt(width.getText());
             int h = Integer.parseInt(height.getText());
 
-            spielfeld.removeAll();  // Altes Spielfeld leeren
-            spielfeld.setLayout(new GridLayout(h, w)); // Neues Layout setzen
+            spielfeld.removeAll();
+            spielfeld.setLayout(new GridLayout(h, w));
+            buttons = new JButton[h][w];
 
             for (int i = 0; i < h; i++) {
                 for (int j = 0; j < w; j++) {
@@ -93,7 +91,6 @@ public class TicTacToeGUI {
                     feld.setFocusPainted(false);
                     feld.setPreferredSize(new Dimension(80, 80));
 
-                    // MouseListener hinzufügen
                     final int row = i;
                     final int col = j;
                     feld.addActionListener(e -> {
@@ -104,13 +101,13 @@ public class TicTacToeGUI {
                         }
                     });
 
+                    buttons[i][j] = feld;
                     spielfeld.add(feld);
                 }
             }
 
-            spielfeld.revalidate(); // Layout aktualisieren
-            spielfeld.repaint();    // Neu zeichnen
-
+            spielfeld.revalidate();
+            spielfeld.repaint();
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(frame, "Bitte gültige Zahlen für Breite und Höhe eingeben!", "Fehler", JOptionPane.ERROR_MESSAGE);
         }
@@ -120,7 +117,8 @@ public class TicTacToeGUI {
         int h = daten.length;
         int w = daten[0].length;
 
-        spielfeld.removeAll();  // Altes Feld löschen
+        buttons = new JButton[h][w];
+        spielfeld.removeAll();
         spielfeld.setLayout(new GridLayout(h, w));
 
         for (int i = 0; i < h; i++) {
@@ -141,6 +139,7 @@ public class TicTacToeGUI {
                     }
                 });
 
+                buttons[i][j] = feld;
                 spielfeld.add(feld);
             }
         }
@@ -149,23 +148,25 @@ public class TicTacToeGUI {
         spielfeld.repaint();
     }
 
-
-
     private void updateWinCondition() {
         try {
             winCondition = Integer.parseInt(value.getText());
             if (winCondition < 2) {
                 JOptionPane.showMessageDialog(frame, "Die Gewinnbedingung muss mindestens 2 sein!", "Fehler", JOptionPane.ERROR_MESSAGE);
-                winCondition = 3; // Standardwert setzen
+                winCondition = 3;
             }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(frame, "Bitte eine gültige Zahl für die Gewinnbedingung eingeben!", "Fehler", JOptionPane.ERROR_MESSAGE);
-            winCondition = 3; // Standardwert setzen
+            winCondition = 3;
         }
     }
 
     private void onFieldClicked(int row, int col, JButton feld) throws SocketException {
         System.out.println("Feld geklickt: Zeile " + row + ", Spalte " + col);
+
+        if (!feld.getText().isEmpty()) {
+            return; // Bereits belegt – nichts tun
+        }
 
         TicTacToeField.set_cross(Spiellogik.getPlayer().getUsername(), row, col, true);
         feld.setText(Spiellogik.getPlayer().getUsername());
@@ -173,19 +174,21 @@ public class TicTacToeGUI {
 
     private void onJoinClicked() throws SocketException {
         Json_converter.create_JSON(Json_converter.Message_type.JOIN, 0, 0);
-        erstelleSpielfeld();
+        // Feld wird durch INIT-Nachricht gesetzt
     }
 
+    public void set_gui_cross(String username, int row, int col) {
+
+        buttons[row][col].setText(username);
+
+    }
     public int getWinCondition() {
         return winCondition;
     }
 
-
     public static void main(String[] args) {
-
         new Thread(() -> {
-            try
-            {
+            try {
                 UDP_communication.receive_udp();
             } catch (SocketException e) {
                 throw new RuntimeException(e);

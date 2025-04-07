@@ -59,6 +59,7 @@ public class Json_converter
             case "action":
                 System.out.println("Action Message detected");
                 TicTacToeField.set_cross(obj.getString("username"), obj.getInt("row"), obj.getInt("col"), false);
+                TicTacToeGUI.instance.set_gui_cross(obj.getString("username"), obj.getInt("row"), obj.getInt("col"));
                 TicTacToeField.print_field();
                 break;
             case "join":
