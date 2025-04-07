@@ -170,6 +170,7 @@ public class TicTacToeGUI {
 
         TicTacToeField.set_cross(Spiellogik.getPlayer().getUsername(), row, col, true);
         feld.setText(Spiellogik.getPlayer().getUsername());
+        Spiellogik.check_for_point(row, col);
     }
 
     private void onJoinClicked() throws SocketException {
@@ -180,6 +181,7 @@ public class TicTacToeGUI {
     public void set_gui_cross(String username, int row, int col) {
 
         buttons[row][col].setText(username);
+        Spiellogik.check_for_point(row, col);
 
     }
     public int getWinCondition() {

@@ -19,6 +19,60 @@ public class Spiellogik
         }
     }
 
+    public static void check_for_point(int row, int col) {
+        check_col(col);
+        check_row(row);
+    }
+
+    public static void check_col(int col) {
+
+        String[][] field = TicTacToeField.getField();
+        String current_name = field[0][col];
+        int counter = 0;
+
+        for(int i = 0; i < TicTacToeField.getHeight(); i++)
+        {
+            if(current_name.equals(field[i][col]))
+            {
+                counter++;
+            }
+            else
+            {
+                current_name = field[i][col];
+                counter = 0;
+            }
+
+            if (counter == TicTacToeField.getK())
+            {
+                System.out.println("Punkt gewonnen");
+            }
+        }
+    }
+
+    public static void check_row(int row) {
+
+        String[][] field = TicTacToeField.getField();
+        String current_name = field[row][0];
+        int counter = 0;
+
+        for(int i = 0; i < TicTacToeField.getHeight(); i++)
+        {
+            if(current_name.equals(field[row][i]))
+            {
+                counter++;
+            }
+            else
+            {
+                current_name = field[row][i];
+                counter = 0;
+            }
+
+            if (counter == TicTacToeField.getK())
+            {
+                System.out.println("Punkt gewonnen für Spieler " + current_name);
+            }
+        }
+    }
     public static Map<String, Integer> getPunktestand() {
         return punktestand;
     }

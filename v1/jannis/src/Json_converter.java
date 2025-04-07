@@ -27,7 +27,7 @@ public class Json_converter
                 obj.put("username", Spiellogik.getPlayer().getUsername());
                 obj.put("row", row);
                 obj.put("col", col);
-                TicTacToeField.print_field();
+                //TicTacToeField.print_field();
                 break;
             case JOIN:
                 obj.put("type", "join");
@@ -60,7 +60,7 @@ public class Json_converter
                 System.out.println("Action Message detected");
                 TicTacToeField.set_cross(obj.getString("username"), obj.getInt("row"), obj.getInt("col"), false);
                 TicTacToeGUI.instance.set_gui_cross(obj.getString("username"), obj.getInt("row"), obj.getInt("col"));
-                TicTacToeField.print_field();
+                //TicTacToeField.print_field();
                 break;
             case "join":
                 System.out.println("Join Message detected");

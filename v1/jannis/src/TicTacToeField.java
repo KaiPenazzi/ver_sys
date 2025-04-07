@@ -39,7 +39,7 @@ public class TicTacToeField
                 field[i][j] = temp.getString(j);
             }
         }
-        print_field();
+        //print_field();
         width = col;
         height = row;
         k = val;
@@ -67,7 +67,7 @@ public class TicTacToeField
         return true;
     }
 
-    public static void print_field()
+    /*public static void print_field()
     {
         for (int i = 0; i < width; i++)
         {
@@ -77,7 +77,7 @@ public class TicTacToeField
             }
             System.out.println("");
         }
-    }
+    }*/
 
     public static int getWidth() {
         return width;
