@@ -1,5 +1,10 @@
 use druid::{
-    widget::{Button, Flex, Label, List, TextBox}, Env, LensExt, Widget, WidgetExt,
+    theme::{
+        BUTTON_BORDER_RADIUS, BUTTON_DARK,
+        WINDOW_BACKGROUND_COLOR,
+    },
+    widget::{Button, Flex, Label, List, TextBox},
+    Color, Env, LensExt, Widget, WidgetExt,
 };
 use ui_cell::UiCell;
 
@@ -18,74 +23,61 @@ mod ui_cell;
 pub fn ui_builder() -> impl Widget<AppData> {
     let mut root = Flex::column();
 
-    //{
-    //    let mut row = Flex::row();
-    //    row.add_child(Label::new("port: "));
-    //    row.add_child(
-    //        TextBox::new()
-    //            .with_placeholder("port")
-    //            .lens(AppData::input_port)
-    //            .fix_width(200.0),
-    //    );
-    //    root.add_child(row);
-    //}
-
     {
         let mut row = Flex::row();
-        row.add_child(Label::new("x-size: "));
+        row.add_child(Label::new("x-size: ").padding((10., 0.)));
         row.add_child(
             TextBox::new()
                 .with_placeholder("x-size")
                 .lens(AppData::manager.then(Manager::x_size))
                 .fix_width(200.0),
         );
-        root.add_child(row);
+        root.add_child(row.padding((0., 2.)));
     }
 
     {
         let mut row = Flex::row();
-        row.add_child(Label::new("y-size: "));
+        row.add_child(Label::new("y-size: ").padding((10.0, 0.)));
         row.add_child(
             TextBox::new()
                 .with_placeholder("y-size")
                 .lens(AppData::manager.then(Manager::y_size))
                 .fix_width(200.0),
         );
-        root.add_child(row);
+        root.add_child(row.padding((0., 2.)));
     }
 
     {
         let mut row = Flex::row();
-        row.add_child(Label::new("k-size: "));
+        row.add_child(Label::new("k-size: ").padding((10.0, 0.)));
         row.add_child(
             TextBox::new()
                 .with_placeholder("k")
                 .lens(AppData::manager.then(Manager::k_size))
                 .fix_width(200.0),
         );
-        root.add_child(row);
+        root.add_child(row.padding((0., 2.)));
     }
 
     {
         let mut row = Flex::row();
         row.add_child(
-            Button::new("Create new Game")
-                .on_click(|_ev, appdata: &mut AppData, _env| appdata.manager.new_game()),
+            Button::new("New Game")
+                .on_click(|_ev, appdata: &mut AppData, _env| appdata.manager.new_game())
+                .fix_size(100., 50.)
+                .padding((10., 0.)),
         );
         row.add_child(
-            Button::new("Join").on_click(|_ev, appdata: &mut AppData, _env| appdata.manager.join()),
+            Button::new("Join")
+                .on_click(|_ev, appdata: &mut AppData, _env| appdata.manager.join())
+                .fix_size(100., 50.)
+                .padding((10., 0.)),
         );
-        root.add_child(row)
+        root.add_child(row.padding((0., 5.)))
     }
 
     let list_cols = List::new(|| {
-        let list_rows = List::new(|| {
-            //Button::dynamic(|cell: &Cell, _env: &Env| cell.text.clone())
-            //    .on_click(Cell::on_click)
-            //    .fix_size(60., 60.)
-            UiCell::new().on_click(Cell::on_click)
-        })
-        .lens(Row::cells);
+        let list_rows = List::new(|| UiCell::new().on_click(Cell::on_click)).lens(Row::cells);
         Flex::column().with_child(list_rows)
     })
     .horizontal()
@@ -105,4 +97,13 @@ pub fn ui_builder() -> impl Widget<AppData> {
     root.add_child(Flex::column().with_child(list_scores));
 
     root
+}
+
+pub fn my_theme(env: &mut Env, _data: &AppData) {
+    env.set(
+        WINDOW_BACKGROUND_COLOR,
+        Color::from_hex_str("#00001a").unwrap(),
+    );
+    env.set(BUTTON_DARK, Color::from_hex_str("#4d004d").unwrap());
+    env.set(BUTTON_BORDER_RADIUS, 2.);
 }

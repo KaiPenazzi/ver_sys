@@ -62,7 +62,7 @@ use std::hash::{Hash, Hasher};
 
 fn string_to_hex_color(input: &str) -> String {
     if input == "None" {
-        return "#eeeeee".to_string();
+        return "#2d2d33".to_string();
     }
 
     let mut hasher = DefaultHasher::new();

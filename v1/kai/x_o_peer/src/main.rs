@@ -19,6 +19,7 @@ use eve::Delegate;
 use manager::Manager;
 use model::com::SendMsg;
 use pars::Args;
+use ui::my_theme;
 use ui::ui_builder;
 
 #[derive(Clone, Data, Lens)]
@@ -55,6 +56,7 @@ async fn main() {
     tasks.push(tokio::spawn(run_cleint(rx)));
 
     launcher
+        .configure_env(my_theme)
         .delegate(Delegate)
         .log_to_console()
         .launch(app_data)
