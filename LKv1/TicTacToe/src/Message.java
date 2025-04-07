@@ -3,9 +3,14 @@ public class Message{
     private String type;
     private MessageData data;
 
+    /**
+     * Message Datentyp der an Peers gesendet wird
+     */
     public Message(){
-    
+        this.type = null;
+        this.data = null;
     }
+
     public Message(String type, MessageData data){
         this.type = type;
         this.data = data;

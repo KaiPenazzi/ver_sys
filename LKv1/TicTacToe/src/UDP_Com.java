@@ -1,51 +1,87 @@
-import javax.xml.crypto.Data;
-import java.net.DatagramSocket;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.*;
 
 
 public class UDP_Com {
-    public static void recv_UDP(){
-        int port = 12345;
-         try{
-             DatagramSocket socket = new DatagramSocket(port);
-             byte[] buf = new byte[1024];
-             DatagramPacket packet = new DatagramPacket(buf, buf.length);
-             System.out.println("waiting for Msg");
-             socket.receive(packet);
-             System.out.println("waiting for Msg");
-             String recvMsg = new String(packet.getData(), 0 , packet.getLength());
-             System.out.println(recvMsg);
+    private static DatagramSocket socket;
 
-             socket.close();
-
-         } catch (Exception e) {
-             e.printStackTrace();
-         }
-
+    /**
+     * Anfangs wird der Socket einmal für den Port geöffnet um so mehrfache Öffnungsversuche zu verhindern
+     * @param port
+     */
+    public static void socketInitializer(int port) throws SocketException {
+        if (socket == null || socket.isClosed()){
+            socket = new DatagramSocket(port);
+        }
+    }
+    public static void socketClose(){
+        if(socket!= null && !socket.isClosed()){
+            socket.close();
+        }
 
     }
 
-    public static void send_UDP(){
+    /**
+     * empfange UDP Nachricht in Json Format. Parse auf Message Objekt
+     * @return Message Objekt aus übertragenem Json File
+     */
+    public static Message recv_UDP(){
+        Message message = new Message();
+         try{
+             socket.setSoTimeout((100));
+             byte[] buf = new byte[1024];
+             DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
-        int port = 12345;
-        String ip = "192.168.5.6";
-        String msg = "Test Jannis";
+             socket.receive(packet);
+             if (packet.getPort() == socket.getLocalPort()){
+                 return null;
+             }
 
-        try{
-            DatagramSocket socket = new DatagramSocket();
+             String recvMsg = new String(packet.getData(), 0 , packet.getLength());
+             if(!recvMsg.equals("") &&  recvMsg != null){
+                 message = Msg_Conversion.processIncomingMessage(recvMsg);
+             }
+             System.out.println(message.getType() + " message recveived");
 
-            byte[] data = msg.getBytes();
-            InetAddress address = InetAddress.getByName(ip);
-            DatagramPacket packet = new DatagramPacket(data,data.length,address,port);
-            socket.send(packet);
+             message = Msg_Conversion.processIncomingMessage(recvMsg);
 
-            socket.close();
+         }catch (SocketTimeoutException e){
+             return null;
+         }
+         catch (Exception e) {
+             e.printStackTrace();
+         }
+         return message;
 
-        } catch (Exception e) {
-            e.printStackTrace();
+    }
+
+    /**
+     *  sende eine Nachricht per UDP an alle Peers (nicht an sich selbst)
+     *  die message wird erst in ein Json Objekt serialisiert und dann gesendet
+     * @param message zuvor erstellte Message
+     *
+     */
+    public static void send_UDP(Message message){
+        for (Player p : Game.players  ){
+            try{
+            int port = p.getPort();
+            String ip = p.getIp();
+            if(port != Game.myPort) {
+                String jsonMessage = Msg_Conversion.createJSONFromMessage(message);
+                DatagramSocket socket = new DatagramSocket();
+                byte[] data = jsonMessage.getBytes();
+                InetAddress address = InetAddress.getByName(ip);
+                DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
+                socket.send(packet);
+                System.out.println(message.getType() + " message sent");
+                socket.close();
+            }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
+
     }
 
 

@@ -34,5 +34,9 @@ public class ActionMessageData extends MessageData {
         this.usr = usr;
     }
 
+    @Override
+    public void printData(){
+        System.out.println(x + "   " + y +"   "+ usr);
 
+    }
 }
