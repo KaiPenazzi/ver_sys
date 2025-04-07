@@ -1,5 +1,5 @@
 use std::{
-    net::{IpAddr, SocketAddr},
+    net::{AddrParseError, IpAddr, SocketAddr},
     str::FromStr,
 };
 
@@ -19,12 +19,18 @@ impl Peer {
     pub fn to_url(&self) -> String {
         return format!("{}:{}", self.ip, self.port.to_string());
     }
-    pub fn from_url(url: String) -> Self {
-        let addr = SocketAddr::from_str(&url).unwrap();
-        Self {
-            ip: addr.ip(),
-            port: addr.port().try_into().unwrap(),
+    pub fn from_url(url: &str) -> Option<Self> {
+        match SocketAddr::from_str(url) {
+            Ok(addr) => {
+                return Some(Self {
+                    ip: addr.ip(),
+                    port: addr.port().try_into().unwrap(),
+                });
+            }
+            Err(_) => println!("could not parse the url: {}", url),
         }
+
+        None
     }
 }
 

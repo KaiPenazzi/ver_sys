@@ -3,7 +3,7 @@ use std::{
     sync::{mpsc::Sender, Arc, Mutex},
 };
 
-use druid::{im::Vector, Data};
+use druid::{im::Vector, Data, Lens};
 
 use crate::{
     model::{
@@ -13,9 +13,10 @@ use crate::{
     PORT_A,
 };
 
-#[derive(Data, Clone)]
+#[derive(Data, Clone, Lens)]
 pub struct Client {
-    peers: Vector<Peer>,
+    pub peers: Vector<Peer>,
+    pub new_url: String,
     msg_q: Arc<Mutex<Sender<SendMsg>>>,
 }
 
@@ -24,18 +25,24 @@ impl Client {
         let mut client = Self {
             peers: Vector::new(),
             msg_q: tx,
+            new_url: "".to_string(),
         };
 
         for url in urls {
-            client.peers.push_back(Peer::from_url(url))
+            client.peers.push_back(Peer::from_url(&url).unwrap())
         }
 
-        client.peers.push_back(Peer {
-            ip: "127.0.0.1".parse().unwrap(),
-            port: PORT_A,
-        });
-
         client
+    }
+
+    pub fn add(&mut self) {
+        match Peer::from_url(&self.new_url) {
+            Some(peer) => {
+                self.peers.push_back(peer);
+                self.new_url = "".to_string()
+            }
+            None => {}
+        }
     }
 
     fn send(&self, data: Message, to: Option<IpAddr>) {
@@ -76,7 +83,11 @@ impl Client {
     }
 
     pub fn send_join(&self) {
-        let peer = self.peers.get(0).unwrap();
-        self.send(Message::join(), Some(peer.ip.clone()));
+        let peer = self.peers.get(0);
+
+        match peer {
+            Some(peer) => self.send(Message::join(), Some(peer.ip.clone())),
+            None => println!("no peer is known"),
+        }
     }
 }
