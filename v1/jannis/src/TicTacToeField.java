@@ -47,6 +47,11 @@ public class TicTacToeField
         TicTacToeGUI.instance.setzeFeldMitDaten(field);
     }
 
+    public static void reset(int row, int col)
+    {
+        field[row][col] = "empty";
+    }
+
     public static boolean set_cross(String username, int row, int col, boolean jsonMSG) throws SocketException {
         Player player = Spiellogik.getPlayer();
 
