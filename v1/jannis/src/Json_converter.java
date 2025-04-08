@@ -61,6 +61,7 @@ public class Json_converter
                 TicTacToeField.set_cross(obj.getString("username"), obj.getInt("row"), obj.getInt("col"), false);
                 TicTacToeGUI.instance.set_gui_cross(obj.getString("username"), obj.getInt("row"), obj.getInt("col"));
 
+
                 String username = obj.getString("username");
 
                 if (!Spiellogik.getPunktestand().containsKey(username)) {

@@ -142,7 +142,13 @@ public class TicTacToeGUI {
                 feld.setFont(new Font("Arial", Font.PLAIN, 40));
                 feld.setFocusPainted(false);
                 feld.setPreferredSize(new Dimension(80, 80));
-                feld.setText(daten[i][j].equals("empty") ? "" : daten[i][j]);
+                if (daten[i][j].equals("empty")) {
+                    feld.setText("");
+                }
+                else {
+                    feld.setBackground(getColorForString(daten[i][j]));
+                }
+                //feld.setText(daten[i][j].equals("empty") ? "" : daten[i][j]);
 
                 final int row = i;
                 final int col = j;
@@ -182,7 +188,8 @@ public class TicTacToeGUI {
         }
 
         TicTacToeField.set_cross(Spiellogik.getPlayer().getUsername(), row, col, true);
-        feld.setText(Spiellogik.getPlayer().getUsername());
+        //feld.setText(Spiellogik.getPlayer().getUsername());
+        buttons[row][col].setBackground(getColorForString(Spiellogik.getPlayer().getUsername()));
         Spiellogik.check_for_point(row, col);
     }
 
@@ -191,7 +198,8 @@ public class TicTacToeGUI {
     }
 
     public void set_gui_cross(String username, int row, int col) {
-        buttons[row][col].setText(username);
+        buttons[row][col].setBackground(getColorForString(username));
+        //buttons[row][col].setText(username);
         Spiellogik.check_for_point(row, col);
     }
 
@@ -214,6 +222,16 @@ public class TicTacToeGUI {
 
     public int getWinCondition() {
         return winCondition;
+    }
+
+    private Color getColorForString(String value) {
+        // Nutzerabhängige Farbe
+        int hash = value.hashCode();
+        //rot, grün und blau wert berechnen
+        int r = (hash & 0xFF0000) >> 16;
+        int g = (hash & 0x00FF00) >> 8;
+        int b = (hash & 0x0000FF);
+        return new Color(r, g, b).brighter();
     }
 
     public static void main(String[] args) {
