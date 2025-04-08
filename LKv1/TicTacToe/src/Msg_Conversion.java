@@ -19,15 +19,15 @@ public class Msg_Conversion {
         Message message = new Message();
         String type = obj.getString("type");
         switch (type){
-            case "Action":
-                message.setType("Action");
-                ActionMessageData actiondata = new ActionMessageData(obj.getInt("x"), obj.getInt("y"), obj.getString("user") );
+            case "action":
+                message.setType("action");
+                ActionMessageData actiondata = new ActionMessageData(obj.getInt("x"), obj.getInt("y"), obj.getString("usr") );
                 message.setData(actiondata);
                 break;
-            case "Init":
-                message.setType("Init");
+            case "init":
+                message.setType("init");
 
-                JSONObject pointObj = obj.getJSONObject("points");
+                JSONObject pointObj = obj.getJSONObject("score");
                 HashMap<String,Integer> points = new HashMap<String,Integer>();
                 //Rangliste parsen
                 for ( String key : pointObj.keySet()){
@@ -35,7 +35,7 @@ public class Msg_Conversion {
                     points.put(key, val);
                 }
 
-                JSONArray boardArr = obj.getJSONArray("board");
+                JSONArray boardArr = obj.getJSONArray("field");
                 //board parsen
                 int size = boardArr.length();
                 String[][] fields = new String[size][size];
@@ -52,8 +52,8 @@ public class Msg_Conversion {
                 message.setData(initData);
 
                 break;
-            case "Join":
-                message.setType("Join");
+            case "join":
+                message.setType("join");
                 break;
         }
 
@@ -71,18 +71,18 @@ public class Msg_Conversion {
         JSONObject obj = new JSONObject();
         String jsonString = "";
         switch(message.getType()){
-            case "Action":
+            case "action":
                 ActionMessageData actionData = (ActionMessageData) message.getData();
-                obj.put("type", "Action");
+                obj.put("type", "action");
                 obj.put("x", actionData.getX());
                 obj.put("y", actionData.getY());
-                obj.put("user",actionData.getUsr());
+                obj.put("usr",actionData.getUsr());
                 jsonString = obj.toString(4);
                 System.out.println(jsonString);
                 break;
-            case "Init":
+            case "init":
                 InitMessageData initData = (InitMessageData) message.getData();
-                obj.put("type", "Init");
+                obj.put("type", "init");
                 JSONArray boardJson = new JSONArray();
                 for (String[] row : initData.getBoard().getBoard() ){
                     JSONArray jRow = new JSONArray();
@@ -91,18 +91,18 @@ public class Msg_Conversion {
                     }
                     boardJson.put(jRow);
                 }
-                obj.put("board", boardJson);
+                obj.put("field", boardJson);
                 JSONObject pointsJson = new JSONObject();
                 for(String user : initData.points.keySet()){
                     pointsJson.put(user, initData.points.get(user));
                 }
-                obj.put("points", pointsJson);
+                obj.put("score", pointsJson);
                 jsonString = obj.toString(4);
 
                 break;
 
-            case "Join":
-                obj.put("type","Join");
+            case "join":
+                obj.put("type","join");
                 jsonString = obj.toString(4);
                 break;
         }

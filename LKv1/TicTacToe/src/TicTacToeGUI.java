@@ -80,7 +80,7 @@ public class TicTacToeGUI {
                 throw new RuntimeException(ex);
             }
             game = new Game(new Board(), new HashMap<String, Integer>(), port);
-            Message joinMessage = new Message("Join", null);
+            Message joinMessage = new Message("join", null);
             UDP_Com.send_UDP(joinMessage);
             // warte 2 sek ob eine Init nachricht kommt
             Message returnedMessage = UDP_Com.recv_UDP();
@@ -88,7 +88,7 @@ public class TicTacToeGUI {
                 if (returnedMessage.getType().equals("join")) {
                     //es existiert noch kein spiel/ keine Init erhalten
 
-                } else if (returnedMessage.getType().equals("Init")) {
+                } else if (returnedMessage.getType().equals("init")) {
                     InitMessageData msg = (InitMessageData) returnedMessage.getData();
                     System.out.println(msg.getBoard().getFieldSize() + msg.getBoard().getK());
                     game.setGameBoard(msg.getBoard());
@@ -115,7 +115,7 @@ public class TicTacToeGUI {
                     initBoard(game.getGameBoard());
                     game.setRunning(true);
                     InitMessageData initData = new InitMessageData(game.getRanking(), game.getGameBoard());
-                    Message initMsg = new Message("Init", initData);
+                    Message initMsg = new Message("init", initData);
                     UDP_Com.send_UDP(initMsg);
                 }
 
@@ -146,7 +146,7 @@ public class TicTacToeGUI {
                     if (game.move(finalX, finalY, username)) {
                         //sende move per udp
                         ActionMessageData moveData = new ActionMessageData(finalX, finalY, username);
-                        Message moveMessage = new Message("Action", moveData);
+                        Message moveMessage = new Message("action", moveData);
                         UDP_Com.send_UDP(moveMessage);
                         updateBoardButtonColors();
                         //game.getGameBoard().printBoardTest();
@@ -228,7 +228,7 @@ public class TicTacToeGUI {
             if (incomingMessage != null) {
                 System.out.println(incomingMessage.getType());
                 switch (incomingMessage.getType()) {
-                    case "Init":
+                    case "init":
                         if (!game.isRunning()) {
                             InitMessageData initMessage = (InitMessageData) incomingMessage.getData();
                             game.setGameBoard(initMessage.getBoard());
@@ -240,18 +240,19 @@ public class TicTacToeGUI {
                             game.setRunning(true);
                         }
                         break;
-                    case "Action":
+                    case "action":
                         if (game.isRunning()) {
                             ActionMessageData actionMessage = (ActionMessageData) incomingMessage.getData();
                             game.move(actionMessage.getX(), actionMessage.getY(), actionMessage.getUsr());
                             updateBoardButtonColors();
+                            refreshRankingDisplay();
                         }
                         break;
 
-                    case "Join":
+                    case "join":
                         if (game.isRunning()) {
                             InitMessageData joinAnswerdata = new InitMessageData(game.getRanking(), game.getGameBoard());
-                            Message joinAnswer = new Message("Init", joinAnswerdata);
+                            Message joinAnswer = new Message("init", joinAnswerdata);
                             UDP_Com.send_UDP(joinAnswer);
                         }
                         break;
