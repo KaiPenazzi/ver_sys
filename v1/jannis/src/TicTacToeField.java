@@ -69,6 +69,7 @@ public class TicTacToeField
         {
             Json_converter.create_JSON(Json_converter.Message_type.ACTION, row, col);
         }
+
         return true;
     }
 

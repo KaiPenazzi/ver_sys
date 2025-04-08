@@ -10,7 +10,7 @@ public class Spiellogik
 
     public static void start_new_Game(int row, int col, int val, boolean jsonmsg) throws SocketException {
         TicTacToeField.createField(row, col, val);
-        TicTacToeGUI.instance.updateRanking(player.getUsername());
+        TicTacToeGUI.instance.updateRanking(Spiellogik.getPunktestand());
         if(jsonmsg) {
             Json_converter.create_JSON(Json_converter.Message_type.INIT, row, col); // row und col werden in dem Fall nicht verwendet
             System.out.println("Neues Spiel");
@@ -24,69 +24,62 @@ public class Spiellogik
         check_row(row);
         check_col(col);
         check_diagonal();
+        TicTacToeGUI.instance.updateRanking(punktestand);
     }
 
     public static void check_col(int col) {
-
         String[][] field = TicTacToeField.getField();
-        String current_name = field[0][col];
+        String current_name = "";
         int counter = 0;
 
-        for(int i = 0; i < TicTacToeField.getHeight(); i++)
-        {
-            if(current_name.equals(field[i][col]))
-            {
+        for (int i = 0; i < TicTacToeField.getHeight(); i++) {
+            String cell = field[i][col];
+            if (!cell.equals("empty") && cell.equals(current_name)) {
                 counter++;
-            }
-            else
-            {
-                current_name = field[i][col];
-                counter = 0;
+            } else {
+                current_name = cell;
+                counter = cell.equals("empty") ? 0 : 1;
             }
 
-            if (counter == TicTacToeField.getK())
-            {
-                System.out.println("Punkt gewonnen");
-                for(int offset = 0; offset < TicTacToeField.getWidth(); offset++)
-                {
+            if (counter == TicTacToeField.getK()) {
+                System.out.println("Punkt gewonnen für Spieler " + current_name);
+                for (int offset = 0; offset < TicTacToeField.getK(); offset++) {
                     TicTacToeField.reset(i - offset, col);
                 }
                 TicTacToeGUI.instance.setzeFeldMitDaten(TicTacToeField.getField());
-                TicTacToeGUI.instance.updateRanking(player.getUsername());
+                punktestand.put(current_name, punktestand.getOrDefault(current_name, 0) + 1);
+                return; // nach Treffer direkt abbrechen
             }
         }
     }
 
-    public static void check_row(int row) {
 
+    public static void check_row(int row) {
         String[][] field = TicTacToeField.getField();
-        String current_name = field[row][0];
+        String current_name = "";
         int counter = 0;
 
-        for(int i = 0; i < TicTacToeField.getHeight(); i++)
-        {
-            if(current_name.equals(field[row][i]))
-            {
+        for (int i = 0; i < TicTacToeField.getWidth(); i++) {
+            String cell = field[row][i];
+            if (!cell.equals("empty") && cell.equals(current_name)) {
                 counter++;
-            }
-            else
-            {
-                current_name = field[row][i];
-                counter = 0;
+            } else {
+                current_name = cell;
+                counter = cell.equals("empty") ? 0 : 1;
             }
 
-            if (counter == TicTacToeField.getK())
-            {
+            if (counter == TicTacToeField.getK()) {
                 System.out.println("Punkt gewonnen für Spieler " + current_name);
-                for(int offset = 0; offset < TicTacToeField.getWidth(); offset++)
-                {
+                for (int offset = 0; offset < TicTacToeField.getK(); offset++) {
                     TicTacToeField.reset(row, i - offset);
                 }
                 TicTacToeGUI.instance.setzeFeldMitDaten(TicTacToeField.getField());
-                TicTacToeGUI.instance.updateRanking(player.getUsername());
+                punktestand.put(current_name, punktestand.getOrDefault(current_name, 0) + 1);
+                return;
             }
         }
     }
+
 
     public static void check_diagonal() {
         String[][] field = TicTacToeField.getField();
@@ -115,7 +108,7 @@ public class Spiellogik
                         TicTacToeField.reset(row + offset, col + offset);
                     }
                     TicTacToeGUI.instance.setzeFeldMitDaten(TicTacToeField.getField());
-                    TicTacToeGUI.instance.updateRanking(player.getUsername());
+                    punktestand.put(current_name, punktestand.getOrDefault(current_name, 0) + 1);
                 }
             }
         }
@@ -141,7 +134,7 @@ public class Spiellogik
                         TicTacToeField.reset(row + offset, col - offset);
                     }
                     TicTacToeGUI.instance.setzeFeldMitDaten(TicTacToeField.getField());
-                    TicTacToeGUI.instance.updateRanking(player.getUsername());
+                    punktestand.put(current_name, punktestand.getOrDefault(current_name, 0) + 1);
                 }
             }
         }

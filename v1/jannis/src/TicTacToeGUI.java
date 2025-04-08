@@ -195,14 +195,14 @@ public class TicTacToeGUI {
         Spiellogik.check_for_point(row, col);
     }
 
-    public void updateRanking(String playerName) {
-        ranking.put(playerName, ranking.getOrDefault(playerName, -1) + 1);
-
+    public void updateRanking(Map<String, Integer> ranking) {
         rankingModel.clear();
+
         ranking.entrySet().stream()
-                .sorted((a, b) -> b.getValue() - a.getValue())
+                .sorted((a, b) -> b.getValue().compareTo(a.getValue())) // absteigend nach Punkten
                 .forEach(entry -> rankingModel.addElement(entry.getKey() + ": " + entry.getValue()));
     }
+
 
     public void resetField() {
         for (JButton[] row : buttons) {
@@ -236,7 +236,7 @@ public class TicTacToeGUI {
         Spiellogik.setPlayer(new Player(username, port));
 
         Map<String, Integer> ranking = new HashMap<>();
-        ranking.put(username, -1);
+        ranking.put(username, 0);
         Spiellogik.setPunktestand(ranking);
         SwingUtilities.invokeLater(TicTacToeGUI::new);
     }
