@@ -225,12 +225,12 @@ public class TicTacToeGUI {
     }
 
     private Color getColorForString(String value) {
-        // Nutzerabhängige Farbe
         int hash = value.hashCode();
-        //rot, grün und blau wert berechnen
+
         int r = (hash & 0xFF0000) >> 16;
         int g = (hash & 0x00FF00) >> 8;
         int b = (hash & 0x0000FF);
+
         return new Color(r, g, b).brighter();
     }
 

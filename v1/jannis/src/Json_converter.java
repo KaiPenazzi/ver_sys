@@ -1,4 +1,5 @@
 import org.json.*;
+import java.util.HashMap;
 
 import java.net.SocketException;
 
@@ -53,6 +54,16 @@ public class Json_converter
                 if (rows > 0) {
                     cols = field.getJSONArray(0).length(); // Anzahl der Spalten in der ersten Zeile
                 }
+
+                JSONObject pointObj = obj.getJSONObject("Punktestand");
+                HashMap<String,Integer> ranking = new HashMap<String,Integer>();
+                //Rangliste parsen
+                for ( String key : pointObj.keySet()){
+                    int val = pointObj.getInt(key);
+                    ranking.put(key, val);
+                }
+                Spiellogik.setPunktestand(ranking);
+                TicTacToeGUI.instance.updateRanking(ranking);
 
                 TicTacToeField.set_game(field, rows, cols, obj.getInt("k"));
                 break;
