@@ -6,23 +6,28 @@ public class UDP_communication {
 
     public static void send_udp(String message) throws SocketException {
         String address = "127.0.0.1";
+        int[] ports = { 1111, 2222, 3333};
 
         try(DatagramSocket socket = new DatagramSocket())
         {
-            InetAddress serverIp = InetAddress.getByName(address);
-            byte[] sendData = message.getBytes();
+           for (int i = 0; i < ports.length; i++) {
+               if (ports[i] != Spiellogik.getPlayer().getPort()) {
+                   InetAddress serverIp = InetAddress.getByName(address);
+                   byte[] sendData = message.getBytes();
 
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverIp, Spiellogik.getPlayer().getPort());
-            socket.send(sendPacket);
+                   DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverIp, ports[i]);
+                   socket.send(sendPacket);
 
-            System.out.println("Gesendete Nachricht: " + message);;
+                   System.out.println("Gesendete Nachricht: " + message);;
+               }
+           }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public static void receive_udp() throws SocketException {
-        int port = 54321;
+        int port = Spiellogik.getPlayer().getPort();
         byte[] receive_buf  = new byte[1024];
 
         try(DatagramSocket socket = new DatagramSocket(port))

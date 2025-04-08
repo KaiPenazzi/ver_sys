@@ -235,14 +235,6 @@ public class TicTacToeGUI {
     }
 
     public static void main(String[] args) {
-        new Thread(() -> {
-            try {
-                UDP_communication.receive_udp();
-            } catch (SocketException e) {
-                throw new RuntimeException(e);
-            }
-        }).start();
-
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Gib deinen Usernamen an: ");
@@ -252,6 +244,14 @@ public class TicTacToeGUI {
         int port = scanner.nextInt();
 
         Spiellogik.setPlayer(new Player(username, port));
+
+        new Thread(() -> {
+            try {
+                UDP_communication.receive_udp();
+            } catch (SocketException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
 
         Map<String, Integer> ranking = new HashMap<>();
         ranking.put(username, 0);
