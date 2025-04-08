@@ -61,7 +61,7 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
 fn string_to_hex_color(input: &str) -> String {
-    if input == "None" {
+    if input == "none" {
         return "#2d2d33".to_string();
     }
 

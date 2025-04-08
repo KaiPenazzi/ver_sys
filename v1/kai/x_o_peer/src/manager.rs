@@ -1,8 +1,5 @@
 use druid::{Data, Lens};
-use std::sync::{
-    mpsc::Sender,
-    Arc, Mutex,
-};
+use std::sync::{mpsc::Sender, Arc, Mutex};
 
 use crate::{
     game::Game,
@@ -68,7 +65,7 @@ impl Manager {
         match msg.r#type.as_str() {
             "init" => {
                 if let Ok(init) = serde_json::from_value::<InitData>(msg.data.clone()) {
-                    println!("{}", msg.data);
+                    // println!("{}", msg.data);
                     self.game = Game::from_init(init);
                 } else {
                     eprintln!("Fehler beim Parsen von 'init' Daten");
