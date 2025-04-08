@@ -1,9 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.SocketException;
-import java.util.Scanner;
+import java.util.*;
+import java.util.List;
 
 public class TicTacToeGUI {
     public static TicTacToeGUI instance;
@@ -17,13 +17,18 @@ public class TicTacToeGUI {
     private JFrame frame;
     private int winCondition = 3;
 
-    private JButton[][] buttons; // Matrix zur Verwaltung der Spielfelder
+    private JButton[][] buttons;
+
+    // Ranking
+    private Map<String, Integer> ranking = new HashMap<>();
+    private DefaultListModel<String> rankingModel;
+    private JList<String> rankingList;
 
     public TicTacToeGUI() {
         instance = this;
         frame = new JFrame("Tic Tac Toe");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 500);
+        frame.setSize(700, 500);
         frame.setLayout(new BorderLayout());
 
         // Steuer-Panel mit Eingabefeldern und Buttons
@@ -44,12 +49,21 @@ public class TicTacToeGUI {
         controlPanel.add(neuesSpielButton);
         controlPanel.add(joinButton);
 
+        // Ranking-Anzeige
+        rankingModel = new DefaultListModel<>();
+        rankingList = new JList<>(rankingModel);
+        rankingList.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        rankingList.setBorder(BorderFactory.createTitledBorder("Ranking"));
+        JScrollPane rankingScroll = new JScrollPane(rankingList);
+        rankingScroll.setPreferredSize(new Dimension(150, 0));
+
+        // Spielfeld
         spielfeld = new JPanel();
-        spielfeld.setLayout(new GridLayout(3, 3)); // Standardgröße
+        spielfeld.setLayout(new GridLayout(3, 3));
 
         neuesSpielButton.addActionListener(e -> {
             updateWinCondition();
-            erstelleSpielfeld(); // Nur leere Felder erzeugen
+            erstelleSpielfeld();
             try {
                 Spiellogik.start_new_Game(
                         Integer.parseInt(width.getText()),
@@ -72,6 +86,7 @@ public class TicTacToeGUI {
 
         frame.add(controlPanel, BorderLayout.NORTH);
         frame.add(spielfeld, BorderLayout.CENTER);
+        frame.add(rankingScroll, BorderLayout.EAST);
         frame.setVisible(true);
     }
 
@@ -162,10 +177,8 @@ public class TicTacToeGUI {
     }
 
     private void onFieldClicked(int row, int col, JButton feld) throws SocketException {
-        System.out.println("Feld geklickt: Zeile " + row + ", Spalte " + col);
-
         if (!feld.getText().isEmpty()) {
-            return; // Bereits belegt – nichts tun
+            return; // Feld bereits belegt
         }
 
         TicTacToeField.set_cross(Spiellogik.getPlayer().getUsername(), row, col, true);
@@ -175,15 +188,30 @@ public class TicTacToeGUI {
 
     private void onJoinClicked() throws SocketException {
         Json_converter.create_JSON(Json_converter.Message_type.JOIN, 0, 0);
-        // Feld wird durch INIT-Nachricht gesetzt
     }
 
     public void set_gui_cross(String username, int row, int col) {
-
         buttons[row][col].setText(username);
         Spiellogik.check_for_point(row, col);
-
     }
+
+    public void updateRanking(String playerName) {
+        ranking.put(playerName, ranking.getOrDefault(playerName, -1) + 1);
+
+        rankingModel.clear();
+        ranking.entrySet().stream()
+                .sorted((a, b) -> b.getValue() - a.getValue())
+                .forEach(entry -> rankingModel.addElement(entry.getKey() + ": " + entry.getValue()));
+    }
+
+    public void resetField() {
+        for (JButton[] row : buttons) {
+            for (JButton button : row) {
+                button.setText("");
+            }
+        }
+    }
+
     public int getWinCondition() {
         return winCondition;
     }
@@ -206,6 +234,10 @@ public class TicTacToeGUI {
         int port = scanner.nextInt();
 
         Spiellogik.setPlayer(new Player(username, port));
+
+        Map<String, Integer> ranking = new HashMap<>();
+        ranking.put(username, -1);
+        Spiellogik.setPunktestand(ranking);
         SwingUtilities.invokeLater(TicTacToeGUI::new);
     }
 }

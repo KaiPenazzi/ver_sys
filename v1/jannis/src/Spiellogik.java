@@ -10,6 +10,7 @@ public class Spiellogik
 
     public static void start_new_Game(int row, int col, int val, boolean jsonmsg) throws SocketException {
         TicTacToeField.createField(row, col, val);
+        TicTacToeGUI.instance.updateRanking(player.getUsername());
         if(jsonmsg) {
             Json_converter.create_JSON(Json_converter.Message_type.INIT, row, col); // row und col werden in dem Fall nicht verwendet
             System.out.println("Neues Spiel");
@@ -20,8 +21,8 @@ public class Spiellogik
     }
 
     public static void check_for_point(int row, int col) {
-        check_col(col);
         check_row(row);
+        check_col(col);
         check_diagonal();
     }
 
@@ -51,6 +52,7 @@ public class Spiellogik
                     TicTacToeField.reset(i - offset, col);
                 }
                 TicTacToeGUI.instance.setzeFeldMitDaten(TicTacToeField.getField());
+                TicTacToeGUI.instance.updateRanking(player.getUsername());
             }
         }
     }
@@ -81,6 +83,7 @@ public class Spiellogik
                     TicTacToeField.reset(row, i - offset);
                 }
                 TicTacToeGUI.instance.setzeFeldMitDaten(TicTacToeField.getField());
+                TicTacToeGUI.instance.updateRanking(player.getUsername());
             }
         }
     }
@@ -112,6 +115,7 @@ public class Spiellogik
                         TicTacToeField.reset(row + offset, col + offset);
                     }
                     TicTacToeGUI.instance.setzeFeldMitDaten(TicTacToeField.getField());
+                    TicTacToeGUI.instance.updateRanking(player.getUsername());
                 }
             }
         }
@@ -137,6 +141,7 @@ public class Spiellogik
                         TicTacToeField.reset(row + offset, col - offset);
                     }
                     TicTacToeGUI.instance.setzeFeldMitDaten(TicTacToeField.getField());
+                    TicTacToeGUI.instance.updateRanking(player.getUsername());
                 }
             }
         }
