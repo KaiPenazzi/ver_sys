@@ -3,3 +3,4 @@ cairo-devel
 pango-devel
 gtk3-devel
 
+wget https://github.com/KaiPenazzi/ver_sys/releases/download/x_o_peer0.6.1/app_open_suse0.6.1
