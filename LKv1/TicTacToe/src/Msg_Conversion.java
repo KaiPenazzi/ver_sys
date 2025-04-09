@@ -29,26 +29,34 @@ public class Msg_Conversion {
 
                 JSONObject pointObj = obj.getJSONObject("score");
                 HashMap<String,Integer> points = new HashMap<String,Integer>();
+
+                InitMessageData initData = new InitMessageData(null,null);
                 //Rangliste parsen
                 for ( String key : pointObj.keySet()){
                     int val = pointObj.getInt(key);
                     points.put(key, val);
                 }
-
-                JSONArray boardArr = obj.getJSONArray("field");
-                //board parsen
-                int size = boardArr.length();
-                String[][] fields = new String[size][size];
-                for (int i = 0; i < size; i++){
-                    JSONArray row = boardArr.getJSONArray(i);
-                    for(int j = 0; j < size; j++){
-                        String username = row.getString(j);
-                        fields[i][j] = username;
+                if(obj.has("field")) {
+                    JSONArray boardArr = obj.getJSONArray("field");
+                    //board parsen
+                    int size = boardArr.length();
+                    String[][] fields = new String[size][size];
+                    for (int i = 0; i < size; i++) {
+                        JSONArray row = boardArr.getJSONArray(i);
+                        for (int j = 0; j < size; j++) {
+                            String username = row.getString(j);
+                            fields[i][j] = username;
+                        }
                     }
+
+                    Board board = new Board(size, size);
+                    board.setBoard(fields);
+                      initData = new InitMessageData(points, board);
+                }else {
+                     initData.setPoints(points);
                 }
-                Board board = new Board(size, size);
-                board.setBoard(fields);
-                InitMessageData initData = new InitMessageData(points, board);
+
+
                 message.setData(initData);
 
                 break;
@@ -92,6 +100,7 @@ public class Msg_Conversion {
                     boardJson.put(jRow);
                 }
                 obj.put("field", boardJson);
+                obj.put("k",initData.getBoard().getK());
                 JSONObject pointsJson = new JSONObject();
                 for(String user : initData.points.keySet()){
                     pointsJson.put(user, initData.points.get(user));

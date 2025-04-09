@@ -90,16 +90,21 @@ public class TicTacToeGUI {
 
                 } else if (returnedMessage.getType().equals("init")) {
                     InitMessageData msg = (InitMessageData) returnedMessage.getData();
-                    System.out.println(msg.getBoard().getFieldSize() + msg.getBoard().getK());
-                    game.setGameBoard(msg.getBoard());
-                    fieldSize = game.getGameBoard().getFieldSize();
-                    k = game.getGameBoard().getK();
-                    game.setRanking(msg.points);
-                    game.setRunning(true);
-                    fieldSizeField.setEditable(false);
-                    initButton.setEnabled(false);
-                    kField.setEnabled(false);
-                    initBoard(game.getGameBoard());
+                    //System.out.println(msg.getBoard().getFieldSize() + msg.getBoard().getK());
+                    if(msg.getBoard() == null){
+                        game.setRanking(msg.points);
+                    }else{
+                        game.setGameBoard(msg.getBoard());
+                        fieldSize = game.getGameBoard().getFieldSize();
+                        k = game.getGameBoard().getK();
+                        game.setRanking(msg.points);
+                        game.setRunning(true);
+                        fieldSizeField.setEditable(false);
+                        initButton.setEnabled(false);
+                        kField.setEnabled(false);
+                        initBoard(game.getGameBoard());
+                    }
+
                 }
             }
             //fange an auf Nachrichten zu warten
@@ -231,13 +236,15 @@ public class TicTacToeGUI {
                     case "init":
                         if (!game.isRunning()) {
                             InitMessageData initMessage = (InitMessageData) incomingMessage.getData();
-                            game.setGameBoard(initMessage.getBoard());
+                            if(initMessage.getBoard() != null){
+                                game.setGameBoard(initMessage.getBoard());
+                                initBoard(game.getGameBoard());
+                                updateBoardButtonColors();
+                                refreshRankingDisplay();
+                                initButton.setEnabled(false);
+                                game.setRunning(true);
+                            }
                             game.setRanking(initMessage.points);
-                            initBoard(game.getGameBoard());
-                            updateBoardButtonColors();
-                            refreshRankingDisplay();
-                            initButton.setEnabled(false);
-                            game.setRunning(true);
                         }
                         break;
                     case "action":

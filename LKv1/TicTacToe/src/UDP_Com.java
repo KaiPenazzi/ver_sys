@@ -73,6 +73,7 @@ public class UDP_Com {
                 DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
                 socket.send(packet);
                 System.out.println(message.getType() + " message sent");
+                //message.getData().printData();
                 socket.close();
             }
 

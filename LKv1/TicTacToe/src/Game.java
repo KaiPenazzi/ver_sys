@@ -17,9 +17,9 @@ public class Game {
         this.ranking = ranking;
         players = new ArrayList<Player>();
         //für Labor bereits vorher bekannt
-        players.add(new Player(1111,"127.0.0.1"));
-        players.add(new Player(2222,"127.0.0.1"));
-        players.add(new Player(3333,"127.0.0.1"));
+        players.add(new Player(1111,"192.168.5.2"));
+        players.add(new Player(2222,"192.168.5.14"));
+        players.add(new Player(3333,"192.168.5.6"));
         this.myPort = myPort;
     }
 
