@@ -43,6 +43,7 @@ impl Manager {
 
     pub fn action(&mut self, x: u32, y: u32) {
         let action = ActionData {
+            r#type: "action",
             usr: self.usr.clone(),
             x: x,
             y: y,

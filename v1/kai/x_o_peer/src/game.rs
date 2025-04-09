@@ -37,6 +37,7 @@ impl Game {
 
     pub fn to_init(&self) -> InitData {
         InitData {
+            r#type: "init",
             field: self.field.to_vec(),
             score: self.scores.to_vec(),
             k: self.field.k,
