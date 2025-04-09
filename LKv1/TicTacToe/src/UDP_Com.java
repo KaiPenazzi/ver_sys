@@ -36,6 +36,7 @@ public class UDP_Com {
                  return null;
              }
 
+
              String recvMsg = new String(packet.getData(), 0 , packet.getLength());
              if(!recvMsg.equals("") &&  recvMsg != null){
                  message = Msg_Conversion.processIncomingMessage(recvMsg);

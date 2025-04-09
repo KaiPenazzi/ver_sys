@@ -12,6 +12,7 @@ public class Game {
     private boolean isRunning = false;
 
 
+    //Player liste variabel
     public Game(Board gameBoard, HashMap<String,Integer>  ranking, int myPort) {
         this.gameBoard = gameBoard;
         this.ranking = ranking;

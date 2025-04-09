@@ -19,6 +19,8 @@ public class TicTacToeGUI {
     private Game game;
     private DefaultListModel<String> rankingModel = new DefaultListModel<>();
 
+
+    //TODO: MessageData Klassen ersellen für newPlayer, Join und Playerlist
     public TicTacToeGUI() {
         createGUI();
     }

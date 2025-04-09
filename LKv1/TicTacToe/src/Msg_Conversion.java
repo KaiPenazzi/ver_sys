@@ -55,17 +55,12 @@ public class Msg_Conversion {
                 }else {
                      initData.setPoints(points);
                 }
-
-
                 message.setData(initData);
-
                 break;
             case "join":
                 message.setType("join");
                 break;
         }
-
-
         return message;
     }
 
@@ -107,7 +102,6 @@ public class Msg_Conversion {
                 }
                 obj.put("score", pointsJson);
                 jsonString = obj.toString(4);
-
                 break;
 
             case "join":

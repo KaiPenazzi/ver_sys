@@ -1,12 +1,12 @@
 public class Player {
 
-    private String nickname;
+    private String username;
     private int port;
     private String ip;
 
     public Player(String nickname, int port, String ip){
         this.ip = ip;
-        this.nickname = nickname;
+        this.username = nickname;
         this.port = port;
     }
     public Player(int port, String ip){
@@ -14,7 +14,7 @@ public class Player {
         this.port = port;
     }
     public void setNickname(String nickname) {
-        this.nickname = nickname;
+        this.username = nickname;
     }
 
     public void setPort(int port) {
@@ -26,7 +26,7 @@ public class Player {
     }
 
     public String getNickname() {
-        return nickname;
+        return username;
     }
 
     public String getIp() {
