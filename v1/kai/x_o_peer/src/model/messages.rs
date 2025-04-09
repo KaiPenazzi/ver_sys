@@ -34,7 +34,7 @@ impl Message {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct InitData {
     pub field: Vec<Vec<String>>,
-    pub scores: Vec<Score>,
+    pub score: Vec<Score>,
     pub k: u32,
 }
 
