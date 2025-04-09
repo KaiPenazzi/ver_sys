@@ -2,23 +2,21 @@ import java.io.IOException;
 import java.net.*;
 public class UDP_communication {
 
-    //String addresses [] = {"192.168.5.2", "192.168.5.8"}; // todo check IP Adresses in Lab
+    static String addresses [] = {"192.168.5.2", "192.168.5.14"}; // todo check IP Adresses in Lab
 
     public static void send_udp(String message) throws SocketException {
-        String address = "127.0.0.1";
+        //String address = "127.0.0.1";
         int[] ports = { 1111, 2222, 3333};
 
         try(DatagramSocket socket = new DatagramSocket())
         {
            for (int i = 0; i < ports.length; i++) {
                if (ports[i] != Spiellogik.getPlayer().getPort()) {
-                   InetAddress serverIp = InetAddress.getByName(address);
+                   InetAddress serverIp = InetAddress.getByName(addresses[i]);
                    byte[] sendData = message.getBytes();
 
                    DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverIp, ports[i]);
                    socket.send(sendPacket);
-
-                   System.out.println("Gesendete Nachricht: " + message);;
                }
            }
         } catch (Exception e) {

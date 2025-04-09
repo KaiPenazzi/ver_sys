@@ -142,13 +142,13 @@ public class TicTacToeGUI {
                 feld.setFont(new Font("Arial", Font.PLAIN, 40));
                 feld.setFocusPainted(false);
                 feld.setPreferredSize(new Dimension(80, 80));
-                if (daten[i][j].equals("empty")) {
+                if (daten[i][j].equals("none")) {
                     feld.setText("");
                 }
                 else {
                     feld.setBackground(getColorForString(daten[i][j]));
                 }
-                //feld.setText(daten[i][j].equals("empty") ? "" : daten[i][j]);
+                //feld.setText(daten[i][j].equals("none") ? "" : daten[i][j]);
 
                 final int row = i;
                 final int col = j;
