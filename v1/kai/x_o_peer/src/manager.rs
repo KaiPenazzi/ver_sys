@@ -5,7 +5,7 @@ use crate::{
     game::Game,
     model::{
         com::{RecvMsg, SendMsg},
-        messages::{ActionData, InitData},
+        messages::{ActionData, InitData, Message},
     },
     udp::client::Client,
 };
@@ -43,7 +43,7 @@ impl Manager {
 
     pub fn action(&mut self, x: u32, y: u32) {
         let action = ActionData {
-            r#type: "action",
+            r#type: "action".to_string(),
             usr: self.usr.clone(),
             x: x,
             y: y,
@@ -63,30 +63,17 @@ impl Manager {
 
     fn parser(&mut self, udp_msg: &RecvMsg) {
         let msg = &udp_msg.msg;
-        match msg.r#type.as_str() {
-            "init" => {
-                if let Ok(init) = serde_json::from_value::<InitData>(msg.data.clone()) {
-                    // println!("{}", msg.data);
-                    self.game = Game::from_init(init);
-                } else {
-                    eprintln!("Fehler beim Parsen von 'init' Daten");
-                }
+        match msg {
+            Message::Init(init) => {
+                self.game = Game::from_init(init.clone());
             }
-            "action" => {
-                if let Ok(action) = serde_json::from_value::<ActionData>(msg.data.clone()) {
-                    self.game.field.set(&action);
-                    self.game.check();
-                } else {
-                    eprintln!("Fehler beim Parsen von 'action' Daten");
-                }
+            Message::Action(action) => {
+                self.game.field.set(&action);
+                self.game.check();
             }
-            "join" => self
-                .msq_client
-                .send_init(self.game.to_init(), Some(udp_msg.from.clone())),
-            _ => {
+            Message::Join(join) => {
                 self.msq_client
                     .send_init(self.game.to_init(), Some(udp_msg.from.clone()));
-                eprintln!("Unbekannter Nachrichtentyp: {}", msg.r#type);
             }
         }
     }

@@ -8,7 +8,7 @@ use druid::{im::Vector, Data, Lens};
 use crate::{
     model::{
         com::{Peer, SendMsg},
-        messages::{ActionData, InitData, Message},
+        messages::{ActionData, InitData, JoinData, Message},
     },
     PORT_A,
 };
@@ -75,18 +75,23 @@ impl Client {
     }
 
     pub fn send_action(&self, data: ActionData) {
-        self.send(Message::action(data), None);
+        self.send(Message::Action(data), None);
     }
 
     pub fn send_init(&self, data: InitData, to: Option<IpAddr>) {
-        self.send(Message::init(data), to);
+        self.send(Message::Init(data), to);
     }
 
     pub fn send_join(&self) {
         let peer = self.peers.get(0);
 
         match peer {
-            Some(peer) => self.send(Message::join(), Some(peer.ip.clone())),
+            Some(peer) => self.send(
+                Message::Join(JoinData {
+                    r#type: "join".to_string(),
+                }),
+                Some(peer.ip.clone()),
+            ),
             None => println!("no peer is known"),
         }
     }
