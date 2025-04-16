@@ -1,12 +1,11 @@
 import java.net.SocketException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class Spiellogik
 {
     private static Map<String, Integer> punktestand = new HashMap<>();
     private static Player player;
+    private static List<Player> player_list = new ArrayList<>();
 
     public static void start_new_Game(int row, int col, int val, boolean jsonmsg) throws SocketException {
         TicTacToeField.createField(row, col, val);
@@ -155,5 +154,18 @@ public class Spiellogik
 
     public static Player getPlayer() {
         return player;
+    }
+
+    public static List<Player> getPlayer_list() {
+        return player_list;
+    }
+
+    public static void setPlayer_list(List<Player> player_list) {
+        Spiellogik.player_list = player_list;
+    }
+
+    public static void addPlayerToList(Player player)
+    {
+        player_list.add(player);
     }
 }

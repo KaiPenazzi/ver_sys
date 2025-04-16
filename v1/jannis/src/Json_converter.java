@@ -32,6 +32,9 @@ public class Json_converter
                 break;
             case JOIN:
                 obj.put("type", "join");
+                obj.put("usr", Spiellogik.getPlayer().getUsername());
+                obj.put("ip", Spiellogik.getPlayer().getIp());
+                obj.put("port", Spiellogik.getPlayer().getPort());
                 break;
             default:
                 break;
@@ -58,9 +61,9 @@ public class Json_converter
                 JSONObject pointObj = obj.getJSONObject("Punktestand");
                 HashMap<String,Integer> ranking = new HashMap<String,Integer>();
                 //Rangliste parsen
-                for ( String key : pointObj.keySet()){
-                    int val = pointObj.getInt(key);
-                    ranking.put(key, val);
+                for (Object key : pointObj.keySet()){
+                    int val = pointObj.getInt((String) key);
+                    ranking.put((String) key, val);
                 }
                 Spiellogik.setPunktestand(ranking);
                 TicTacToeGUI.instance.updateRanking(ranking);
