@@ -24,6 +24,24 @@ public class UDP_communication {
         }
     }
 
+    public static void send_udp_to_specific_member(String message, String ip, int port) throws SocketException {
+
+        try(DatagramSocket socket = new DatagramSocket())
+        {
+            InetAddress serverIp = InetAddress.getByName(ip);
+            byte[] sendData = message.getBytes();
+
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverIp, port);
+            socket.send(sendPacket);
+
+            System.out.println("Gesendete Nachricht: " + message);;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public static void receive_udp() throws SocketException {
         int port = Spiellogik.getPlayer().getPort();
         byte[] receive_buf  = new byte[1024];

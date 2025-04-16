@@ -11,7 +11,7 @@ public class Spiellogik
         TicTacToeField.createField(row, col, val);
         TicTacToeGUI.instance.updateRanking(Spiellogik.getPunktestand());
         if(jsonmsg) {
-            Json_converter.create_JSON(Json_converter.Message_type.INIT, row, col); // row und col werden in dem Fall nicht verwendet
+            Json_converter.create_JSON(Json_converter.Message_type.INIT, row, col, null, 0); // row, col, ip und port werden in dem Fall nicht verwendet
             System.out.println("Neues Spiel");
         }
         else {
@@ -167,5 +167,14 @@ public class Spiellogik
     public static void addPlayerToList(Player player)
     {
         player_list.add(player);
+    }
+
+    public static List<String> getPlayers_name() {
+        List<String> players_name = new ArrayList<>();
+        for (Player p : player_list)
+        {
+            players_name.add(p.getUsername());
+        }
+        return players_name;
     }
 }

@@ -127,6 +127,8 @@ public class TicTacToeGUI {
                     feld.setFont(new Font("Arial", Font.PLAIN, 40));
                     feld.setFocusPainted(false);
                     feld.setPreferredSize(new Dimension(80, 80));
+                    Color bg = new Color(238, 238, 238).brighter();
+                    feld.setBackground(bg);
 
                     final int row = i;
                     final int col = j;
@@ -164,6 +166,8 @@ public class TicTacToeGUI {
                 feld.setFont(new Font("Arial", Font.PLAIN, 40));
                 feld.setFocusPainted(false);
                 feld.setPreferredSize(new Dimension(80, 80));
+                Color bg = new Color(238, 238, 238).brighter();
+                feld.setBackground(bg);
                 if (daten[i][j].equals("empty")) {
                     feld.setText("");
                 } else {
@@ -227,7 +231,7 @@ public class TicTacToeGUI {
         System.out.println("Versuche Beitritt zu: " + ip + ":" + port);
 
         // Anpassung je nach deiner Methode – hier als Platzhalter:
-        Json_converter.create_JSON(Json_converter.Message_type.JOIN, 4, 4);
+        Json_converter.create_JSON(Json_converter.Message_type.JOIN, 4, 4, ip, port);
     }
 
     public void set_gui_cross(String username, int row, int col) {
@@ -242,9 +246,11 @@ public class TicTacToeGUI {
                 .forEach(entry -> rankingModel.addElement(entry.getKey() + ": " + entry.getValue()));
     }
 
-    public void updateOnlinePlayers(List<String> playersOnline) {
+    public void updateOnlinePlayers(List<Player> playersOnline) {
+        List<String> playersOnline_names = Spiellogik.getPlayers_name();
+
         onlineModel.clear();
-        playersOnline.stream().sorted().forEach(onlineModel::addElement);
+        playersOnline_names.stream().sorted().forEach(onlineModel::addElement);
     }
 
     public void resetField() {
@@ -260,6 +266,12 @@ public class TicTacToeGUI {
     }
 
     private Color getColorForString(String value) {
+        if(value.equals("none"))
+        {
+            return new Color(238, 238, 238).brighter();  // Ein helles Grau
+
+        }
+
         int hash = value.hashCode();
         int r = (hash & 0xFF0000) >> 16;
         int g = (hash & 0x00FF00) >> 8;
@@ -281,6 +293,7 @@ public class TicTacToeGUI {
 
         Player my_Player = new Player(username, ip, port);
         Spiellogik.setPlayer(my_Player);
+        Spiellogik.addPlayerToList(my_Player);
 
         new Thread(() -> {
             try {

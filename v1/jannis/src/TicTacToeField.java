@@ -67,7 +67,7 @@ public class TicTacToeField
         TicTacToeField.getField()[row][col] = username;
         if(jsonMSG)
         {
-            Json_converter.create_JSON(Json_converter.Message_type.ACTION, row, col);
+            Json_converter.create_JSON(Json_converter.Message_type.ACTION, row, col, null, 0);
         }
 
         return true;

@@ -9,19 +9,21 @@ public class Json_converter
     {
         INIT,
         ACTION,
-        JOIN
+        JOIN,
     }
 
-    public static void create_JSON(Message_type type, int row, int col) throws SocketException {
+    public static void create_JSON(Message_type type, int row, int col, String friend_ip, int friend_port) throws SocketException {
         JSONObject obj = new JSONObject();
 
         switch (type)
         {
             case INIT:
                 obj = build_init(obj);
+                UDP_communication.send_udp(obj.toString());
                 break;
             case ACTION:
                 obj = build_action(obj, row, col);
+                UDP_communication.send_udp(obj.toString());
                 //TicTacToeField.print_field();
                 break;
             case JOIN:
@@ -29,11 +31,14 @@ public class Json_converter
                 obj.put("usr", Spiellogik.getPlayer().getUsername());
                 obj.put("ip", Spiellogik.getPlayer().getIp());
                 obj.put("port", Spiellogik.getPlayer().getPort());
+
+                UDP_communication.send_udp_to_specific_member(obj.toString(), friend_ip, friend_port);
                 break;
             default:
                 break;
         }
-        UDP_communication.send_udp(obj.toString());
+
+        TicTacToeGUI.instance.updateOnlinePlayers(Spiellogik.getPlayer_list());
         System.out.println(obj.toString(4));
     }
 
@@ -43,6 +48,7 @@ public class Json_converter
         obj.put("field", TicTacToeField.getField());
         obj.put("k", TicTacToeField.getK());
         obj.put("score", Spiellogik.getPunktestand());
+
 
         return obj;
     }
@@ -100,10 +106,17 @@ public class Json_converter
                 break;
             case "join":
                 System.out.println("Join Message detected");
-                create_JSON(Message_type.INIT, 0, 0); // row und col werden nicht verwendet
+                String usr = obj.getString("usr");
+                String ip = obj.getString("ip");
+                int port = obj.getInt("port");
+
+                Spiellogik.addPlayerToList(new Player(usr, ip, port));
+
+                create_JSON(Message_type.INIT, 0, 0, null, 0); // row und col werden nicht verwendet
                 break;
             default:
                 break;
         }
+        TicTacToeGUI.instance.updateOnlinePlayers(Spiellogik.getPlayer_list());
     }
 }
