@@ -33,11 +33,11 @@ public class Spiellogik
 
         for (int i = 0; i < TicTacToeField.getHeight(); i++) {
             String cell = field[i][col];
-            if (!cell.equals("empty") && cell.equals(current_name)) {
+            if (!cell.equals("none") && cell.equals(current_name)) {
                 counter++;
             } else {
                 current_name = cell;
-                counter = cell.equals("empty") ? 0 : 1;
+                counter = cell.equals("none") ? 0 : 1;
             }
 
             if (counter == TicTacToeField.getK()) {
@@ -60,11 +60,11 @@ public class Spiellogik
 
         for (int i = 0; i < TicTacToeField.getWidth(); i++) {
             String cell = field[row][i];
-            if (!cell.equals("empty") && cell.equals(current_name)) {
+            if (!cell.equals("none") && cell.equals(current_name)) {
                 counter++;
             } else {
                 current_name = cell;
-                counter = cell.equals("empty") ? 0 : 1;
+                counter = cell.equals("none") ? 0 : 1;
             }
 
             if (counter == TicTacToeField.getK()) {
@@ -90,7 +90,7 @@ public class Spiellogik
         for (int row = 0; row <= height - k; row++) {
             for (int col = 0; col <= width - k; col++) {
                 String current_name = field[row][col];
-                if (current_name.equals("empty")) continue;
+                if (current_name.equals("none")) continue;
 
                 boolean win = true;
                 for (int offset = 1; offset < k; offset++) {
@@ -116,7 +116,7 @@ public class Spiellogik
         for (int row = 0; row <= height - k; row++) {
             for (int col = k - 1; col < width; col++) {
                 String current_name = field[row][col];
-                if (current_name.equals("empty")) continue;
+                if (current_name.equals("none")) continue;
 
                 boolean win = true;
                 for (int offset = 1; offset < k; offset++) {

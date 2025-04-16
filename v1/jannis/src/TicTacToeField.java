@@ -24,7 +24,7 @@ public class TicTacToeField
         {
             for (int j = 0; j < width; j++)
             {
-                TicTacToeField.getField()[i][j] = "empty";
+                TicTacToeField.getField()[i][j] = "none";
             }
         }
     }
@@ -49,7 +49,7 @@ public class TicTacToeField
 
     public static void reset(int row, int col)
     {
-        field[row][col] = "empty";
+        field[row][col] = "none";
     }
 
     public static boolean set_cross(String username, int row, int col, boolean jsonMSG) throws SocketException {
@@ -60,7 +60,7 @@ public class TicTacToeField
             return false;
         }
 
-        if (!TicTacToeField.getField()[row][col].equals("empty"))
+        if (!TicTacToeField.getField()[row][col].equals("none"))
         {
             return false;
         }

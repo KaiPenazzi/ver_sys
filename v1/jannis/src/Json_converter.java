@@ -18,16 +18,10 @@ public class Json_converter
         switch (type)
         {
             case INIT:
-                obj.put("type", "init");
-                obj.put("field", TicTacToeField.getField());
-                obj.put("k", TicTacToeField.getK());
-                obj.put("Punktestand", Spiellogik.getPunktestand());
+                obj = build_init(obj);
                 break;
             case ACTION:
-                obj.put("type", "action");
-                obj.put("username", Spiellogik.getPlayer().getUsername());
-                obj.put("row", row);
-                obj.put("col", col);
+                obj = build_action(obj, row, col);
                 //TicTacToeField.print_field();
                 break;
             case JOIN:
@@ -40,7 +34,27 @@ public class Json_converter
                 break;
         }
         UDP_communication.send_udp(obj.toString());
-        System.out.println(obj.toString());
+        System.out.println(obj.toString(4));
+    }
+
+    public static JSONObject build_init(JSONObject obj)
+    {
+        obj.put("type", "init");
+        obj.put("field", TicTacToeField.getField());
+        obj.put("k", TicTacToeField.getK());
+        obj.put("score", Spiellogik.getPunktestand());
+
+        return obj;
+    }
+
+    public static JSONObject build_action(JSONObject obj, int row, int col)
+    {
+        obj.put("type", "action");
+        obj.put("usr", Spiellogik.getPlayer().getUsername());
+        obj.put("y", row);
+        obj.put("x", col);
+
+        return obj;
     }
 
     public static void receive_JSON(String message) throws SocketException {
@@ -58,10 +72,10 @@ public class Json_converter
                     cols = field.getJSONArray(0).length(); // Anzahl der Spalten in der ersten Zeile
                 }
 
-                JSONObject pointObj = obj.getJSONObject("Punktestand");
+                JSONObject pointObj = obj.getJSONObject("score");
                 HashMap<String,Integer> ranking = new HashMap<String,Integer>();
                 //Rangliste parsen
-                for (Object key : pointObj.keySet()){
+                for ( Object key : pointObj.keySet()){
                     int val = pointObj.getInt((String) key);
                     ranking.put((String) key, val);
                 }
@@ -72,11 +86,11 @@ public class Json_converter
                 break;
             case "action":
                 System.out.println("Action Message detected");
-                TicTacToeField.set_cross(obj.getString("username"), obj.getInt("row"), obj.getInt("col"), false);
-                TicTacToeGUI.instance.set_gui_cross(obj.getString("username"), obj.getInt("row"), obj.getInt("col"));
+                TicTacToeField.set_cross(obj.getString("usr"), obj.getInt("y"), obj.getInt("x"), false);
+                TicTacToeGUI.instance.set_gui_cross(obj.getString("usr"), obj.getInt("y"), obj.getInt("x"));
 
 
-                String username = obj.getString("username");
+                String username = obj.getString("usr");
 
                 if (!Spiellogik.getPunktestand().containsKey(username)) {
                     Spiellogik.getPunktestand().put(username, 0);
