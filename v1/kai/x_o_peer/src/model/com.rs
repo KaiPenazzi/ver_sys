@@ -7,7 +7,7 @@ use druid::{Data, Lens};
 
 use crate::game::scores::GameScores;
 
-use super::messages::{JoinData, Message};
+use super::messages::{JoinData, LeaveData, Message};
 
 #[derive(Debug, Clone, Data, Lens)]
 pub struct Peer {
@@ -30,6 +30,19 @@ impl Peer {
             url: SocketAddr::new(IpAddr::from_str(&join.ip).unwrap(), join.port.clone()),
             usr: join.usr.clone(),
         }
+    }
+
+    pub fn from_leave(leave: &LeaveData) -> Self {
+        Self {
+            url: SocketAddr::new(IpAddr::from_str(&leave.ip).unwrap(), leave.port.clone()),
+            usr: leave.usr.clone(),
+        }
+    }
+}
+
+impl PartialEq for Peer {
+    fn eq(&self, other: &Self) -> bool {
+        self.url == other.url && self.usr == other.usr
     }
 }
 

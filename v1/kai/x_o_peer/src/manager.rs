@@ -78,7 +78,8 @@ impl Manager {
                 self.msq_client.add(new_peer);
             }
             Message::Leave(leave) => {
-                self.msq_client.leave(&leave.usr);
+                let leave_peer = Peer::from_leave(leave);
+                self.msq_client.leave(&leave_peer);
             }
         }
     }

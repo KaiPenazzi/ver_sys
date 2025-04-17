@@ -5,7 +5,7 @@ import json
 def main():
     parser = argparse.ArgumentParser(description="UDP Join Message Sender")
     parser.add_argument("port", type=int, help="Port number to send to (1-65535)")
-    parser.add_argument("usr", type=str, default="test", nargs="?", help="Target name (default: test)")
+    parser.add_argument("usr", type=str, default="test_join", nargs="?", help="Target name (default: test)")
     args = parser.parse_args()
     
     if not (1 <= args.port <= 65535):
@@ -15,6 +15,8 @@ def main():
     message = {
         "type": "leave",
         "usr": args.usr,
+        "port": 1225,
+        "ip": "127.0.0.1",
     }
     
     json_message = json.dumps(message)

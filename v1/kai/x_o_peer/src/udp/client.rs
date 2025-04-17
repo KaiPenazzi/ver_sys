@@ -73,7 +73,7 @@ impl Client {
         self.peers.push_back(peer)
     }
 
-    pub fn leave(&mut self, usr: &str) {
-        self.peers.retain(|peer: &Peer| peer.usr != usr)
+    pub fn leave(&mut self, peer: &Peer) {
+        self.peers.retain(|in_peer: &Peer| in_peer != peer);
     }
 }

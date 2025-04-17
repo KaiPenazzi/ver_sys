@@ -55,6 +55,8 @@ impl JoinData {
 pub struct LeaveData {
     pub r#type: String,
     pub usr: String,
+    pub ip: String,
+    pub port: u16,
 }
 
 impl LeaveData {
