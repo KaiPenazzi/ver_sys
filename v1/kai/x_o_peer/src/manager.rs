@@ -4,7 +4,7 @@ use std::sync::{mpsc::Sender, Arc, Mutex};
 use crate::{
     game::Game,
     model::{
-        com::{RecvMsg, SendMsg},
+        com::{Peer, RecvMsg, SendMsg},
         messages::{ActionData, Message},
     },
     udp::client::Client,
@@ -21,11 +21,11 @@ pub struct Manager {
 }
 
 impl Manager {
-    pub fn new(usr: String, urls: Vec<String>, tx: Arc<Mutex<Sender<SendMsg>>>) -> Self {
+    pub fn new(usr: String, tx: Arc<Mutex<Sender<SendMsg>>>) -> Self {
         Self {
             game: Game::new(0, 0, 0),
             usr: usr,
-            msq_client: Client::new(tx, urls),
+            msq_client: Client::new(tx),
             x_size: 3.to_string(),
             y_size: 3.to_string(),
             k_size: 3.to_string(),
@@ -71,9 +71,14 @@ impl Manager {
                 self.game.field.set(&action);
                 self.game.check();
             }
-            Message::Join(_join) => {
+            Message::Join(join) => {
+                let new_peer = Peer::from_join(join);
                 self.msq_client
-                    .send_init(self.game.to_init(), Some(udp_msg.from.clone()));
+                    .send_init(self.game.to_init(), Some(&new_peer));
+                self.msq_client.add(new_peer);
+            }
+            Message::Leave(leave) => {
+                self.msq_client.leave(&leave.usr);
             }
         }
     }

@@ -7,6 +7,7 @@ pub enum Message {
     Init(InitData),
     Action(ActionData),
     Join(JoinData),
+    Leave(LeaveData),
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -40,10 +41,24 @@ impl ActionData {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct JoinData {
     pub r#type: String,
+    pub usr: String,
+    pub ip: String,
+    pub port: u16,
 }
-
 impl JoinData {
     pub fn to_msg(self) -> Message {
         Message::Join(self)
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct LeaveData {
+    pub r#type: String,
+    pub usr: String,
+}
+
+impl LeaveData {
+    pub fn to_msg(self) -> Message {
+        Message::Leave(self)
     }
 }

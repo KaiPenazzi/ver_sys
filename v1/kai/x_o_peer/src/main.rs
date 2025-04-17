@@ -38,7 +38,7 @@ async fn main() {
 
     let (tx, rx) = mpsc::channel::<SendMsg>();
     let tx_arc = Arc::new(Mutex::new(tx));
-    let manager = Manager::new(args.usr, args.urls, tx_arc);
+    let manager = Manager::new(args.usr, tx_arc);
     let app_data = AppData {
         manager: manager,
         input_x: "3".to_string(),

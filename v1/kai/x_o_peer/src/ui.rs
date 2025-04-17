@@ -109,27 +109,17 @@ pub fn controlls() -> impl Widget<AppData> {
 }
 
 fn udp_client() -> impl Widget<AppData> {
-    let mut root = Flex::column();
-    {
+    let root = Flex::column();
+
+    let peers = List::new(|| {
         let mut row = Flex::row();
-        row.add_child(Label::new("url:").padding((10., 0.)));
-        row.add_child(
-            TextBox::new()
-                .lens(AppData::manager.then(Manager::msq_client.then(Client::new_url)))
-                .fix_width(127.),
-        );
-        row.add_child(
-            Button::new("Add")
-                .on_click(|_cts, data: &mut AppData, _env| data.manager.msq_client.add())
-                .fix_size(63., 30.)
-                .padding((10., 0.)),
-        );
+        row.add_child(Label::new(|peer: &Peer, _env: &Env| peer.usr.clone()));
 
-        root.add_child(row.padding((0., 10.)));
-    }
+        row.add_child(Label::new(|peer: &Peer, _env: &Env| peer.to_url()));
 
-    let peers = List::new(|| Label::new(|peer: &Peer, _env: &Env| peer.to_url()))
-        .lens(AppData::manager.then(Manager::msq_client.then(Client::peers)));
+        row
+    })
+    .lens(AppData::manager.then(Manager::msq_client.then(Client::peers)));
 
     root.with_child(peers)
 }

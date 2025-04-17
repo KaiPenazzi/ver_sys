@@ -23,5 +23,6 @@ fn parse(msg: Message) -> Option<String> {
         Message::Init(init) => return Some(serde_json::to_string(&init).unwrap()),
         Message::Action(action) => return Some(serde_json::to_string(&action).unwrap()),
         Message::Join(join) => return Some(serde_json::to_string(&join).unwrap()),
+        Message::Leave(leave) => return Some(serde_json::to_string(&leave).unwrap()),
     }
 }

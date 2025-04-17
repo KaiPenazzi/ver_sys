@@ -1,60 +1,33 @@
-use std::{
-    net::IpAddr,
-    sync::{mpsc::Sender, Arc, Mutex},
-};
+use std::sync::{mpsc::Sender, Arc, Mutex};
 
 use druid::{im::Vector, Data, Lens};
 
 use crate::model::{
-        com::{Peer, SendMsg},
-        messages::{ActionData, InitData, JoinData, Message},
-    };
+    com::{Peer, SendMsg},
+    messages::{ActionData, InitData, JoinData, Message},
+};
 
 #[derive(Data, Clone, Lens)]
 pub struct Client {
     pub peers: Vector<Peer>,
-    pub new_url: String,
     msg_q: Arc<Mutex<Sender<SendMsg>>>,
 }
 
 impl Client {
-    pub fn new(tx: Arc<Mutex<Sender<SendMsg>>>, urls: Vec<String>) -> Self {
-        let mut client = Self {
+    pub fn new(tx: Arc<Mutex<Sender<SendMsg>>>) -> Self {
+        let client = Self {
             peers: Vector::new(),
             msg_q: tx,
-            new_url: "".to_string(),
         };
-
-        for url in urls {
-            client.peers.push_back(Peer::from_url(&url).unwrap())
-        }
 
         client
     }
 
-    pub fn add(&mut self) {
-        match Peer::from_url(&self.new_url) {
-            Some(peer) => {
-                self.peers.push_back(peer);
-                self.new_url = "".to_string()
-            }
-            None => {}
-        }
-    }
-
-    fn send(&self, data: Message, to: Option<IpAddr>) {
+    fn send(&self, data: Message, to: Option<&Peer>) {
         let mut send_to: Vec<Peer>;
 
         match to {
-            Some(ip) => {
-                println!("{}", ip);
-                send_to = vec![self
-                    .peers
-                    .iter()
-                    .find(|peer| peer.ip == ip)
-                    .unwrap()
-                    .clone()]
-            }
+            Some(peer) => send_to = vec![peer.clone()],
             None => {
                 send_to = Vec::new();
                 for peer in self.peers.clone() {
@@ -75,7 +48,7 @@ impl Client {
         self.send(Message::Action(data), None);
     }
 
-    pub fn send_init(&self, data: InitData, to: Option<IpAddr>) {
+    pub fn send_init(&self, data: InitData, to: Option<&Peer>) {
         self.send(Message::Init(data), to);
     }
 
@@ -86,10 +59,21 @@ impl Client {
             Some(peer) => self.send(
                 Message::Join(JoinData {
                     r#type: "join".to_string(),
+                    usr: peer.usr.clone(),
+                    ip: peer.url.ip().to_string(),
+                    port: peer.url.port(),
                 }),
-                Some(peer.ip.clone()),
+                Some(peer),
             ),
             None => println!("no peer is known"),
         }
+    }
+
+    pub fn add(&mut self, peer: Peer) {
+        self.peers.push_back(peer)
+    }
+
+    pub fn leave(&mut self, usr: &str) {
+        self.peers.retain(|peer: &Peer| peer.usr != usr)
     }
 }

@@ -6,7 +6,7 @@ use crate::{
     eve::UDP_MSG_RECV,
     model::{
         com::RecvMsg,
-        messages::{ActionData, InitData, JoinData, Message},
+        messages::{ActionData, InitData, JoinData, LeaveData, Message},
     },
 };
 
@@ -35,15 +35,15 @@ pub async fn run_server(event_sink: druid::ExtEventSink, port: String) -> std::i
                 let join = from_value::<JoinData>(val).unwrap();
                 Message::Join(join)
             }
+            "leave" => {
+                let leave = from_value::<LeaveData>(val).unwrap();
+                Message::Leave(leave)
+            }
             _ => {
                 println!("not supported msg type");
-                Message::Join(JoinData {
-                    r#type: "join".to_string(),
-                })
+                continue;
             }
         };
-
-        // println!("{:?}", &val);
 
         let _ = event_sink.submit_command(
             UDP_MSG_RECV,

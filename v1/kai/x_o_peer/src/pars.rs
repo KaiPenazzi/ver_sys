@@ -8,7 +8,4 @@ pub struct Args {
 
     #[arg(short)]
     pub port: String,
-
-    #[arg()]
-    pub urls: Vec<String>,
 }

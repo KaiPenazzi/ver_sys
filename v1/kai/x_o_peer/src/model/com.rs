@@ -5,32 +5,31 @@ use std::{
 
 use druid::{Data, Lens};
 
-use super::messages::Message;
+use crate::game::scores::GameScores;
+
+use super::messages::{JoinData, Message};
 
 #[derive(Debug, Clone, Data, Lens)]
 pub struct Peer {
-    pub ip: IpAddr,
-    pub port: u32,
+    pub url: SocketAddr,
+    pub usr: String,
 }
 impl Peer {
-    pub fn new(id: IpAddr, port: u32) -> Self {
-        Self { ip: id, port: port }
+    pub fn new(ip: IpAddr, port: u16, usr: String) -> Self {
+        Self {
+            url: SocketAddr::new(ip, port),
+            usr: usr,
+        }
     }
     pub fn to_url(&self) -> String {
-        return format!("{}:{}", self.ip, self.port.to_string());
+        self.url.to_string()
     }
-    pub fn from_url(url: &str) -> Option<Self> {
-        match SocketAddr::from_str(url) {
-            Ok(addr) => {
-                return Some(Self {
-                    ip: addr.ip(),
-                    port: addr.port().try_into().unwrap(),
-                });
-            }
-            Err(_) => println!("could not parse the url: {}", url),
-        }
 
-        None
+    pub fn from_join(join: &JoinData) -> Self {
+        Self {
+            url: SocketAddr::new(IpAddr::from_str(&join.ip).unwrap(), join.port.clone()),
+            usr: join.usr.clone(),
+        }
     }
 }
 
