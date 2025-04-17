@@ -5,7 +5,7 @@ use crate::{
     game::Game,
     model::{
         com::{RecvMsg, SendMsg},
-        messages::{ActionData, InitData, Message},
+        messages::{ActionData, Message},
     },
     udp::client::Client,
 };
@@ -71,7 +71,7 @@ impl Manager {
                 self.game.field.set(&action);
                 self.game.check();
             }
-            Message::Join(join) => {
+            Message::Join(_join) => {
                 self.msq_client
                     .send_init(self.game.to_init(), Some(udp_msg.from.clone()));
             }

@@ -5,13 +5,10 @@ use std::{
 
 use druid::{im::Vector, Data, Lens};
 
-use crate::{
-    model::{
+use crate::model::{
         com::{Peer, SendMsg},
         messages::{ActionData, InitData, JoinData, Message},
-    },
-    PORT_A,
-};
+    };
 
 #[derive(Data, Clone, Lens)]
 pub struct Client {

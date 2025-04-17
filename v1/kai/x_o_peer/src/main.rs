@@ -1,4 +1,4 @@
-mod coroutine;
+pub mod coroutins;
 pub mod eve;
 pub mod game;
 pub mod manager;
@@ -13,7 +13,7 @@ pub const PORT_A: u32 = 1225;
 pub const PORT: u32 = 1234;
 
 use clap::Parser;
-use coroutine::{run_cleint, run_server};
+use coroutins::{client::run_cleint, server::run_server};
 use druid::{AppLauncher, Data, Lens, WindowDesc};
 use eve::Delegate;
 use manager::Manager;

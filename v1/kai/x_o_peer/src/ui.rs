@@ -1,7 +1,7 @@
 use druid::{
     theme::{BUTTON_BORDER_RADIUS, BUTTON_DARK, WINDOW_BACKGROUND_COLOR},
     widget::{Button, Flex, Label, List, TextBox},
-    Color, Env, LensExt, Size, Widget, WidgetExt,
+    Color, Env, LensExt, Widget, WidgetExt,
 };
 use ui_cell::UiCell;
 
