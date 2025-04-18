@@ -1,11 +1,14 @@
 use druid::{Data, Lens};
-use std::sync::{mpsc::Sender, Arc, Mutex};
+use std::{
+    net::SocketAddr,
+    str::FromStr,
+};
 
 use crate::{
     game::Game,
     model::{
-        com::{Peer, RecvMsg, SendMsg},
-        messages::{ActionData, Message},
+        com::RecvMsg,
+        messages::{ActionData, Message, ToPeer},
     },
     udp::client::Client,
 };
@@ -18,17 +21,19 @@ pub struct Manager {
     pub x_size: String,
     pub y_size: String,
     pub k_size: String,
+    pub friend: String,
 }
 
 impl Manager {
-    pub fn new(usr: String, tx: Arc<Mutex<Sender<SendMsg>>>) -> Self {
+    pub fn new(usr: String, msq_client: Client) -> Self {
         Self {
             game: Game::new(0, 0, 0),
-            usr: usr,
-            msq_client: Client::new(tx),
+            usr,
+            msq_client,
             x_size: 3.to_string(),
             y_size: 3.to_string(),
             k_size: 3.to_string(),
+            friend: "".to_string(),
         }
     }
 
@@ -45,8 +50,8 @@ impl Manager {
         let action = ActionData {
             r#type: "action".to_string(),
             usr: self.usr.clone(),
-            x: x,
-            y: y,
+            x,
+            y,
         };
         self.game.field.set(&action);
         self.game.check();
@@ -54,7 +59,20 @@ impl Manager {
     }
 
     pub fn join(&self) {
-        self.msq_client.send_join();
+        let url = SocketAddr::from_str(&self.friend);
+        match url {
+            Ok(url) => {
+                self.msq_client.send_join(&url);
+            }
+            Err(_) => {
+                println!("Invalid URL");
+                return;
+            }
+        }
+    }
+
+    pub fn leave(&mut self) {
+        self.msq_client.send_leave();
     }
 
     pub fn rec_msg(&mut self, msg: &RecvMsg) {
@@ -72,14 +90,23 @@ impl Manager {
                 self.game.check();
             }
             Message::Join(join) => {
-                let new_peer = Peer::from_join(join);
+                let new_peer = join.to_peer();
                 self.msq_client
                     .send_init(self.game.to_init(), Some(&new_peer));
+                self.msq_client.send_player(&new_peer);
+                self.msq_client.send_new_player(&join);
                 self.msq_client.add(new_peer);
             }
             Message::Leave(leave) => {
-                let leave_peer = Peer::from_leave(leave);
+                let leave_peer = leave.to_peer();
                 self.msq_client.leave(&leave_peer);
+            }
+            Message::NewPlayer(new_player) => {
+                let new_peer = new_player.to_peer();
+                self.msq_client.add(new_peer);
+            }
+            Message::Player(player) => {
+                self.msq_client.add_players(player.clone());
             }
         }
     }

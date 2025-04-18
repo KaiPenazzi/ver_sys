@@ -1,11 +1,6 @@
-use std::{
-    net::{IpAddr, SocketAddr},
-    str::FromStr,
-};
+use std::net::{IpAddr, SocketAddr};
 
 use druid::{Data, Lens};
-
-use crate::game::scores::GameScores;
 
 use super::messages::{JoinData, LeaveData, Message};
 
@@ -18,24 +13,37 @@ impl Peer {
     pub fn new(ip: IpAddr, port: u16, usr: String) -> Self {
         Self {
             url: SocketAddr::new(ip, port),
-            usr: usr,
+            usr: usr.clone(),
         }
     }
+
+    pub fn from_url(url: &SocketAddr) -> Self {
+        let url = url.clone();
+        Self {
+            url,
+            usr: "".to_string(),
+        }
+    }
+
     pub fn to_url(&self) -> String {
         self.url.to_string()
     }
 
-    pub fn from_join(join: &JoinData) -> Self {
-        Self {
-            url: SocketAddr::new(IpAddr::from_str(&join.ip).unwrap(), join.port.clone()),
-            usr: join.usr.clone(),
+    pub fn to_join(&self) -> JoinData {
+        JoinData {
+            r#type: "join".to_string(),
+            usr: self.usr.clone(),
+            ip: self.url.ip().to_string(),
+            port: self.url.port(),
         }
     }
 
-    pub fn from_leave(leave: &LeaveData) -> Self {
-        Self {
-            url: SocketAddr::new(IpAddr::from_str(&leave.ip).unwrap(), leave.port.clone()),
-            usr: leave.usr.clone(),
+    pub fn to_leave(&self) -> LeaveData {
+        LeaveData {
+            r#type: "leave".to_string(),
+            usr: self.usr.clone(),
+            ip: self.url.ip().to_string(),
+            port: self.url.port(),
         }
     }
 }

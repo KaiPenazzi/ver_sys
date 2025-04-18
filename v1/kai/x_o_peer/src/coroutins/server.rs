@@ -6,7 +6,7 @@ use crate::{
     eve::UDP_MSG_RECV,
     model::{
         com::RecvMsg,
-        messages::{ActionData, InitData, JoinData, LeaveData, Message},
+        messages::{ActionData, InitData, JoinData, LeaveData, Message, NewPlayerData, PlayerData},
     },
 };
 
@@ -38,6 +38,14 @@ pub async fn run_server(event_sink: druid::ExtEventSink, port: String) -> std::i
             "leave" => {
                 let leave = from_value::<LeaveData>(val).unwrap();
                 Message::Leave(leave)
+            }
+            "new_player" => {
+                let new_player = from_value::<NewPlayerData>(val).unwrap();
+                Message::NewPlayer(new_player)
+            }
+            "player" => {
+                let player = from_value::<PlayerData>(val).unwrap();
+                Message::Player(player)
             }
             _ => {
                 println!("not supported msg type");
