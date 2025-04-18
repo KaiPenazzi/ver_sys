@@ -8,7 +8,7 @@ use druid::{im::Vector, Data, Lens};
 use crate::model::{
     com::{Peer, SendMsg},
     messages::{
-        ActionData, InitData, JoinData, Message, NewPlayerData, PeerData, PlayerData, ToPeer,
+        ActionData, InitData, JoinData, Message, PeerData, PlayerData, ToPeer,
     },
 };
 
@@ -61,6 +61,11 @@ impl Client {
 
     pub fn send_join(&self, to: &SocketAddr) {
         self.send(Message::Join(self.own.to_join()), Some(&Peer::from_url(to)));
+    }
+
+    pub fn send_leave(&mut self) {
+        self.send(Message::Leave(self.own.to_leave()), None);
+        self.peers.clear();
     }
 
     pub fn send_player(&self, to: &Peer) {

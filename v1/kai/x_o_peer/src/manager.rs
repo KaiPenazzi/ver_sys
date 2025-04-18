@@ -2,13 +2,12 @@ use druid::{Data, Lens};
 use std::{
     net::SocketAddr,
     str::FromStr,
-    sync::{mpsc::Sender, Arc, Mutex},
 };
 
 use crate::{
     game::Game,
     model::{
-        com::{Peer, RecvMsg, SendMsg},
+        com::RecvMsg,
         messages::{ActionData, Message, ToPeer},
     },
     udp::client::Client,
@@ -70,6 +69,10 @@ impl Manager {
                 return;
             }
         }
+    }
+
+    pub fn leave(&mut self) {
+        self.msq_client.send_leave();
     }
 
     pub fn rec_msg(&mut self, msg: &RecvMsg) {

@@ -73,7 +73,7 @@ pub fn controlls() -> impl Widget<AppData> {
         );
         row.add_child(
             Button::new("Leave")
-                .on_click(|_ev, appdata: &mut AppData, _env| appdata.manager.new_game())
+                .on_click(|_ev, appdata: &mut AppData, _env| appdata.manager.leave())
                 .fix_size(110., 50.)
                 .padding((10., 0.)),
         );

@@ -27,6 +27,10 @@ impl GameField {
     }
 
     pub fn init_with_fields(field: Vec<Vec<String>>, k: u32) -> Self {
+        if field.len() == 0 || field[0].len() == 0 {
+            return Self::init(0, 0, k);
+        }
+
         let mut grid = Self {
             x: field.len(),
             y: field[0].len(),
