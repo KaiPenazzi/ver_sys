@@ -1,6 +1,30 @@
+use std::{
+    net::{IpAddr, SocketAddr},
+    str::FromStr,
+};
+
 use serde::{Deserialize, Serialize};
 
 use crate::game::scores::Score;
+
+use super::com::Peer;
+
+pub trait ToPeer {
+    fn to_peer(&self) -> Peer;
+}
+
+macro_rules! impl_to_peer {
+    ($t:ty) => {
+        impl ToPeer for $t {
+            fn to_peer(&self) -> Peer {
+                Peer {
+                    url: SocketAddr::new(IpAddr::from_str(&self.ip).unwrap(), self.port),
+                    usr: self.usr.clone(),
+                }
+            }
+        }
+    };
+}
 
 #[derive(Debug, Deserialize, Serialize)]
 pub enum Message {
@@ -8,6 +32,14 @@ pub enum Message {
     Action(ActionData),
     Join(JoinData),
     Leave(LeaveData),
+    NewPlayer(NewPlayerData),
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct PeerData {
+    pub usr: String,
+    pub ip: String,
+    pub port: u16,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -18,24 +50,12 @@ pub struct InitData {
     pub k: u32,
 }
 
-impl InitData {
-    pub fn to_msg(self) -> Message {
-        Message::Init(self)
-    }
-}
-
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ActionData {
     pub r#type: String,
     pub usr: String,
     pub x: u32,
     pub y: u32,
-}
-
-impl ActionData {
-    pub fn to_msg(self) -> Message {
-        Message::Action(self)
-    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -45,11 +65,8 @@ pub struct JoinData {
     pub ip: String,
     pub port: u16,
 }
-impl JoinData {
-    pub fn to_msg(self) -> Message {
-        Message::Join(self)
-    }
-}
+
+impl_to_peer!(JoinData);
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct LeaveData {
@@ -59,8 +76,14 @@ pub struct LeaveData {
     pub port: u16,
 }
 
-impl LeaveData {
-    pub fn to_msg(self) -> Message {
-        Message::Leave(self)
-    }
+impl_to_peer!(LeaveData);
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct NewPlayerData {
+    pub r#type: String,
+    pub usr: String,
+    pub ip: String,
+    pub port: u16,
 }
+
+impl_to_peer!(NewPlayerData);

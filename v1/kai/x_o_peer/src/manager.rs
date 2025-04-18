@@ -5,7 +5,7 @@ use crate::{
     game::Game,
     model::{
         com::{Peer, RecvMsg, SendMsg},
-        messages::{ActionData, Message},
+        messages::{ActionData, Message, ToPeer},
     },
     udp::client::Client,
 };
@@ -72,14 +72,18 @@ impl Manager {
                 self.game.check();
             }
             Message::Join(join) => {
-                let new_peer = Peer::from_join(join);
+                let new_peer = join.to_peer();
                 self.msq_client
                     .send_init(self.game.to_init(), Some(&new_peer));
                 self.msq_client.add(new_peer);
             }
             Message::Leave(leave) => {
-                let leave_peer = Peer::from_leave(leave);
+                let leave_peer = leave.to_peer();
                 self.msq_client.leave(&leave_peer);
+            }
+            Message::NewPlayer(new_player) => {
+                let new_peer = new_player.to_peer();
+                self.msq_client.add(new_peer);
             }
         }
     }

@@ -39,7 +39,7 @@ impl Client {
         let tx = self.msg_q.lock().unwrap();
         tx.send(SendMsg {
             msg: data,
-            send_to: send_to,
+            send_to: send_to.clone(),
         })
         .unwrap();
     }
