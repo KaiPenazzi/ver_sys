@@ -4,7 +4,7 @@ use druid::{im::Vector, Data, Lens};
 
 use crate::model::{
     com::{Peer, SendMsg},
-    messages::{ActionData, InitData, JoinData, Message},
+    messages::{ActionData, InitData, JoinData, Message, PeerData, PlayerData},
 };
 
 #[derive(Data, Clone, Lens)]
@@ -67,6 +67,19 @@ impl Client {
             ),
             None => println!("no peer is known"),
         }
+    }
+
+    pub fn send_player(&self, to: &Peer) {
+        let mut peer_data = PlayerData {
+            r#type: "player".to_string(),
+            players: vec![],
+        };
+
+        for peer in &self.peers {
+            peer_data.players.push(PeerData::from_peer(peer));
+        }
+
+        self.send(Message::Player(peer_data), Some(to));
     }
 
     pub fn add(&mut self, peer: Peer) {

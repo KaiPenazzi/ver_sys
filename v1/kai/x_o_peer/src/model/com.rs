@@ -1,7 +1,4 @@
-use std::{
-    net::{IpAddr, SocketAddr},
-    str::FromStr,
-};
+use std::net::{IpAddr, SocketAddr};
 
 use druid::{Data, Lens};
 
@@ -16,7 +13,7 @@ impl Peer {
     pub fn new(ip: IpAddr, port: u16, usr: String) -> Self {
         Self {
             url: SocketAddr::new(ip, port),
-            usr: usr,
+            usr: usr.clone(),
         }
     }
     pub fn to_url(&self) -> String {

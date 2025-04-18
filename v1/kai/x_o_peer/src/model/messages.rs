@@ -33,13 +33,7 @@ pub enum Message {
     Join(JoinData),
     Leave(LeaveData),
     NewPlayer(NewPlayerData),
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct PeerData {
-    pub usr: String,
-    pub ip: String,
-    pub port: u16,
+    Player(PlayerData),
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -87,3 +81,26 @@ pub struct NewPlayerData {
 }
 
 impl_to_peer!(NewPlayerData);
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct PlayerData {
+    pub r#type: String,
+    pub players: Vec<PeerData>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct PeerData {
+    pub usr: String,
+    pub ip: String,
+    pub port: u16,
+}
+
+impl PeerData {
+    pub fn from_peer(peer: &Peer) -> Self {
+        Self {
+            usr: peer.usr.clone(),
+            ip: peer.url.ip().to_string(),
+            port: peer.url.port(),
+        }
+    }
+}
