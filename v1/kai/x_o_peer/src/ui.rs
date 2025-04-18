@@ -1,3 +1,4 @@
+use controlls::controlls;
 use druid::{
     theme::{BUTTON_BORDER_RADIUS, BUTTON_DARK, WINDOW_BACKGROUND_COLOR},
     widget::{Button, Flex, Label, List, TextBox},
@@ -17,6 +18,7 @@ use crate::{
     AppData,
 };
 
+mod controlls;
 mod ui_cell;
 
 pub fn ui_builder() -> impl Widget<AppData> {
@@ -47,65 +49,6 @@ pub fn ui_builder() -> impl Widget<AppData> {
     root.add_child(udp_client());
 
     root
-}
-
-pub fn controlls() -> impl Widget<AppData> {
-    let mut root = Flex::column();
-
-    {
-        let mut row = Flex::row();
-        row.add_child(Label::new("x-size:").padding((10., 0.)));
-        row.add_child(
-            TextBox::new()
-                .with_placeholder("x-size")
-                .lens(AppData::manager.then(Manager::x_size))
-                .fix_width(165.0),
-        );
-        root.add_child(row.padding((0., 2.)));
-    }
-
-    {
-        let mut row = Flex::row();
-        row.add_child(Label::new("y-size:").padding((10.0, 0.)));
-        row.add_child(
-            TextBox::new()
-                .with_placeholder("y-size")
-                .lens(AppData::manager.then(Manager::y_size))
-                .fix_width(165.0),
-        );
-        root.add_child(row.padding((0., 2.)));
-    }
-
-    {
-        let mut row = Flex::row();
-        row.add_child(Label::new("k-size:").padding((10.0, 0.)));
-        row.add_child(
-            TextBox::new()
-                .with_placeholder("k")
-                .lens(AppData::manager.then(Manager::k_size))
-                .fix_width(165.0),
-        );
-        root.add_child(row.padding((0., 2.)));
-    }
-
-    {
-        let mut row = Flex::row();
-        row.add_child(
-            Button::new("New Game")
-                .on_click(|_ev, appdata: &mut AppData, _env| appdata.manager.new_game())
-                .fix_size(110., 50.)
-                .padding((10., 0.)),
-        );
-        row.add_child(
-            Button::new("Join")
-                .on_click(|_ev, appdata: &mut AppData, _env| appdata.manager.join())
-                .fix_size(110., 50.)
-                .padding((10., 0.)),
-        );
-        root.add_child(row.padding((0., 5.)))
-    }
-
-    root.padding((20.0, 20.0))
 }
 
 fn udp_client() -> impl Widget<AppData> {

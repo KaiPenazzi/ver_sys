@@ -1,4 +1,7 @@
-use std::sync::{mpsc::Sender, Arc, Mutex};
+use std::{
+    net::SocketAddr,
+    sync::{mpsc::Sender, Arc, Mutex},
+};
 
 use druid::{im::Vector, Data, Lens};
 
@@ -13,13 +16,15 @@ use crate::model::{
 pub struct Client {
     pub peers: Vector<Peer>,
     msg_q: Arc<Mutex<Sender<SendMsg>>>,
+    pub own: Peer,
 }
 
 impl Client {
-    pub fn new(tx: Arc<Mutex<Sender<SendMsg>>>) -> Self {
+    pub fn new(tx: Arc<Mutex<Sender<SendMsg>>>, own: Peer) -> Self {
         let client = Self {
             peers: Vector::new(),
             msg_q: tx,
+            own: own,
         };
 
         client
@@ -54,27 +59,14 @@ impl Client {
         self.send(Message::Init(data), to);
     }
 
-    pub fn send_join(&self) {
-        let peer = self.peers.get(0);
-
-        match peer {
-            Some(peer) => self.send(
-                Message::Join(JoinData {
-                    r#type: "join".to_string(),
-                    usr: peer.usr.clone(),
-                    ip: peer.url.ip().to_string(),
-                    port: peer.url.port(),
-                }),
-                Some(peer),
-            ),
-            None => println!("no peer is known"),
-        }
+    pub fn send_join(&self, to: &SocketAddr) {
+        self.send(Message::Join(self.own.to_join()), Some(&Peer::from_url(to)));
     }
 
     pub fn send_player(&self, to: &Peer) {
         let mut peer_data = PlayerData {
             r#type: "player".to_string(),
-            players: vec![],
+            players: vec![PeerData::from_peer(&self.own)],
         };
 
         for peer in &self.peers {

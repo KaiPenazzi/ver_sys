@@ -1,5 +1,9 @@
 use druid::{Data, Lens};
-use std::sync::{mpsc::Sender, Arc, Mutex};
+use std::{
+    net::SocketAddr,
+    str::FromStr,
+    sync::{mpsc::Sender, Arc, Mutex},
+};
 
 use crate::{
     game::Game,
@@ -18,17 +22,19 @@ pub struct Manager {
     pub x_size: String,
     pub y_size: String,
     pub k_size: String,
+    pub friend: String,
 }
 
 impl Manager {
-    pub fn new(usr: String, tx: Arc<Mutex<Sender<SendMsg>>>) -> Self {
+    pub fn new(usr: String, msq_client: Client) -> Self {
         Self {
             game: Game::new(0, 0, 0),
-            usr: usr,
-            msq_client: Client::new(tx),
+            usr,
+            msq_client,
             x_size: 3.to_string(),
             y_size: 3.to_string(),
             k_size: 3.to_string(),
+            friend: "".to_string(),
         }
     }
 
@@ -45,8 +51,8 @@ impl Manager {
         let action = ActionData {
             r#type: "action".to_string(),
             usr: self.usr.clone(),
-            x: x,
-            y: y,
+            x,
+            y,
         };
         self.game.field.set(&action);
         self.game.check();
@@ -54,7 +60,16 @@ impl Manager {
     }
 
     pub fn join(&self) {
-        self.msq_client.send_join();
+        let url = SocketAddr::from_str(&self.friend);
+        match url {
+            Ok(url) => {
+                self.msq_client.send_join(&url);
+            }
+            Err(_) => {
+                println!("Invalid URL");
+                return;
+            }
+        }
     }
 
     pub fn rec_msg(&mut self, msg: &RecvMsg) {

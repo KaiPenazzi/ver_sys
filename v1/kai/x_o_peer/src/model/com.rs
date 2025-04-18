@@ -2,7 +2,7 @@ use std::net::{IpAddr, SocketAddr};
 
 use druid::{Data, Lens};
 
-use super::messages::Message;
+use super::messages::{JoinData, Message};
 
 #[derive(Debug, Clone, Data, Lens)]
 pub struct Peer {
@@ -16,8 +16,26 @@ impl Peer {
             usr: usr.clone(),
         }
     }
+
+    pub fn from_url(url: &SocketAddr) -> Self {
+        let url = url.clone();
+        Self {
+            url,
+            usr: "".to_string(),
+        }
+    }
+
     pub fn to_url(&self) -> String {
         self.url.to_string()
+    }
+
+    pub fn to_join(&self) -> JoinData {
+        JoinData {
+            r#type: "join".to_string(),
+            usr: self.usr.clone(),
+            ip: self.url.ip().to_string(),
+            port: self.url.port(),
+        }
     }
 }
 
