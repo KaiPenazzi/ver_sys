@@ -62,6 +62,17 @@ pub struct JoinData {
 
 impl_to_peer!(JoinData);
 
+impl JoinData {
+    pub fn to_new_player(&self) -> NewPlayerData {
+        NewPlayerData {
+            r#type: "new_player".to_string(),
+            usr: self.usr.clone(),
+            ip: self.ip.clone(),
+            port: self.port,
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct LeaveData {
     pub r#type: String,
@@ -94,6 +105,8 @@ pub struct PeerData {
     pub ip: String,
     pub port: u16,
 }
+
+impl_to_peer!(PeerData);
 
 impl PeerData {
     pub fn from_peer(peer: &Peer) -> Self {

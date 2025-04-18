@@ -76,6 +76,7 @@ impl Manager {
                 self.msq_client
                     .send_init(self.game.to_init(), Some(&new_peer));
                 self.msq_client.send_player(&new_peer);
+                self.msq_client.send_new_player(&join);
                 self.msq_client.add(new_peer);
             }
             Message::Leave(leave) => {
@@ -87,7 +88,7 @@ impl Manager {
                 self.msq_client.add(new_peer);
             }
             Message::Player(player) => {
-                println!("Player: {:?}", player);
+                self.msq_client.add_players(player.clone());
             }
         }
     }
