@@ -19,6 +19,13 @@ public class TicTacToeGUI {
     private Game game;
     private DefaultListModel<String> rankingModel = new DefaultListModel<>();
 
+    private JList<String> playerList;
+    private DefaultListModel<String> playerModel = new DefaultListModel<>();
+    private JButton leaveButton;
+
+    private JPanel sidePanel;
+
+
 
     //TODO: MessageData Klassen ersellen für newPlayer, Join und Playerlist
     public TicTacToeGUI() {
@@ -56,15 +63,45 @@ public class TicTacToeGUI {
 
         boardPanel = new JPanel();
 
+        // Neues Panel für rechte Seite (Ranking + Players + Leave Button)
+        sidePanel = new JPanel();
+        sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
+
+// Ranking-Liste
         rankingList = new JList<>(rankingModel);
         JScrollPane rankingScrollPane = new JScrollPane(rankingList);
-        rankingScrollPane.setPreferredSize(new Dimension(150, 0));
         rankingScrollPane.setBorder(BorderFactory.createTitledBorder("Ranking"));
+        rankingScrollPane.setMaximumSize(new Dimension(150, 200));
+        sidePanel.add(rankingScrollPane);
+
+// Player-Liste
+        playerList = new JList<>(playerModel);
+        JScrollPane playerScrollPane = new JScrollPane(playerList);
+        playerScrollPane.setBorder(BorderFactory.createTitledBorder("Players"));
+        playerScrollPane.setMaximumSize(new Dimension(150, 200));
+        sidePanel.add(playerScrollPane);
+
+// Leave-Button
+        leaveButton = new JButton("Leave");
+        leaveButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        sidePanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        sidePanel.add(leaveButton);
+
+        leaveButton.addActionListener(e -> {
+            if (game != null && username != null) {
+                LeaveMessageData leaveData = new LeaveMessageData(username, port, UDP_Com.getOwnIp());
+                Message leaveMsg = new Message("leave", leaveData);
+                UDP_Com.send_UDP(leaveMsg);
+            }
+            System.exit(0); // Anwendung schließen
+        });
+
+
 
         // Container für Mitte (Spielfeld) und rechts (Ranking)
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.add(boardPanel, BorderLayout.CENTER);
-        centerPanel.add(rankingScrollPane, BorderLayout.EAST);
+        centerPanel.add(sidePanel, BorderLayout.EAST);
 
         frame.add(centerPanel, BorderLayout.CENTER);
 
@@ -81,8 +118,12 @@ public class TicTacToeGUI {
             } catch (SocketException ex) {
                 throw new RuntimeException(ex);
             }
+
+
+
             game = new Game(new Board(), new HashMap<String, Integer>(), port);
-            Message joinMessage = new Message("join", null);
+            JoinMessageData joinData = new JoinMessageData(username,port, UDP_Com.getOwnIp());
+            Message joinMessage = new Message("join", joinData);
             UDP_Com.send_UDP(joinMessage);
             // warte 2 sek ob eine Init nachricht kommt
             Message returnedMessage = UDP_Com.recv_UDP();
@@ -133,7 +174,13 @@ public class TicTacToeGUI {
 
         frame.setSize(600, 600);
         frame.setVisible(true);
+        sidePanel.setPreferredSize(new Dimension(120, sidePanel.getPreferredSize().height));
     }
+
+
+
+
+
 
     private void initBoard(Board b) {
         boardPanel.removeAll();
@@ -172,6 +219,15 @@ public class TicTacToeGUI {
             boardPanel.repaint();
         }
         updateBoardButtonColors();
+
+        SwingUtilities.invokeLater(() -> {
+            int cellWidth = boardPanel.getWidth() / b.getFieldSize();
+            int minSideWidth = cellWidth;
+
+            Dimension currentSize = sidePanel.getPreferredSize();
+            sidePanel.setPreferredSize(new Dimension(Math.max(minSideWidth, currentSize.width), currentSize.height));
+            sidePanel.revalidate();
+        });
     }
     private Color getColorForString(String value) {
         // Nutzerabhängige Farbe
@@ -192,7 +248,14 @@ public class TicTacToeGUI {
         for (String user : game.getRanking().keySet()) {
             rankingModel.addElement(user + ": " + game.getRanking().get(user));
         }
+
+        playerModel.clear();
+        for (Player player : Game.players) {
+            playerModel.addElement(player.getUsr());
+        }
     }
+
+
 
 
     private void updateBoardButtonColors() {
@@ -277,7 +340,7 @@ public class TicTacToeGUI {
                             Message playerListMsg = new Message("player", playerListMsgData);
                             UDP_Com.send_UDP(playerListMsg, newPlayer);
                         }
-
+                        refreshRankingDisplay();
                         break;
 
                     case "player":
@@ -289,13 +352,16 @@ public class TicTacToeGUI {
                     case "leave":
                         LeaveMessageData leaveMsgData = (LeaveMessageData)  incomingMessage.getData();
                         Player deletedPlayer = new Player(leaveMsgData.getUsr(), leaveMsgData.getPort(), leaveMsgData.getIp());
+                        System.out.println(deletedPlayer.toString());
                         Game.players.remove(deletedPlayer);
+                        System.out.println(Game.players.toString());
+                        refreshRankingDisplay();
                         break;
                     case "new_player":
                         NewPlayerMessageData newPlayerMsgData = (NewPlayerMessageData) incomingMessage.getData();
                         Player newPlayer = new Player(newPlayerMsgData.getUsr(), newPlayerMsgData.getPort(), newPlayerMsgData.getIp());
                         Game.players.add(newPlayer);
-
+                        refreshRankingDisplay();
                         break;
                 }
             }

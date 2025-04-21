@@ -110,5 +110,16 @@ public class UDP_Com {
             }
 
         }
+    public static String getOwnIp() {
 
+        return "127.0.0.1";
+       /*
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            return "Unbekannt";
+        }
+    */
+    }
 }

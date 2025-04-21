@@ -36,4 +36,28 @@ public class Player {
     public void setIp(String ip) {
         this.ip = ip;
     }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "usr='" + usr + '\'' +
+                ", port=" + port +
+                ", ip='" + ip + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o){
+            return true;
+        }
+        else {
+        if (o == null || getClass() != o.getClass()) return false;
+        Player player = (Player) o;
+        return port == player.port &&
+                usr.equals(player.usr) &&
+                ip.equals(player.ip);
+    }
+    }
+
 }
