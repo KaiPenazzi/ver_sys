@@ -9,7 +9,7 @@ public class UDP_communication {
         for (Player p : Spiellogik.getPlayer_list()) {
             try(DatagramSocket socket = new DatagramSocket())
             {
-                if (p != Spiellogik.getPlayer()) {
+                if (!p.equals(Spiellogik.getPlayer())) {
                     InetAddress serverIp = InetAddress.getByName(p.getIp());
                     byte[] sendData = message.getBytes();
 

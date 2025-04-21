@@ -10,12 +10,13 @@ public class TicTacToeGUI {
 
     private JButton neuesSpielButton;
     private JButton joinButton;
+    private JButton leaveButton; // NEU
     private JPanel spielfeld;
     private JTextField width;
     private JTextField height;
     private JTextField value;
-    private JTextField friendIPField;     // NEU
-    private JTextField friendPortField;   // NEU
+    private JTextField friendIPField;
+    private JTextField friendPortField;
     private JFrame frame;
     private int winCondition = 3;
 
@@ -32,7 +33,6 @@ public class TicTacToeGUI {
         instance = this;
         frame = new JFrame("Tic Tac Toe");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        // Fenstergröße wurde auf 1200x800 vergrößert.
         frame.setSize(1200, 800);
         frame.setLayout(new BorderLayout());
 
@@ -41,11 +41,12 @@ public class TicTacToeGUI {
         height = new JTextField("3", 3);
         value = new JTextField("3", 3);
 
-        friendIPField = new JTextField("127.0.0.1", 10);    // NEU
-        friendPortField = new JTextField("12345", 5);       // NEU
+        friendIPField = new JTextField("127.0.0.1", 10);
+        friendPortField = new JTextField("12345", 5);
 
         neuesSpielButton = new JButton("Neues Spiel");
         joinButton = new JButton("Join");
+        leaveButton = new JButton("Leave"); // NEU
 
         controlPanel.add(new JLabel("Breite:"));
         controlPanel.add(width);
@@ -54,13 +55,14 @@ public class TicTacToeGUI {
         controlPanel.add(new JLabel("Punkte für Sieg:"));
         controlPanel.add(value);
 
-        controlPanel.add(new JLabel("IP Freund:"));        // NEU
-        controlPanel.add(friendIPField);                   // NEU
-        controlPanel.add(new JLabel("Port Freund:"));       // NEU
-        controlPanel.add(friendPortField);                 // NEU
+        controlPanel.add(new JLabel("IP Freund:"));
+        controlPanel.add(friendIPField);
+        controlPanel.add(new JLabel("Port Freund:"));
+        controlPanel.add(friendPortField);
 
         controlPanel.add(neuesSpielButton);
         controlPanel.add(joinButton);
+        controlPanel.add(leaveButton); // NEU
 
         rankingModel = new DefaultListModel<>();
         rankingList = new JList<>(rankingModel);
@@ -100,11 +102,19 @@ public class TicTacToeGUI {
 
         joinButton.addActionListener(e -> {
             try {
-                onJoinClicked();  // updated
+                onJoinClicked();
             } catch (SocketException ex) {
                 throw new RuntimeException(ex);
             }
         });
+
+        leaveButton.addActionListener(e -> {
+            try {
+                onLeaveClicked();
+            } catch (SocketException ex) {
+                throw new RuntimeException(ex);
+            }
+        }); // NEU
 
         frame.add(controlPanel, BorderLayout.NORTH);
         frame.add(spielfeld, BorderLayout.CENTER);
@@ -229,9 +239,17 @@ public class TicTacToeGUI {
         }
 
         System.out.println("Versuche Beitritt zu: " + ip + ":" + port);
-
-        // Anpassung je nach deiner Methode – hier als Platzhalter:
         Json_converter.create_JSON(Json_converter.Message_type.JOIN, 4, 4, ip, port);
+    }
+
+    private void onLeaveClicked() throws SocketException { // NEU
+        int confirm = JOptionPane.showConfirmDialog(frame, "Möchtest du das Spiel wirklich verlassen?", "Bestätigen", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            System.out.println("Spiel wird verlassen...");
+            Json_converter.create_JSON(Json_converter.Message_type.LEAVE, 0, 0, null, 0);
+            frame.dispose();
+            System.exit(0);
+        }
     }
 
     public void set_gui_cross(String username, int row, int col) {
@@ -266,10 +284,8 @@ public class TicTacToeGUI {
     }
 
     private Color getColorForString(String value) {
-        if(value.equals("none"))
-        {
-            return new Color(238, 238, 238).brighter();  // Ein helles Grau
-
+        if (value.equals("none")) {
+            return new Color(238, 238, 238).brighter();
         }
 
         int hash = value.hashCode();

@@ -167,6 +167,12 @@ public class Spiellogik
     public static void addPlayerToList(Player player)
     {
         player_list.add(player);
+
+    }
+
+    public static void deletePlayerFromList(Player player)
+    {
+        player_list.remove(player);
     }
 
     public static List<String> getPlayers_name() {
