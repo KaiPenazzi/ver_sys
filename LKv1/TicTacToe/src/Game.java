@@ -23,7 +23,7 @@ public class Game {
         //players.add(new Player(2222,"192.168.5.14"));
         //players.add(new Player(3333,"192.168.5.6"));
         //für Labor Teil 2 nur  friend bekannt
-        players.add(new Player("friend",1111,"127.0.0.1"));
+        //players.add(new Player("friend",1111,"127.0.0.1"));
 
         this.myPort = myPort;
     }

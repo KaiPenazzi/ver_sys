@@ -25,6 +25,7 @@ public class TicTacToeGUI {
 
     private JPanel sidePanel;
 
+    private JTextField friendNameField, friendIpField, friendPortField;
 
 
     //TODO: MessageData Klassen ersellen für newPlayer, Join und Playerlist
@@ -58,6 +59,18 @@ public class TicTacToeGUI {
         inputPanel.add(new JLabel("K:"));
         inputPanel.add(kField);
         inputPanel.add(initButton);
+
+        friendNameField = new JTextField("");
+        friendIpField = new JTextField("");
+        friendPortField = new JTextField("");
+
+        inputPanel.add(new JLabel("Friend:"));
+        inputPanel.add(friendNameField);
+        inputPanel.add(new JLabel("Friend IP:"));
+        inputPanel.add(friendIpField);
+        inputPanel.add(new JLabel("Friend Port:"));
+        inputPanel.add(friendPortField);
+
 
         frame.add(inputPanel, BorderLayout.NORTH);
 
@@ -119,11 +132,17 @@ public class TicTacToeGUI {
                 throw new RuntimeException(ex);
             }
 
-
-
             game = new Game(new Board(), new HashMap<String, Integer>(), port);
             JoinMessageData joinData = new JoinMessageData(username,port, UDP_Com.getOwnIp());
             Message joinMessage = new Message("join", joinData);
+            if(!friendIpField.getText().isEmpty()){
+                Game.players.add(new Player(friendNameField.getText(),Integer.parseInt(friendPortField.getText()),friendIpField.getText()));
+            }else {
+                Game.players.add(new Player(username,port,"127.0.0.1"));
+            }
+
+
+
             UDP_Com.send_UDP(joinMessage);
             // warte 2 sek ob eine Init nachricht kommt
             Message returnedMessage = UDP_Com.recv_UDP();
