@@ -1,4 +1,5 @@
 import java.net.*;
+import java.util.List;
 
 
 public class UDP_Com {
@@ -74,7 +75,7 @@ public class UDP_Com {
                 DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
                 socket.send(packet);
                 System.out.println(message.getType() + " message sent");
-                //message.getData().printData();
+
                 socket.close();
             }
 
@@ -86,5 +87,28 @@ public class UDP_Com {
 
     }
 
+
+    public static void send_UDP(Message message, Player player) {
+
+                try{
+                int port = player.getPort();
+                String ip = player.getIp();
+                if(port != Game.myPort) {
+                    String jsonMessage = Msg_Conversion.createJSONFromMessage(message);
+                    DatagramSocket socket = new DatagramSocket();
+                    byte[] data = jsonMessage.getBytes();
+                    InetAddress address = InetAddress.getByName(ip);
+                    DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
+                    socket.send(packet);
+                    System.out.println(message.getType() + " message sent");
+                    //message.getData().printData();
+                    socket.close();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
 
 }

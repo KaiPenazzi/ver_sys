@@ -1,6 +1,8 @@
 import org.json.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Klasse um aus Json Files, die als String ankommen in eine Message zu parsen
@@ -59,7 +61,41 @@ public class Msg_Conversion {
                 break;
             case "join":
                 message.setType("join");
+                JoinMessageData joinData = new JoinMessageData(obj.getString("usr"), obj.getInt("port"),obj.getString("ip") );
+                message.setData(joinData);
                 break;
+            case "player":
+                message.setType("player");
+
+
+                List<Player> playerList = new ArrayList<>();
+                JSONArray playerListJson = obj.getJSONArray("players");
+                for (int i = 0; i < playerListJson.length(); i++) {
+                    JSONObject jsonPlayer = playerListJson.getJSONObject(i);
+                    String usr = jsonPlayer.optString("usr");
+                    int port = jsonPlayer.getInt("port");
+                    String ip = jsonPlayer.getString("ip");
+                    Player newP = new Player(usr, port, ip);
+                    playerList.add(newP);
+                }
+
+                PlayerMessageData playerData = new PlayerMessageData(playerList);
+                message.setData(playerData);
+
+                break;
+            case "leave":
+                message.setType("leave");
+
+                LeaveMessageData leaveMessageData = new LeaveMessageData(obj.getString("usr"), obj.getInt("port"),obj.getString("ip") );
+                message.setData(leaveMessageData);
+                break;
+            case "new_player":
+                message.setType("new_player");
+                NewPlayerMessageData newPlayerData = new NewPlayerMessageData(obj.getString("usr"), obj.getInt("port"),obj.getString("ip"));
+                message.setData(newPlayerData);
+                break;
+
+
         }
         return message;
     }
@@ -105,10 +141,50 @@ public class Msg_Conversion {
                 break;
 
             case "join":
+                JoinMessageData joinData = (JoinMessageData) message.getData();
+
                 obj.put("type","join");
+                obj.put("usr",joinData.getUsr() );
+                obj.put("port", joinData.getPort());
+                obj.put("ip",joinData.getIp());
+                jsonString = obj.toString(4);
+                break;
+
+            case "player":
+                PlayerMessageData playerData = (PlayerMessageData) message.getData();
+
+                obj.put("type", "player");
+                JSONArray playerList = new JSONArray();
+                for(Player p : playerData.getPlayers()){
+                    JSONObject playerObj = new JSONObject();
+                    playerObj.put("usr", p.getUsr());
+                    playerObj.put("port",p.getPort());
+                    playerObj.put("ip", p.getIp());
+                    playerList.put(playerObj);
+                }
+                obj.put("players", playerList);
+                jsonString = obj.toString(4);
+                break;
+
+            case "leave":
+                LeaveMessageData leaveData = (LeaveMessageData) message.getData();
+                obj.put("type", "leave");
+                obj.put("usr",leaveData.getUsr() );
+                obj.put("port", leaveData.getPort());
+                obj.put("ip",leaveData.getIp());
+                jsonString = obj.toString(4);
+                break;
+
+            case "new_player":
+                NewPlayerMessageData newPData = (NewPlayerMessageData) message.getData();
+                obj.put("type", "new_player");
+                obj.put("usr",newPData.getUsr() );
+                obj.put("port", newPData.getPort());
+                obj.put("ip",newPData.getIp());
                 jsonString = obj.toString(4);
                 break;
         }
+
 
         return jsonString;
     }

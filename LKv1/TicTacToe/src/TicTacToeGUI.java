@@ -260,13 +260,46 @@ public class TicTacToeGUI {
 
                     case "join":
                         if (game.isRunning()) {
+                            JoinMessageData joinMessage = (JoinMessageData) incomingMessage.getData();
+                            Player  newPlayer = new Player(joinMessage.getUsr(), joinMessage.getPort(), joinMessage.getIp());
                             InitMessageData joinAnswerdata = new InitMessageData(game.getRanking(), game.getGameBoard());
                             Message joinAnswer = new Message("init", joinAnswerdata);
-                            UDP_Com.send_UDP(joinAnswer);
+                            UDP_Com.send_UDP(joinAnswer,newPlayer);
+
+                            NewPlayerMessageData newPlayerMsgData = new NewPlayerMessageData(joinMessage.getUsr(), joinMessage.getPort(), joinMessage.getIp());
+                            Message newPlMsg = new Message("new_player", newPlayerMsgData);
+                            UDP_Com.send_UDP(newPlMsg);
+
+                            Game.players.add(newPlayer);
+
+                            //player list an neuen Spieler senden
+                            PlayerMessageData playerListMsgData = new PlayerMessageData(Game.players);
+                            Message playerListMsg = new Message("player", playerListMsgData);
+                            UDP_Com.send_UDP(playerListMsg, newPlayer);
                         }
+
+                        break;
+
+                    case "player":
+                        PlayerMessageData playerMessage = (PlayerMessageData) incomingMessage.getData();
+                        Game.players = playerMessage.getPlayers();
+
+                        refreshRankingDisplay();
+                        break;
+                    case "leave":
+                        LeaveMessageData leaveMsgData = (LeaveMessageData)  incomingMessage.getData();
+                        Player deletedPlayer = new Player(leaveMsgData.getUsr(), leaveMsgData.getPort(), leaveMsgData.getIp());
+                        Game.players.remove(deletedPlayer);
+                        break;
+                    case "new_player":
+                        NewPlayerMessageData newPlayerMsgData = (NewPlayerMessageData) incomingMessage.getData();
+                        Player newPlayer = new Player(newPlayerMsgData.getUsr(), newPlayerMsgData.getPort(), newPlayerMsgData.getIp());
+                        Game.players.add(newPlayer);
+
                         break;
                 }
             }
+            refreshRankingDisplay();
             boardPanel.revalidate();
             boardPanel.repaint();
         }
