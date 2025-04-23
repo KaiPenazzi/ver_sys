@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("application")
     id("com.google.protobuf") version "0.9.4"
 }
 
@@ -16,8 +17,13 @@ dependencies {
     implementation("io.grpc:grpc-protobuf:1.71.0")
     implementation("io.grpc:grpc-stub:1.71.0")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
+    implementation("com.google.protobuf:protobuf-java-util:3.25.3")
 
     testImplementation("junit:junit:4.13.2")
+}
+
+application {
+    mainClass = "org.example.LogClient"
 }
 
 protobuf {
@@ -43,6 +49,20 @@ tasks.named<ProcessResources>("processResources") {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
+tasks.register<JavaExec>("runServer") {
+    group = "application"
+    description = "Startet den gRPC-Server"
+    mainClass.set("org.example.LogServer") // deine Server-Klasse
+    classpath = sourceSets["main"].runtimeClasspath
+}
+
+tasks.register<JavaExec>("runClient") {
+    group = "application"
+    description = "Startet den gRPC-Client"
+    mainClass.set("org.example.LogClient") // deine Client-Klasse
+    classpath = sourceSets["main"].runtimeClasspath
+}
+
 sourceSets {
     main {
         proto {
@@ -53,4 +73,6 @@ sourceSets {
         }
     }
 }
+
+
 

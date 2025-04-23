@@ -4,6 +4,7 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
 option java_package = "org.example";  // Dies gibt das Java-Package an
+option java_multiple_files = true;
 
 message Log {
   string usr_id = 1;
