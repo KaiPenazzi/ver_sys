@@ -3,6 +3,7 @@ plugins {
     id("com.google.protobuf") version "0.9.4"
 }
 
+
 version = "1.0.0"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
