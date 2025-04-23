@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 option java_package = "org.example";
+option java_multiple_files = true;
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
