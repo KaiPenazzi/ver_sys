@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+message Log {
+  int32 line_number = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string usr_id = 3;
+  string log_text = 4;
+}
+
+service LogService {
+  rpc AddLog(Log) returns (google.protobuf.Empty);
+  rpc GetLog(google.protobuf.Empty) returns (stream Log);
+  rpc ListenLog(google.protobuf.Empty) returns (stream Log);
+  rpc UnlistenLog(google.protobuf.Empty) returns (google.protobuf.Empty);
+}
