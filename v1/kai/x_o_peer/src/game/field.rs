@@ -1,4 +1,4 @@
-use druid::{im::Vector, Data, Env, EventCtx, Lens};
+use druid::{im::Vector, Color, Data, Env, EventCtx, Lens};
 
 use crate::{eve::FIELD_CLICKED, model::messages::ActionData};
 
@@ -27,6 +27,10 @@ impl GameField {
     }
 
     pub fn init_with_fields(field: Vec<Vec<String>>, k: u32) -> Self {
+        if field.len() == 0 || field[0].len() == 0 {
+            return Self::init(0, 0, k);
+        }
+
         let mut grid = Self {
             x: field.len(),
             y: field[0].len(),
@@ -48,7 +52,9 @@ impl GameField {
 
         if let Some(row) = self.cols.get_mut(x) {
             if let Some(cell) = row.cells.get_mut(y) {
-                cell.set(&action.usr);
+                if cell.text == "none" {
+                    cell.set(&action.usr);
+                }
             }
         }
     }
@@ -117,7 +123,7 @@ impl GameField {
             let mut cells: Vec<&Cell> = vec![];
 
             for cell in &col.cells {
-                if cell.text != "None" && cell.text == start_name {
+                if cell.text != "none" && cell.text == start_name {
                     count += 1;
                     cells.push(cell);
                 } else {
@@ -150,7 +156,7 @@ impl GameField {
                     .get(x.try_into().unwrap(), y.try_into().unwrap())
                     .unwrap()
                     .clone();
-                if cell.text != "None" && cell.text == start_name {
+                if cell.text != "none" && cell.text == start_name {
                     count += 1;
                     cells.push(cell)
                 } else {
@@ -182,7 +188,7 @@ impl GameField {
                     .get((x + y).try_into().unwrap(), y.try_into().unwrap())
                     .unwrap()
                     .clone();
-                if cell.text != "None" && cell.text == start_name {
+                if cell.text != "none" && cell.text == start_name {
                     count += 1;
                     cells.push(cell);
                 } else {
@@ -210,7 +216,7 @@ impl GameField {
                     .get(x.try_into().unwrap(), (x + y).try_into().unwrap())
                     .unwrap()
                     .clone();
-                if cell.text != "None" && cell.text == start_name {
+                if cell.text != "none" && cell.text == start_name {
                     count += 1;
                     cells.push(cell);
                 } else {
@@ -239,7 +245,7 @@ impl GameField {
                 if x >= y {
                     let cell = self.get(x - y, y).unwrap().clone();
 
-                    if cell.text != "None" && cells[0].text == cell.text {
+                    if cell.text != "none" && cells[0].text == cell.text {
                         cells.push(cell);
                     } else {
                         cells.clear();
@@ -263,7 +269,7 @@ impl GameField {
                 if y + i < self.y {
                     let cell = self.get(self.x - 1 - i, y + i).unwrap().clone();
 
-                    if cell.text != "None" && cells[0].text == cell.text {
+                    if cell.text != "none" && cells[0].text == cell.text {
                         cells.push(cell);
                     } else {
                         cells.clear();
@@ -321,13 +327,15 @@ pub struct Cell {
     pub text: String,
     pub x: u32,
     pub y: u32,
+    pub color: Color,
 }
 impl Cell {
     fn new(x: u32, y: u32) -> Self {
         Self {
-            text: "None".to_string(),
+            text: "none".to_string(),
             x: x,
             y: y,
+            color: Color::BLACK,
         }
     }
 
@@ -336,6 +344,7 @@ impl Cell {
             text: text,
             x: x,
             y: y,
+            color: Color::BLACK,
         }
     }
 
@@ -348,7 +357,7 @@ impl Cell {
     }
 
     pub fn reset(&mut self) {
-        self.text = "None".to_string()
+        self.text = "none".to_string()
     }
 }
 
@@ -445,8 +454,8 @@ mod test_field {
             y: 2,
         });
         let expected = vec![
-            vec!["None", "None", "None", "None"],
-            vec!["None", "None", "test", "None"],
+            vec!["none", "none", "none", "none"],
+            vec!["none", "none", "test", "none"],
         ];
 
         assert_eq!(field.to_vec(), expected)

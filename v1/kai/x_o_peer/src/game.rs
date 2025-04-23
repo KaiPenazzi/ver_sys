@@ -24,7 +24,7 @@ impl Game {
     pub fn from_init(init: InitData) -> Self {
         Self {
             field: GameField::init_with_fields(init.field, init.k),
-            scores: GameScores::new(),
+            scores: GameScores::from_vec(init.score),
         }
     }
 
@@ -32,6 +32,15 @@ impl Game {
         match self.field.check() {
             Some(usr) => self.scores.add_point(usr),
             None => (),
+        }
+    }
+
+    pub fn to_init(&self) -> InitData {
+        InitData {
+            r#type: "init".to_string(),
+            field: self.field.to_vec(),
+            score: self.scores.to_vec(),
+            k: self.field.k,
         }
     }
 }
