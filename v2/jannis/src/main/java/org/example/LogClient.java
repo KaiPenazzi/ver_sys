@@ -4,6 +4,7 @@ import com.google.protobuf.Empty;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -19,10 +20,13 @@ public class LogClient {
         // 2. Stub für asynchrone gRPC-Aufrufe
         LogServiceGrpc.LogServiceStub stub = LogServiceGrpc.newStub(channel);
 
-        // 3. Latch für Synchronisation (damit main nicht vorzeitig endet)
+        // 3. Latch für Synchronisation
         CountDownLatch finishLatch = new CountDownLatch(1);
 
-        // 4. Antwort-Observer für AddLog (für die serverseitige Antwort: Empty)
+        // 4. Listener starten (vor AddLog)
+        listenLogs(stub);
+
+        // 5. Antwort-Observer für AddLog
         StreamObserver<Empty> responseObserver = new StreamObserver<>() {
             @Override
             public void onNext(Empty empty) {
@@ -42,7 +46,7 @@ public class LogClient {
             }
         };
 
-        // 5. Request-Stream an den Server senden (AddLog)
+        // 6. Request-Stream an den Server senden (AddLog)
         StreamObserver<Log> requestObserver = stub.addLog(responseObserver);
 
         try {
@@ -62,7 +66,6 @@ public class LogClient {
                     .setLogText("Dritter Logeintrag")
                     .build());
 
-            // Stream abschließen (nichts mehr senden)
             requestObserver.onCompleted();
 
         } catch (Exception e) {
@@ -70,32 +73,62 @@ public class LogClient {
             throw e;
         }
 
-        // 6. Auf Abschluss warten
+        // 7. Auf Abschluss von AddLog warten
         if (!finishLatch.await(5, TimeUnit.SECONDS)) {
             System.err.println("⚠️ Timeout beim Warten auf Serverantwort");
         }
 
-        // 7. Test für GetLog hinzufügen
-        getLogs(stub);
+        // 8. GetLog-Test (auskommentiert – bei Bedarf aktivieren)
+        // getLogs(stub);
 
-        // 8. Verbindung schließen
+        // 9. Verbindung schließen (nach kurzer Wartezeit, um evtl. Logs zu empfangen)
+        Thread.sleep(2000);
         channel.shutdownNow();
     }
 
-    // Methode, die die `GetLog`-Methode des Servers testet
+    // Neuer Test für ListenLog
+    private static void listenLogs(LogServiceGrpc.LogServiceStub stub) {
+        System.out.println("📡 Warte auf neue Logs vom Server...");
+
+        StreamObserver<LoggedLog> responseObserver = new StreamObserver<>() {
+            @Override
+            public void onNext(LoggedLog loggedLog) {
+                System.out.println("📥 Neuer Log-Eintrag empfangen:");
+                System.out.println("  Zeile: " + loggedLog.getLineNumber());
+                System.out.println("  Zeit:  " + loggedLog.getTimestamp());
+                System.out.println("  User:  " + loggedLog.getLog().getUsrId());
+                System.out.println("  Text:  " + loggedLog.getLog().getLogText());
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                System.err.println("❌ Fehler beim Empfangen von Logs: " + t.getMessage());
+            }
+
+            @Override
+            public void onCompleted() {
+                System.out.println("🔚 ListenLog beendet.");
+            }
+        };
+
+        stub.listenLog(User.getDefaultInstance(), responseObserver);
+    }
+
+    // Bestehender Test für GetLog (bleibt erhalten)
     private static void getLogs(LogServiceGrpc.LogServiceStub stub) throws InterruptedException {
         System.out.println("\n🔄 Holen der Logs...");
 
-        // CountDownLatch für Synchronisation
         CountDownLatch finishLatch = new CountDownLatch(1);
 
-        // Antwort-Observer für GetLog
         StreamObserver<ListLoggedLog> responseObserver = new StreamObserver<>() {
             @Override
             public void onNext(ListLoggedLog listLoggedLog) {
                 System.out.println("✅ Logs empfangen:");
                 listLoggedLog.getLogsList().forEach(log -> {
-                    System.out.println("Zeilennummer: " + log.getLineNumber() + ", Log: " + log.getLog().getLogText() + ", User: " + log.getLog().getUsrId());
+                    System.out.println("Zeilennummer: " + log.getLineNumber() +
+                            ", Timestamp: " + log.getTimestamp() +
+                            ", Log: " + log.getLog().getLogText() +
+                            ", User: " + log.getLog().getUsrId());
                 });
             }
 
@@ -112,10 +145,8 @@ public class LogClient {
             }
         };
 
-        // Sende leeren Request (Google Empty) für GetLog
         stub.getLog(Empty.getDefaultInstance(), responseObserver);
 
-        // Warten auf Antwort
         if (!finishLatch.await(5, TimeUnit.SECONDS)) {
             System.err.println("⚠️ Timeout beim Warten auf Serverantwort");
         }
