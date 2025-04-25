@@ -24,7 +24,7 @@ public class Main {
                 .setLogText("test log")
                 .build();
 
-        StreamObserver<Log> add_observer = stub.addLog(new StreamObserver<Empty>() {
+        StreamObserver<Empty> send_observer = new StreamObserver<Empty>() {
             @Override
             public void onNext(Empty value) {
                 System.out.println("Log added successfully");
@@ -39,16 +39,23 @@ public class Main {
             public void onCompleted() {
                 System.out.println("Stream completed");
             }
-        });
+        };
+
+        StreamObserver<Log> add_observer = stub.addLog(send_observer);
 
         System.out.println("Sending log...");
         add_observer.onNext(log);
         add_observer.onNext(log);
-        add_observer.onNext(log);
-        add_observer.onNext(log);
+
+        try {
+            // add_observer.wait();
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            System.err.println("Error: " + e.getMessage());
+        }
 
         System.out.println("Completing stream...");
-        add_observer.onCompleted();
+        send_observer.onCompleted();
         channel.shutdown();
     }
 }
