@@ -20,12 +20,13 @@ class MyServer extends LogServiceImplBase {
 
             @Override
             public void onError(Throwable t) {
-                System.err.println("Error: " + t.getMessage());
+                System.err.println("REC addLog ERROR: " + t.getMessage());
             }
 
             @Override
             public void onCompleted() {
                 System.out.println("Stream completed");
+                responseObserver.onNext(Empty.getDefaultInstance());
                 responseObserver.onCompleted();
             }
         };

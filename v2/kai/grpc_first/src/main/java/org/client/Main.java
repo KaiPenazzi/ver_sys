@@ -6,6 +6,7 @@ import org.example.LogServiceGrpc.LogServiceStub;
 
 import com.google.protobuf.Empty;
 
+import io.grpc.Deadline;
 import io.grpc.ManagedChannel;
 import io.grpc.stub.StreamObserver;
 
@@ -17,7 +18,8 @@ public class Main {
                 .usePlaintext()
                 .build();
 
-        LogServiceStub stub = LogServiceGrpc.newStub(channel);
+        LogServiceStub stub = LogServiceGrpc.newStub(channel).withDeadlineAfter(5,
+                java.util.concurrent.TimeUnit.SECONDS);
 
         Log log = Log.newBuilder()
                 .setUsrId("123")
@@ -47,15 +49,14 @@ public class Main {
         add_observer.onNext(log);
         add_observer.onNext(log);
 
-        try {
-            // add_observer.wait();
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            System.err.println("Error: " + e.getMessage());
-        }
-
         System.out.println("Completing stream...");
-        send_observer.onCompleted();
+        add_observer.onCompleted();
         channel.shutdown();
+
+        try {
+            channel.awaitTermination(1, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            System.err.println("Channel termination interrupted: " + e.getMessage());
+        }
     }
 }
