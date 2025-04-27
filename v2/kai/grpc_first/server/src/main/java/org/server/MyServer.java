@@ -14,8 +14,6 @@ public class MyServer {
     }
 
     public void start() {
-        System.out.println("start Server");
-
         server = ServerBuilder.forPort(port)
                 .addService(new MyService())
                 .build();

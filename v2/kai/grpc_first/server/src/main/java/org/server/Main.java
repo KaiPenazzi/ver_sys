@@ -2,7 +2,11 @@ package org.server;
 
 public class Main {
     public static void main(String[] args) {
-        MyServer server = new MyServer(3000);
+        System.out.println(
+                "usage: java -jar server.jar <port>\nif you haven't specified port, default port is 3000");
+        int port = (args.length > 0 && args[0] != null) ? Integer.parseInt(args[0]) : 3000;
+
+        MyServer server = new MyServer(port);
         server.start();
     }
 }

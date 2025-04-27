@@ -30,9 +30,7 @@ public class MyClient {
     }
 
     public void start() {
-        System.out.println("Client started");
-
-        channel = io.grpc.ManagedChannelBuilder.forAddress("127.0.0.1", 3000)
+        channel = io.grpc.ManagedChannelBuilder.forAddress(url.getHost(), url.getPort())
                 .usePlaintext()
                 .build();
 
@@ -64,7 +62,6 @@ public class MyClient {
         addLogObserver = async_stub.addLog(new StreamObserver<Empty>() {
             @Override
             public void onNext(Empty value) {
-                System.out.println("Log added successfully");
             }
 
             @Override
@@ -74,7 +71,6 @@ public class MyClient {
 
             @Override
             public void onCompleted() {
-                System.out.println("AddLog Stream completed");
             }
         });
 
@@ -90,6 +86,7 @@ public class MyClient {
     }
 
     public void listenLog() {
+        System.out.println("Listening to logs...");
         Printer.header();
         async_stub.listenLog(User.newBuilder().setUserId(usr).build(), new StreamObserver<LoggedLog>() {
             @Override
@@ -104,7 +101,6 @@ public class MyClient {
 
             @Override
             public void onCompleted() {
-                System.out.println("ListenLog Stream completed");
             }
         });
     }
@@ -113,7 +109,6 @@ public class MyClient {
         async_stub.unlistenLog(User.newBuilder().setUserId(usr).build(), new StreamObserver<Empty>() {
             @Override
             public void onNext(Empty value) {
-                System.out.println("UnlistenLog completed");
             }
 
             @Override
@@ -123,7 +118,7 @@ public class MyClient {
 
             @Override
             public void onCompleted() {
-                System.out.println("UnlistenLog Stream completed");
+                System.out.println("Unlistening to logs...");
             }
         });
     }

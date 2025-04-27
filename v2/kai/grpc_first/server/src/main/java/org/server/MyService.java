@@ -20,15 +20,12 @@ class MyService extends LogServiceImplBase {
 
     @Override
     public StreamObserver<Log> addLog(StreamObserver<Empty> responseObserver) {
-        System.out.println("Received log request");
-
         return new StreamObserver<Log>() {
             @Override
             public void onNext(Log value) {
                 LoggedLog loggedlog = logger.addLog(value);
 
                 listeners.forEach((usr, observer) -> {
-                    System.out.println("Sending log to listener: " + usr);
                     observer.onNext(loggedlog);
                 });
             }
@@ -40,7 +37,6 @@ class MyService extends LogServiceImplBase {
 
             @Override
             public void onCompleted() {
-                System.out.println("Stream completed");
                 responseObserver.onNext(Empty.getDefaultInstance());
                 responseObserver.onCompleted();
             }
@@ -49,21 +45,17 @@ class MyService extends LogServiceImplBase {
 
     @Override
     public void getLog(Empty request, StreamObserver<ListLoggedLog> responseObserver) {
-        System.out.println("Received getLogs request");
         responseObserver.onNext(logger.getLogs());
         responseObserver.onCompleted();
     }
 
     @Override
     public void listenLog(User request, StreamObserver<LoggedLog> responseObserver) {
-        System.out.println("Received listenLog request");
         listeners.put(request.getUserId(), responseObserver);
     }
 
     @Override
     public void unlistenLog(User request, StreamObserver<Empty> responseObserver) {
-        System.out.println("Received stopListenLog request");
-
         var listenerObserver = listeners.remove(request.getUserId());
         listenerObserver.onCompleted();
 
