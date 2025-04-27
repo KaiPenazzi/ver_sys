@@ -1,68 +1,52 @@
 package org.client;
 
-import org.example.ListLoggedLog;
-import org.example.Log;
-import org.example.LogServiceGrpc;
-import org.example.LogServiceGrpc.LogServiceBlockingV2Stub;
-import org.example.LogServiceGrpc.LogServiceStub;
-import org.utils.Printer;
-
-import com.google.protobuf.Empty;
-
-import io.grpc.Deadline;
-import io.grpc.ManagedChannel;
-import io.grpc.stub.StreamObserver;
+import java.net.URI;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("run client");
+        String usr = (args.length > 0 && args[0] != null) ? args[0] : "default";
+        String url = (args.length > 1 && args[1] != null) ? args[1] : "localhost:3000";
 
-        ManagedChannel channel = io.grpc.ManagedChannelBuilder.forAddress("127.0.0.1", 3000)
-                .usePlaintext()
-                .build();
+        MyClient client = new MyClient(usr, URI.create("dummy://" + url));
 
-        LogServiceStub async_stub = LogServiceGrpc.newStub(channel);
-        LogServiceBlockingV2Stub sync_stub = LogServiceGrpc.newBlockingV2Stub(channel);
+        client.start();
 
-        Log log = Log.newBuilder()
-                .setUsrId("123")
-                .setLogText("test log")
-                .build();
+        client.addLog("Hello World");
+        client.getLog();
 
-        StreamObserver<Empty> send_observer = new StreamObserver<Empty>() {
-            @Override
-            public void onNext(Empty value) {
-                System.out.println("Log added successfully");
+        Scanner scanner = new Scanner(System.in);
+
+        String input = "";
+        do {
+            input = scanner.nextLine();
+
+            switch (input) {
+                case "add":
+                    System.out.println("Enter log message:");
+                    String message = scanner.nextLine();
+                    client.addLog(message);
+                    break;
+
+                case "get":
+                    client.getLog();
+                    break;
+
+                case "listen":
+                    System.out.println("Listening to logs...");
+                    client.listenLog();
+                    break;
+
+                case "stop":
+                    System.out.println("Stopping listener...");
+                    client.unlistenLog();
+                    break;
+
+                default:
+                    break;
             }
+        } while (!input.equals("exit"));
 
-            @Override
-            public void onError(Throwable t) {
-                System.err.println("Error: " + t.getMessage());
-            }
-
-            @Override
-            public void onCompleted() {
-                System.out.println("Stream completed");
-            }
-        };
-
-        StreamObserver<Log> add_observer = async_stub.addLog(send_observer);
-
-        System.out.println("Sending log...");
-        add_observer.onNext(log);
-        add_observer.onNext(log);
-        System.out.println("Completing stream...");
-        add_observer.onCompleted();
-
-        ListLoggedLog logs = sync_stub.getLog(Empty.getDefaultInstance());
-        Printer.listloggedlog(logs);
-
-        channel.shutdown();
-
-        try {
-            channel.awaitTermination(1, java.util.concurrent.TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            System.err.println("Channel termination interrupted: " + e.getMessage());
-        }
+        client.stop();
     }
 }

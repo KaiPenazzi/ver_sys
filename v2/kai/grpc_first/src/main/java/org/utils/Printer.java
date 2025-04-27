@@ -33,7 +33,14 @@ public class Printer {
     }
 
     public static void listloggedlog(ListLoggedLog listloggedlog) {
-        // Formatierte Ausgabe der Spaltenüberschrift
+        header();
+
+        for (LoggedLog log : listloggedlog.getLogsList()) {
+            loggedlog(log);
+        }
+    }
+
+    public static void header() {
         System.out.printf("%-" + LINE_NUMBER_WIDTH + "s", "Line");
         System.out.print(" ");
 
@@ -46,12 +53,6 @@ public class Printer {
         System.out.printf("%-" + DATE_WIDTH + "s", "Date");
         System.out.println();
 
-        // Horizontale Trennlinie
         System.out.println("-".repeat(LINE_NUMBER_WIDTH + USER_ID_WIDTH + LOG_TEXT_WIDTH + DATE_WIDTH + 6));
-
-        // Für jede Log-Meldung die loggedlog-Methode aufrufen
-        for (LoggedLog log : listloggedlog.getLogsList()) {
-            loggedlog(log);
-        }
     }
 }

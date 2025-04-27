@@ -1,6 +1,7 @@
 plugins {
     id("java")
     id("com.google.protobuf") version "0.9.4"
+    id("com.gradleup.shadow")
 }
 
 group = "com.example"
@@ -44,7 +45,6 @@ tasks.named<ProcessResources>("processResources") {
 }
 
 tasks.register<JavaExec>("runServer") {
-
     group = "application"
     mainClass.set("org.server.Main")
     classpath = sourceSets["main"].runtimeClasspath
@@ -66,4 +66,3 @@ sourceSets {
         }
     }
 }
-
