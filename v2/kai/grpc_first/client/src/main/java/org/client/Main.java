@@ -12,11 +12,7 @@ public class Main {
 
         client.start();
 
-        client.addLog("Hello World");
-        client.getLog();
-
         Scanner scanner = new Scanner(System.in);
-
         String input = "";
         do {
             input = scanner.nextLine();
@@ -37,7 +33,7 @@ public class Main {
                     client.listenLog();
                     break;
 
-                case "stop":
+                case "unlisten":
                     System.out.println("Stopping listener...");
                     client.unlistenLog();
                     break;

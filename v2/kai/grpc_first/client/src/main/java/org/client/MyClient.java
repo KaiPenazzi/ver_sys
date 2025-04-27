@@ -1,7 +1,6 @@
 package org.client;
 
 import java.net.URI;
-import java.net.URL;
 
 import org.example.Log;
 import org.example.LogServiceGrpc;
@@ -33,7 +32,7 @@ public class MyClient {
     public void start() {
         System.out.println("Client started");
 
-        channel = io.grpc.ManagedChannelBuilder.forAddress(url.getHost(), url.getPort())
+        channel = io.grpc.ManagedChannelBuilder.forAddress("127.0.0.1", 3000)
                 .usePlaintext()
                 .build();
 
