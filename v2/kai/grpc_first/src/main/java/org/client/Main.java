@@ -1,8 +1,11 @@
 package org.client;
 
+import org.example.ListLoggedLog;
 import org.example.Log;
 import org.example.LogServiceGrpc;
+import org.example.LogServiceGrpc.LogServiceBlockingV2Stub;
 import org.example.LogServiceGrpc.LogServiceStub;
+import org.utils.Printer;
 
 import com.google.protobuf.Empty;
 
@@ -18,8 +21,8 @@ public class Main {
                 .usePlaintext()
                 .build();
 
-        LogServiceStub stub = LogServiceGrpc.newStub(channel).withDeadlineAfter(5,
-                java.util.concurrent.TimeUnit.SECONDS);
+        LogServiceStub async_stub = LogServiceGrpc.newStub(channel);
+        LogServiceBlockingV2Stub sync_stub = LogServiceGrpc.newBlockingV2Stub(channel);
 
         Log log = Log.newBuilder()
                 .setUsrId("123")
@@ -43,14 +46,17 @@ public class Main {
             }
         };
 
-        StreamObserver<Log> add_observer = stub.addLog(send_observer);
+        StreamObserver<Log> add_observer = async_stub.addLog(send_observer);
 
         System.out.println("Sending log...");
         add_observer.onNext(log);
         add_observer.onNext(log);
-
         System.out.println("Completing stream...");
         add_observer.onCompleted();
+
+        ListLoggedLog logs = sync_stub.getLog(Empty.getDefaultInstance());
+        Printer.listloggedlog(logs);
+
         channel.shutdown();
 
         try {

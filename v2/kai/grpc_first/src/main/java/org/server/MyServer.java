@@ -1,34 +1,37 @@
 package org.server;
 
-import org.example.Log;
-import org.example.LogServiceGrpc.LogServiceImplBase;
+import java.io.IOException;
 
-import com.google.protobuf.Empty;
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
 
-import io.grpc.stub.StreamObserver;
+public class MyServer {
+    Server server;
+    int port = 3000;
 
-class MyServer extends LogServiceImplBase {
-    @Override
-    public StreamObserver<Log> addLog(StreamObserver<Empty> responseObserver) {
-        System.out.println("Received log request");
+    public MyServer(int port) {
+        this.port = port;
+    }
 
-        return new StreamObserver<Log>() {
-            @Override
-            public void onNext(Log value) {
-                System.out.println("Received log: " + value.getLogText());
-            }
+    public void start() {
+        System.out.println("start Server");
 
-            @Override
-            public void onError(Throwable t) {
-                System.err.println("REC addLog ERROR: " + t.getMessage());
-            }
+        server = ServerBuilder.forPort(port)
+                .addService(new MyService())
+                .build();
 
-            @Override
-            public void onCompleted() {
-                System.out.println("Stream completed");
-                responseObserver.onNext(Empty.getDefaultInstance());
-                responseObserver.onCompleted();
-            }
-        };
+        try {
+            server.start();
+        } catch (IOException e) {
+            System.err.println("Failed to start server: " + e.getMessage());
+            return;
+        }
+
+        try {
+            System.out.println("Server started on port: " + this.port);
+            server.awaitTermination();
+        } catch (InterruptedException e) {
+            System.err.println("Server interrupted: " + e.getMessage());
+        }
     }
 }
