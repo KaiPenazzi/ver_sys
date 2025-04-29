@@ -5,12 +5,111 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 
+import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class LogClient {
 
-    public static void main(String[] args) throws InterruptedException {
+    String username;
+    LogServiceGrpc.LogServiceBlockingStub blockingStubb;
+    LogServiceGrpc.LogServiceStub asyncStubb;
+    StreamObserver<LoggedLog> activeListenObserver = null;
+
+
+    public LogClient(String username, LogServiceGrpc.LogServiceStub asyncStubb)
+    {
+        this.username = username;
+        //this.blockingStubb = blockingStubb;
+        this.asyncStubb = asyncStubb;
+    }
+
+    public void addLog(String log)
+    {
+            StreamObserver<Empty> responseObserver = new StreamObserver<>() {
+                @Override
+                public void onNext(Empty empty) {
+                    System.out.println("Server hat alle Logs erhalten.");
+                }
+
+                @Override
+                public void onError(Throwable t) {
+                    System.err.println("Fehler bei AddLog: " + t.getMessage());
+                }
+
+                @Override
+                public void onCompleted() {
+                    System.out.println("AddLog-Stream abgeschlossen.");
+                }
+            };
+            StreamObserver<Log>addStreamRequestObserver = asyncStubb.addLog(responseObserver);
+
+            addStreamRequestObserver.onNext(Log.newBuilder()
+                    .setUsrId(username)
+                    .setLogText(log)
+                    .build());
+
+            addStreamRequestObserver.onCompleted();
+    }
+
+    public void getLog()
+    {
+
+    }
+
+    public void listen()
+    {
+        activeListenObserver = new StreamObserver<>() {
+            @Override
+            public void onNext(LoggedLog loggedLog) {
+                System.out.println("Neuer Log-Eintrag empfangen:");
+                System.out.println("  Zeile: " + loggedLog.getLineNumber());
+                System.out.println("  Zeit:  " + loggedLog.getTimestamp());
+                System.out.println("  User:  " + loggedLog.getLog().getUsrId());
+                System.out.println("  Text:  " + loggedLog.getLog().getLogText());
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                System.err.println("Fehler beim Empfangen von Logs: " + t.getMessage());
+            }
+
+            @Override
+            public void onCompleted() {
+                System.out.println("ListenLog beendet.");
+            }
+        };
+
+        asyncStubb.listenLog(User.newBuilder()
+                .setUserId(username)
+                .build()
+                , activeListenObserver);
+    }
+
+    public void unlisten()
+    {
+        StreamObserver<Empty> unlistenResponseObserver = new StreamObserver<>() {
+            @Override
+            public void onNext(Empty empty) {
+                System.out.println("Erfolgreich vom Logstream abgemeldet.");
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                System.err.println("Fehler beim Abmelden: " + t.getMessage());
+            }
+
+            @Override
+            public void onCompleted() {
+                System.out.println("Unlisten abgeschlossen.");
+            }
+        };
+
+        asyncStubb.unlistenLog(User.newBuilder().setUserId(username).build(), unlistenResponseObserver);
+        activeListenObserver = null;
+    }
+
+    public void serverTest() throws InterruptedException {
         // 1. Kanal zum Server öffnen
         ManagedChannel channel = ManagedChannelBuilder
                 .forAddress("localhost", 50051)
@@ -30,18 +129,18 @@ public class LogClient {
         StreamObserver<Empty> responseObserver = new StreamObserver<>() {
             @Override
             public void onNext(Empty empty) {
-                System.out.println("✅ Server hat alle Logs erhalten.");
+                System.out.println("Server hat alle Logs erhalten.");
             }
 
             @Override
             public void onError(Throwable t) {
-                System.err.println("❌ Fehler bei AddLog: " + t.getMessage());
+                System.err.println("Fehler bei AddLog: " + t.getMessage());
                 finishLatch.countDown();
             }
 
             @Override
             public void onCompleted() {
-                System.out.println("🔚 AddLog-Stream abgeschlossen.");
+                System.out.println("AddLog-Stream abgeschlossen.");
                 finishLatch.countDown();
             }
         };
@@ -75,7 +174,7 @@ public class LogClient {
 
         // 7. Auf Abschluss von AddLog warten
         if (!finishLatch.await(5, TimeUnit.SECONDS)) {
-            System.err.println("⚠️ Timeout beim Warten auf Serverantwort");
+            System.err.println("Timeout beim Warten auf Serverantwort");
         }
 
         // 8. GetLog-Test (auskommentiert – bei Bedarf aktivieren)
@@ -85,15 +184,14 @@ public class LogClient {
         Thread.sleep(2000);
         channel.shutdownNow();
     }
-
     // Neuer Test für ListenLog
     private static void listenLogs(LogServiceGrpc.LogServiceStub stub) {
-        System.out.println("📡 Warte auf neue Logs vom Server...");
+        System.out.println("Warte auf neue Logs vom Server...");
 
         StreamObserver<LoggedLog> responseObserver = new StreamObserver<>() {
             @Override
             public void onNext(LoggedLog loggedLog) {
-                System.out.println("📥 Neuer Log-Eintrag empfangen:");
+                System.out.println("Neuer Log-Eintrag empfangen:");
                 System.out.println("  Zeile: " + loggedLog.getLineNumber());
                 System.out.println("  Zeit:  " + loggedLog.getTimestamp());
                 System.out.println("  User:  " + loggedLog.getLog().getUsrId());
@@ -102,12 +200,12 @@ public class LogClient {
 
             @Override
             public void onError(Throwable t) {
-                System.err.println("❌ Fehler beim Empfangen von Logs: " + t.getMessage());
+                System.err.println("Fehler beim Empfangen von Logs: " + t.getMessage());
             }
 
             @Override
             public void onCompleted() {
-                System.out.println("🔚 ListenLog beendet.");
+                System.out.println("ListenLog beendet.");
             }
         };
 
@@ -116,14 +214,14 @@ public class LogClient {
 
     // Bestehender Test für GetLog (bleibt erhalten)
     private static void getLogs(LogServiceGrpc.LogServiceStub stub) throws InterruptedException {
-        System.out.println("\n🔄 Holen der Logs...");
+        System.out.println("\nHolen der Logs...");
 
         CountDownLatch finishLatch = new CountDownLatch(1);
 
         StreamObserver<ListLoggedLog> responseObserver = new StreamObserver<>() {
             @Override
             public void onNext(ListLoggedLog listLoggedLog) {
-                System.out.println("✅ Logs empfangen:");
+                System.out.println("Logs empfangen:");
                 listLoggedLog.getLogsList().forEach(log -> {
                     System.out.println("Zeilennummer: " + log.getLineNumber() +
                             ", Timestamp: " + log.getTimestamp() +
@@ -134,13 +232,13 @@ public class LogClient {
 
             @Override
             public void onError(Throwable t) {
-                System.err.println("❌ Fehler bei GetLog: " + t.getMessage());
+                System.err.println("Fehler bei GetLog: " + t.getMessage());
                 finishLatch.countDown();
             }
 
             @Override
             public void onCompleted() {
-                System.out.println("🔚 GetLog abgeschlossen.");
+                System.out.println("GetLog abgeschlossen.");
                 finishLatch.countDown();
             }
         };
@@ -148,7 +246,7 @@ public class LogClient {
         stub.getLog(Empty.getDefaultInstance(), responseObserver);
 
         if (!finishLatch.await(5, TimeUnit.SECONDS)) {
-            System.err.println("⚠️ Timeout beim Warten auf Serverantwort");
+            System.err.println("Timeout beim Warten auf Serverantwort");
         }
     }
 }

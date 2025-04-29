@@ -52,6 +52,16 @@ public class LogServiceImpl extends LogServiceImplBase
     }
 
     @Override
+    public void getLog(Empty request, StreamObserver<ListLoggedLog> responseObserver) {
+
+        ListLoggedLog.Builder builder = ListLoggedLog.newBuilder();
+        builder.addAllLogs(log_list);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+
+    }
+
+    @Override
     public void listenLog(User request, StreamObserver<LoggedLog> responseObserver) {
         listener_map.put(request.getUserId(), responseObserver);
     }
