@@ -12,11 +12,12 @@ public class ClientMain
         Scanner scanner = new Scanner(System.in);
         ManagedChannel channel = getChannel("localhost", 50051);
         LogServiceGrpc.LogServiceStub stub = LogServiceGrpc.newStub(channel);
-        client = new LogClient("Sinnaj004", stub);
+        LogServiceGrpc.LogServiceBlockingStub blockingStubb = LogServiceGrpc.newBlockingStub(channel);
+        client = new LogClient("Sinnaj004", blockingStubb,  stub);
 
+        System.out.print("$ ");
         while (true)
         {
-            //System.out.print("$ ");
             String command = scanner.nextLine();
             parse(command);
         }
@@ -39,12 +40,14 @@ public class ClientMain
                 Scanner scanner = new Scanner(System.in);
                 String log = scanner.nextLine();
                 client.addLog(log);
+                System.out.println("$ ");
                 break;
             case "get":
-                System.out.println("Command: " + command);
+                client.getLog();
                 break;
             case "listen":
                 client.listen();
+                System.out.println("$" );
                 break;
             case "unlisten":
                 client.unlisten();
