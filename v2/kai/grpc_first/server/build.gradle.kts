@@ -55,3 +55,11 @@ tasks.shadowJar {
         )
     }
 }
+
+tasks.register<JavaExec>("runServer") {
+
+    group = "application"
+    mainClass.set("org.server.Main")
+    classpath = sourceSets["main"].runtimeClasspath
+}
+
