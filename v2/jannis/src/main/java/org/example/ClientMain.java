@@ -19,6 +19,8 @@ public class ClientMain
 
         client = new LogClient(user, blockingStubb,  stub);
         String command;
+
+        System.out.println("Execute a command");
         while (true)
         {
             command = scanner.nextLine();
@@ -43,14 +45,12 @@ public class ClientMain
                 Scanner scanner = new Scanner(System.in);
                 String log = scanner.nextLine();
                 client.addLog(log);
-                System.out.println("$ ");
                 break;
             case "get":
                 client.getLog();
                 break;
             case "listen":
                 client.listen();
-                System.out.println("$" );
                 break;
             case "unlisten":
                 client.unlisten();
