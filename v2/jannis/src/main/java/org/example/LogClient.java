@@ -5,150 +5,113 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class LogClient {
 
-    public static void main(String[] args) throws InterruptedException {
-        // 1. Kanal zum Server öffnen
-        ManagedChannel channel = ManagedChannelBuilder
-                .forAddress("localhost", 50051)
-                .usePlaintext()
-                .build();
+    String username;
+    LogServiceGrpc.LogServiceBlockingStub blockingStubb;
+    LogServiceGrpc.LogServiceStub asyncStubb;
+    LogServiceGrpc.LogServiceBlockingStub BlockingStubb;
+    StreamObserver<LoggedLog> activeListenObserver = null;
 
-        // 2. Stub für asynchrone gRPC-Aufrufe
-        LogServiceGrpc.LogServiceStub stub = LogServiceGrpc.newStub(channel);
 
-        // 3. Latch für Synchronisation
-        CountDownLatch finishLatch = new CountDownLatch(1);
+    public LogClient(String username, LogServiceGrpc.LogServiceBlockingStub blockingStubb, LogServiceGrpc.LogServiceStub asyncStubb) {
+        this.username = username;
+        this.blockingStubb = blockingStubb;
+        this.asyncStubb = asyncStubb;
+    }
 
-        // 4. Listener starten (vor AddLog)
-        listenLogs(stub);
-
-        // 5. Antwort-Observer für AddLog
+    public void addLog(String log) {
         StreamObserver<Empty> responseObserver = new StreamObserver<>() {
             @Override
             public void onNext(Empty empty) {
-                System.out.println("✅ Server hat alle Logs erhalten.");
             }
 
             @Override
             public void onError(Throwable t) {
-                System.err.println("❌ Fehler bei AddLog: " + t.getMessage());
-                finishLatch.countDown();
+                System.err.println("Fehler bei AddLog: " + t.getMessage());
             }
 
             @Override
             public void onCompleted() {
-                System.out.println("🔚 AddLog-Stream abgeschlossen.");
-                finishLatch.countDown();
             }
         };
+        StreamObserver<Log> addStreamRequestObserver = asyncStubb.addLog(responseObserver);
 
-        // 6. Request-Stream an den Server senden (AddLog)
-        StreamObserver<Log> requestObserver = stub.addLog(responseObserver);
+        addStreamRequestObserver.onNext(Log.newBuilder()
+                .setUsrId(username)
+                .setLogText(log)
+                .build());
 
-        try {
-            // Beispiel-Logs senden
-            requestObserver.onNext(Log.newBuilder()
-                    .setUsrId("user123")
-                    .setLogText("Erster Logeintrag")
-                    .build());
-
-            requestObserver.onNext(Log.newBuilder()
-                    .setUsrId("user456")
-                    .setLogText("Zweiter Logeintrag")
-                    .build());
-
-            requestObserver.onNext(Log.newBuilder()
-                    .setUsrId("user789")
-                    .setLogText("Dritter Logeintrag")
-                    .build());
-
-            requestObserver.onCompleted();
-
-        } catch (Exception e) {
-            requestObserver.onError(e);
-            throw e;
-        }
-
-        // 7. Auf Abschluss von AddLog warten
-        if (!finishLatch.await(5, TimeUnit.SECONDS)) {
-            System.err.println("⚠️ Timeout beim Warten auf Serverantwort");
-        }
-
-        // 8. GetLog-Test (auskommentiert – bei Bedarf aktivieren)
-        // getLogs(stub);
-
-        // 9. Verbindung schließen (nach kurzer Wartezeit, um evtl. Logs zu empfangen)
-        Thread.sleep(2000);
-        channel.shutdownNow();
+        addStreamRequestObserver.onCompleted();
     }
 
-    // Neuer Test für ListenLog
-    private static void listenLogs(LogServiceGrpc.LogServiceStub stub) {
-        System.out.println("📡 Warte auf neue Logs vom Server...");
+    public void getLog() {
 
-        StreamObserver<LoggedLog> responseObserver = new StreamObserver<>() {
+        ListLoggedLog logs = blockingStubb.getLog(Empty.getDefaultInstance());
+
+        for (LoggedLog log : logs.getLogsList()) {
+            printLog(log);
+        }
+    }
+
+    public void listen() {
+        activeListenObserver = new StreamObserver<>() {
             @Override
             public void onNext(LoggedLog loggedLog) {
-                System.out.println("📥 Neuer Log-Eintrag empfangen:");
-                System.out.println("  Zeile: " + loggedLog.getLineNumber());
-                System.out.println("  Zeit:  " + loggedLog.getTimestamp());
-                System.out.println("  User:  " + loggedLog.getLog().getUsrId());
-                System.out.println("  Text:  " + loggedLog.getLog().getLogText());
+                printLog(loggedLog);
             }
 
             @Override
             public void onError(Throwable t) {
-                System.err.println("❌ Fehler beim Empfangen von Logs: " + t.getMessage());
+                System.err.println("Fehler beim Empfangen von Logs: " + t.getMessage());
             }
 
             @Override
             public void onCompleted() {
-                System.out.println("🔚 ListenLog beendet.");
+                System.out.println("ListenLog beendet.\n$");
             }
         };
 
-        stub.listenLog(User.getDefaultInstance(), responseObserver);
+        asyncStubb.listenLog(User.newBuilder()
+                        .setUserId(username)
+                        .build()
+                , activeListenObserver);
     }
 
-    // Bestehender Test für GetLog (bleibt erhalten)
-    private static void getLogs(LogServiceGrpc.LogServiceStub stub) throws InterruptedException {
-        System.out.println("\n🔄 Holen der Logs...");
-
-        CountDownLatch finishLatch = new CountDownLatch(1);
-
-        StreamObserver<ListLoggedLog> responseObserver = new StreamObserver<>() {
+    public void unlisten() {
+        StreamObserver<Empty> unlistenResponseObserver = new StreamObserver<>() {
             @Override
-            public void onNext(ListLoggedLog listLoggedLog) {
-                System.out.println("✅ Logs empfangen:");
-                listLoggedLog.getLogsList().forEach(log -> {
-                    System.out.println("Zeilennummer: " + log.getLineNumber() +
-                            ", Timestamp: " + log.getTimestamp() +
-                            ", Log: " + log.getLog().getLogText() +
-                            ", User: " + log.getLog().getUsrId());
-                });
+            public void onNext(Empty empty) {
             }
 
             @Override
             public void onError(Throwable t) {
-                System.err.println("❌ Fehler bei GetLog: " + t.getMessage());
-                finishLatch.countDown();
+                System.err.println("Fehler beim Abmelden: " + t.getMessage());
             }
 
             @Override
             public void onCompleted() {
-                System.out.println("🔚 GetLog abgeschlossen.");
-                finishLatch.countDown();
             }
         };
 
-        stub.getLog(Empty.getDefaultInstance(), responseObserver);
+        asyncStubb.unlistenLog(User.newBuilder().setUserId(username).build(), unlistenResponseObserver);
+        activeListenObserver = null;
+    }
 
-        if (!finishLatch.await(5, TimeUnit.SECONDS)) {
-            System.err.println("⚠️ Timeout beim Warten auf Serverantwort");
-        }
+    public static void printLog(LoggedLog log) {
+        Instant instant = Instant.ofEpochSecond(log.getTimestamp().getSeconds());
+        ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());
+
+        String datumFormatiert = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss").format(zdt);
+        System.out.println(log.getLineNumber() + "\t" + datumFormatiert + "\t\t" + log.getLog().getUsrId() + "\t " + log.getLog().getLogText());
+
     }
 }

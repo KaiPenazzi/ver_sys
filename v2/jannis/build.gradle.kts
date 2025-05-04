@@ -23,7 +23,7 @@ dependencies {
 }
 
 application {
-    mainClass = "org.example.LogClient"
+    mainClass.set("org.example.ClientMain")  // Main-Client-Klasse
 }
 
 protobuf {
@@ -52,27 +52,38 @@ tasks.named<ProcessResources>("processResources") {
 tasks.register<JavaExec>("runServer") {
     group = "application"
     description = "Startet den gRPC-Server"
-    mainClass.set("org.example.LogServer") // deine Server-Klasse
+    mainClass.set("org.example.LogServer")  // Main-Server-Klasse
     classpath = sourceSets["main"].runtimeClasspath
+    standardOutput = System.out  // Setze die Standard-Ausgabe
+    errorOutput = System.err  // Setze die Fehler-Ausgabe
+    doFirst {
+        println("Starte den gRPC-Server...")
+    }
 }
 
 tasks.register<JavaExec>("runClient") {
     group = "application"
     description = "Startet den gRPC-Client"
-    mainClass.set("org.example.LogClient") // deine Client-Klasse
+    mainClass.set("org.example.ClientMain")  // Main-Client-Klasse
     classpath = sourceSets["main"].runtimeClasspath
-}
-
-sourceSets {
-    main {
-        proto {
-            srcDir("src/main/proto")
-        }
-        java {
-            srcDirs("build/generated/source/proto/main/java", "build/generated/source/proto/main/grpc")
-        }
+    standardOutput = System.out  // Setze die Standard-Ausgabe
+    errorOutput = System.err  // Setze die Fehler-Ausgabe
+    doFirst {
+        println("Starte den gRPC-Client...")
     }
 }
 
-
-
+tasks.register<Jar>("ClientJar") {
+    archiveBaseName.set("client")
+    manifest {
+        attributes["Main-Class"] = "org.example.ClientMain"
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(sourceSets.main.get().output)
+    dependsOn(configurations.runtimeClasspath)
+    from({
+        configurations.runtimeClasspath.get()
+            .filter { it.name.endsWith("jar") }
+            .map { zipTree(it) }
+    })
+}

@@ -1,9 +1,9 @@
 package org.example;
 
 import com.google.protobuf.Empty;
+import com.google.protobuf.Timestamp;
 import io.grpc.stub.StreamObserver;
 import org.example.LogServiceGrpc.LogServiceImplBase;
-import com.google.protobuf.util.Timestamps;
 
 import java.util.*;
 
@@ -25,7 +25,7 @@ public class LogServiceImpl extends LogServiceImplBase
                 LoggedLog logged = LoggedLog.newBuilder()
                         .setLog(log)
                         .setLineNumber(linecounter++)
-                        .setTimestamp(Timestamps.fromMillis(System.currentTimeMillis()))
+                        .setTimestamp(Timestamp.newBuilder().setSeconds(java.time.Instant.now().getEpochSecond()))
                         .build();
 
                 log_list.add(logged);
@@ -49,6 +49,16 @@ public class LogServiceImpl extends LogServiceImplBase
                 responseObserver.onCompleted();
             }
         };
+    }
+
+    @Override
+    public void getLog(Empty request, StreamObserver<ListLoggedLog> responseObserver) {
+
+        ListLoggedLog.Builder builder = ListLoggedLog.newBuilder();
+        builder.addAllLogs(log_list);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+
     }
 
     @Override

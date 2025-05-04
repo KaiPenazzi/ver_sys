@@ -2,8 +2,6 @@ import java.io.IOException;
 import java.net.*;
 public class UDP_communication {
 
-    //String addresses [] = {"192.168.5.2", "192.168.5.8"}; // todo check IP Adresses in Lab
-
     public static void send_udp(String message) throws SocketException {
 
         for (Player p : Spiellogik.getPlayer_list()) {
