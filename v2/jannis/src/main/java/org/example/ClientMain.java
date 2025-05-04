@@ -10,15 +10,18 @@ public class ClientMain
     static LogClient client;
     public static void main(String[] args) throws InterruptedException {
         Scanner scanner = new Scanner(System.in);
-        ManagedChannel channel = getChannel("localhost", 50051);
+        ManagedChannel channel = getChannel("127.0.0.1", 50051);
         LogServiceGrpc.LogServiceStub stub = LogServiceGrpc.newStub(channel);
         LogServiceGrpc.LogServiceBlockingStub blockingStubb = LogServiceGrpc.newBlockingStub(channel);
-        client = new LogClient("Sinnaj004", blockingStubb,  stub);
 
-        System.out.print("$ ");
+        System.out.println("Gebe deinen Username an");
+        String user = scanner.nextLine();
+
+        client = new LogClient(user, blockingStubb,  stub);
+        String command;
         while (true)
         {
-            String command = scanner.nextLine();
+            command = scanner.nextLine();
             parse(command);
         }
     }
