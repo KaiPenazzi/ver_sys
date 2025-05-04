@@ -98,12 +98,12 @@ tasks.shadowJar {
         )
     }
 }
-tasks.shadowJar {
-    archiveClassifier.set("client")
-    mergeServiceFiles()
-    manifest {
-        attributes(
-            "Main-Class" to "org.example.ClientMain"
-        )
-    }
-}
+// tasks.shadowJar {
+//     archiveClassifier.set("server")
+//     mergeServiceFiles()
+//     manifest {
+//         attributes(
+//             "Main-Class" to "org.example.LogServer"
+//         )
+//     }
+// }
