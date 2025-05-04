@@ -2,6 +2,7 @@ plugins {
     id("java")
     id("application")
     id("com.google.protobuf") version "0.9.4"
+    id("com.github.johnrengelman.shadow") version "7.1.0"
 }
 
 group = "com.example"
@@ -86,4 +87,23 @@ tasks.register<Jar>("ClientJar") {
             .filter { it.name.endsWith("jar") }
             .map { zipTree(it) }
     })
+}
+
+tasks.shadowJar {
+    archiveClassifier.set("client")
+    mergeServiceFiles()
+    manifest {
+        attributes(
+            "Main-Class" to "org.example.ClientMain"
+        )
+    }
+}
+tasks.shadowJar {
+    archiveClassifier.set("client")
+    mergeServiceFiles()
+    manifest {
+        attributes(
+            "Main-Class" to "org.example.ClientMain"
+        )
+    }
 }
