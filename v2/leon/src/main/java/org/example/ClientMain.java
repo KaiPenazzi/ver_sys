@@ -13,7 +13,9 @@ public class ClientMain {
         System.out.println("enter Server Port: ");
         int port = Integer.parseInt(scanner.nextLine());
 
-        String ip = "127.0.0.1";
+        //String ip = "127.0.0.1";
+        String ip = "192.168.5.14";
+        //String ip = "192.168.5.6";
 
         ManagedChannel channel = ManagedChannelBuilder.forAddress(ip, port).usePlaintext().build();
         //ManagedChannel channel = ManagedChannelBuilder.forTarget("localhost:" + port).usePlaintext().build();
