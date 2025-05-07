@@ -23,6 +23,11 @@ message LoggedLog {
 
 message ListLoggedLog { repeated LoggedLog logs = 1; }
 
+service BackupService {
+  rpc AddLog(stream LoggedLog) returns (google.protobuf.Empty);
+  rpc GetBackup(google.protobuf.Empty) returns (ListLoggedLog);
+}
+
 service LogService {
   rpc AddLog(stream Log) returns (google.protobuf.Empty);
   rpc GetLog(google.protobuf.Empty) returns (ListLoggedLog);
@@ -30,9 +35,4 @@ service LogService {
   rpc UnlistenLog(User) returns (google.protobuf.Empty);
   rpc CrashLog(Password) returns (google.protobuf.Empty);
   rpc RestoreLog(Password) returns (google.protobuf.Empty);
-}
-
-service BackupService {
-  rpc AddLog(stream LoggedLog) returns (google.protobuf.Empty);
-  rpc GetBackup(google.protobuf.Empty) returns (ListLoggedLog);
 }
