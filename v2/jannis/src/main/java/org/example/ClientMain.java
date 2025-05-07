@@ -10,7 +10,7 @@ public class ClientMain
     static LogClient client;
     public static void main(String[] args) throws InterruptedException {
         Scanner scanner = new Scanner(System.in);
-        ManagedChannel channel = getChannel("127.0.0.1", 50051);
+        ManagedChannel channel = getChannel("127.0.0.1", 1111);
         LogServiceGrpc.LogServiceStub stub = LogServiceGrpc.newStub(channel);
         LogServiceGrpc.LogServiceBlockingStub blockingStubb = LogServiceGrpc.newBlockingStub(channel);
 

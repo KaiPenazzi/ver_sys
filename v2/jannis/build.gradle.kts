@@ -93,3 +93,13 @@ tasks.shadowJar {
          )
      }
  }
+
+tasks.shadowJar {
+    archiveClassifier.set("backupServer")
+    mergeServiceFiles()
+    manifest {
+        attributes(
+            "Main-Class" to "org.example.BackupServer"
+        )
+    }
+}
