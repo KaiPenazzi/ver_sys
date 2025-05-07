@@ -13,8 +13,8 @@ public class ClientMain {
         System.out.println("enter Server Port: ");
         int port = Integer.parseInt(scanner.nextLine());
 
-        //String ip = "127.0.0.1";
-        String ip = "192.168.5.14";
+        String ip = "127.0.0.1";
+        //String ip = "192.168.5.14";
         //String ip = "192.168.5.6";
 
         ManagedChannel channel = ManagedChannelBuilder.forAddress(ip, port).usePlaintext().build();
@@ -37,8 +37,16 @@ public class ClientMain {
             switch (userInput){
                 case "AddLog":
                     System.out.println("enter Log:");
-                    String l = scanner.nextLine();
-                    client.addLog(l);
+                    while(true){
+                        String l = scanner.nextLine();
+                        if(l.equals("cancel")){
+
+                        }else {
+                            client.addLog(l);
+                            break;
+                        }
+
+                    }
                     break;
                 case  "GetLog":
                     client.getLog();
@@ -53,6 +61,8 @@ public class ClientMain {
                     System.out.println("execution stopped");
                     exit = true;
                     break;
+
+
                 default:
                     System.out.println("Command not found");
                     break;

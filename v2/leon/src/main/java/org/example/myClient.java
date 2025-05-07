@@ -17,6 +17,7 @@ public class myClient {
 
     public void addLog(String log){
         StreamObserver<Empty> responseObserver = new StreamObserver<Empty>() {
+            //StreamObserver<Log> requestObserver =  myAsyncStub.addLog(responseObserver);
             @Override
             public void onNext(Empty empty) {
 
@@ -36,7 +37,7 @@ public class myClient {
 
        requestObserver.onNext(Log.newBuilder().setUsrId(userId).setLogText(log).build());
 
-       requestObserver.onCompleted();
+
 
     }
 

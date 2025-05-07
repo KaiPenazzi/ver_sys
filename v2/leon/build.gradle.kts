@@ -112,3 +112,7 @@ application {
     mainClass.set("org.example.ClientMain")
 }
 
+//application {
+//    mainClass.set("org.example.ServerMain")
+//}
+
