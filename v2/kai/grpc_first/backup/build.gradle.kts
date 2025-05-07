@@ -1,17 +1,15 @@
 plugins {
     id("java")
     id("com.google.protobuf") version "0.9.4"
+    id("com.github.johnrengelman.shadow") version "7.1.0"
 }
-
-group = "com.example"
-version = "1.0.0"
-java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    implementation(project(":utils"))  // Das utils-Modul einbinden
     implementation("io.grpc:grpc-netty-shaded:1.71.0")
     implementation("io.grpc:grpc-protobuf:1.71.0")
     implementation("io.grpc:grpc-stub:1.71.0")
@@ -38,18 +36,28 @@ protobuf {
     }
 }
 
-tasks.named<ProcessResources>("processResources") {
-    exclude("**/*.proto")
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
 sourceSets {
     main {
         proto {
-            srcDir("/proto")
+            srcDir("../proto")  // Verzeichnis für .proto-Dateien
         }
         java {
             srcDirs("build/generated/source/proto/main/java", "build/generated/source/proto/main/grpc")
         }
     }
+}
+
+tasks.shadowJar {
+    mergeServiceFiles()
+    manifest {
+        attributes(
+            "Main-Class" to "org.backup.Main"  // Die Main-Class für das JAR
+        )
+    }
+}
+
+tasks.register<JavaExec>("runBackup") {
+    group = "application"
+    mainClass.set("org.backup.Main")
+    classpath = sourceSets["main"].runtimeClasspath
 }
