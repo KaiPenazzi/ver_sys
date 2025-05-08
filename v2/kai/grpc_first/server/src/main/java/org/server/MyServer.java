@@ -6,24 +6,16 @@ import java.net.URI;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 
-import org.example.BackupServiceGrpc;
-import org.example.BackupServiceGrpc.BackupServiceStub;
-
 public class MyServer {
     Server server;
     int port = 3000;
     MyService myService;
+    BackupClient backupClient;
 
     public MyServer(int port, URI backup) {
         this.port = port;
-
-        var channel = io.grpc.ManagedChannelBuilder.forAddress(backup.getHost(), backup.getPort())
-                .usePlaintext()
-                .build();
-
-        BackupServiceStub asnyc_stub = BackupServiceGrpc.newStub(channel);
-
-        this.myService = new MyService(asnyc_stub);
+        this.backupClient = new BackupClient(backup);
+        this.myService = new MyService(backupClient);
     }
 
     public void start() {
@@ -44,5 +36,9 @@ public class MyServer {
         } catch (InterruptedException e) {
             System.err.println("Server interrupted: " + e.getMessage());
         }
+    }
+
+    public void stop() {
+        backupClient.stop();
     }
 }

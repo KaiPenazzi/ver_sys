@@ -1,7 +1,6 @@
 package org.backup;
 
 import java.io.IOException;
-import java.net.URI;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -22,7 +21,7 @@ public class MyServer {
         try {
             server.start();
         } catch (IOException e) {
-            System.err.println("Failed to start server: " + e.getMessage());
+            System.err.println("Failed to start backup: " + e.getMessage());
             return;
         }
 
@@ -30,7 +29,7 @@ public class MyServer {
             System.out.println("Backup started on port: " + this.port);
             server.awaitTermination();
         } catch (InterruptedException e) {
-            System.err.println("Server interrupted: " + e.getMessage());
+            System.err.println("backup interrupted: " + e.getMessage());
         }
     }
 }
