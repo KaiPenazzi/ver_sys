@@ -21,6 +21,19 @@ public class myServer extends LogServiceImplBase {
     private Map<String,StreamObserver<LoggedLog>> listeners = Collections.synchronizedMap(new HashMap<String,StreamObserver<LoggedLog>>());
     private BackupServiceGrpc.BackupServiceBlockingStub  BackupBlockingStub;
     private BackupServiceGrpc.BackupServiceStub BackupAsyncStub;
+
+
+    public myServer() {
+
+        Channel backupChannel = ManagedChannelBuilder.forAddress("127.0.0.1", 3333)
+                .usePlaintext()
+                .build();
+
+        BackupAsyncStub = BackupServiceGrpc.newStub(backupChannel);
+        BackupBlockingStub = BackupServiceGrpc.newBlockingStub(backupChannel);
+    }
+
+
     /**
      * fügt übergebenen Log zu LogListe hinzu
      * @param responseObserver
@@ -29,28 +42,41 @@ public class myServer extends LogServiceImplBase {
     @Override
     public StreamObserver<Log> addLog(StreamObserver<Empty> responseObserver)
     {
-        if(BackupAsyncStub == null){
-            Channel backupChannel = ManagedChannelBuilder.forAddress("127.0.0.1", 3333).usePlaintext().build();;
-            BackupAsyncStub = BackupServiceGrpc.newStub(backupChannel);
-            BackupBlockingStub = BackupServiceGrpc.newBlockingStub(backupChannel);
-        }
         return new StreamObserver<Log>() {
+
+            StreamObserver<LoggedLog> BackupStreamObserver = BackupAsyncStub.addLog(new StreamObserver<Empty>() {
+
+                @Override
+                public void onNext(Empty value) {
+
+                }
+                @Override
+                public void onError(Throwable throwable){
+                }
+                @Override
+                public void onCompleted() {
+                    System.out.println("Backup Stream completed");
+                }
+            });
+
+
+
             @Override
             public void onNext(Log log) {
+
                 long seconds = java.time.Instant.now().getEpochSecond();
                 Timestamp timestamp = Timestamp.newBuilder().setSeconds(seconds).build();
                 LoggedLog loggedLog = LoggedLog.newBuilder().setLog(log)
                                 .setLineNumber(line++)
                                 .setTimestamp(timestamp)
                                 .build();
-
+                //lokal
                 loggedLogs.add(loggedLog);
 
-                StreamObserver<Empty> backupResponseObserver = createBackupObserver();
-                StreamObserver<LoggedLog> backupRequestObserver = BackupAsyncStub.addLog(backupResponseObserver);
-                backupRequestObserver.onNext(loggedLog);
+                BackupStreamObserver.onNext(loggedLog);
 
 
+                //Listener
                 System.out.println("Log: " + loggedLog.getLog().getLogText() + " added;");
                 for( StreamObserver<LoggedLog> l : listeners.values() ){
                     l.onNext(loggedLog);
@@ -59,13 +85,19 @@ public class myServer extends LogServiceImplBase {
 
             @Override
             public void onError(Throwable throwable) {
-                System.err.println(throwable.getMessage());
+
             }
 
             @Override
             public void onCompleted() {
                 System.out.println("a Client has stopped the Stream");
-                responseObserver.onNext(Empty.newBuilder().build());
+                try {
+                    BackupStreamObserver.onCompleted();
+                }
+                catch ( Exception e){
+
+                }
+                responseObserver.onNext(Empty.getDefaultInstance());
                 responseObserver.onCompleted();
             }
         };
@@ -81,6 +113,7 @@ public class myServer extends LogServiceImplBase {
     {
         ListLoggedLog.Builder logListBuilder = ListLoggedLog.newBuilder();
         logListBuilder.addAllLogs(loggedLogs);
+
         responseObserver.onNext(logListBuilder.build());
         responseObserver.onCompleted();
     }
@@ -98,47 +131,47 @@ public class myServer extends LogServiceImplBase {
         //user von den listenern streichen und Stream schließen
         listeners.remove(request.getUserId());
         System.out.println("User: "+ request.getUserId() + " is not listening anymore" );
-        responseObserver.onNext(Empty.newBuilder().build());
+        responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();
 
     }
 
     @Override
     public void crashLog(Password request, StreamObserver<Empty> responseObserver) {
-        if(request.equals(PASSWORD)){
+        if(request.getPsw().equals(PASSWORD)){
             //Liste leeren
             loggedLogs.clear();
+            System.out.println("server cleared");
         }
-        responseObserver.onNext(Empty.newBuilder().build());
+        else{
+            System.out.println("wrong password");
+        }
+        responseObserver.onNext(Empty.getDefaultInstance());
+        responseObserver.onCompleted();
 
     }
     @Override
     public void restoreLog(Password request, StreamObserver<Empty> responseObserver) {
-        if(request.equals(PASSWORD)){
-            loggedLogs.clear();
+        if(request.getPsw().equals(PASSWORD)){
+            try {
+                ListLoggedLog backupLogs = BackupBlockingStub.getBackup(Empty.getDefaultInstance());
 
-
-
+                synchronized (loggedLogs){
+                    loggedLogs.clear();
+                    loggedLogs.addAll(backupLogs.getLogsList());
+                }
+            } catch (Exception e){
+                System.err.println(e.getMessage());
+            }
+        }else {
+            System.out.println("wrong password");
         }
-        responseObserver.onNext(Empty.newBuilder().build());
+        responseObserver.onNext(Empty.getDefaultInstance());
+        responseObserver.onCompleted();
+
     }
 
-    public StreamObserver<Empty> createBackupObserver() {
-        return new StreamObserver<Empty>() {
-            @Override
-            public void onNext(Empty empty) {
 
-            }
-            @Override
-            public void onError(Throwable throwable) {
-                System.err.println(throwable.getMessage());
-            }
-            @Override
-            public void onCompleted() {
-
-            }
-        };
-    }
 
 }
 

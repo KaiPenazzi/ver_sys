@@ -8,15 +8,21 @@ public class ServerMain{
     public static void main(String[] args) throws Exception{
         int port = 2222;
         int backupPort = 3333;
-        Server server = ServerBuilder.forPort(port)
-                                            .addService(new myServer())
-                                            .build();
+        Server backupServer = ServerBuilder.forPort(backupPort).addService(new myBackupServer()).build();
+        Server server = ServerBuilder.forPort(port).addService(new myServer()).build();
+        //Backup Server in Thread starten
+        new Thread(() -> {
+            try {
+                backupServer.start();
+                backupServer.awaitTermination();
+            }catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
 
+        }).start();
 
+        //Hauptserver in hauptthread
         server.start();
-
-//        Server backupServer = ServerBuilder.forPort(backupPort).addService(new myBackupServer()).build();
-//        backupServer.start();
         System.out.println("Server is running on port " + port);
         System.out.printf("Backing up port: %d\n", backupPort);
         server.awaitTermination();

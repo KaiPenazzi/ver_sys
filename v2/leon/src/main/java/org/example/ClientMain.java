@@ -28,7 +28,9 @@ public class ClientMain {
                             + "AddLog\n"
                             + "GetLog\n"
                             + "ListenLog\n"
-                            + "UnlistenLog");
+                            + "UnlistenLog\n"
+                            + "CrashLog\n"
+                            + "RestoreLog\n");
         System.out.println("Enter command");
         String userInput = scanner.nextLine();
         boolean exit = false;
@@ -36,17 +38,8 @@ public class ClientMain {
 
             switch (userInput){
                 case "AddLog":
-                    System.out.println("enter Log:");
-                    while(true){
-                        String l = scanner.nextLine();
-                        if(l.equals("cancel")){
 
-                        }else {
-                            client.addLog(l);
-                            break;
-                        }
-
-                    }
+                    client.addLog();
                     break;
                 case  "GetLog":
                     client.getLog();
@@ -57,11 +50,21 @@ public class ClientMain {
                 case "UnlistenLog":
                     client.unlisten(client.getUserId());
                     break;
+                case "CrashLog":
+                    System.out.println("enter password: ");
+                    String psw = scanner.nextLine();
+                    client.crashLog(psw);
+                    break;
+                case "RestoreLog":
+                    System.out.println("enter password: ");
+                    String pw = scanner.nextLine();
+                    client.restoreLog(pw);
+                    break;
+
                 case"xx":
                     System.out.println("execution stopped");
                     exit = true;
                     break;
-
 
                 default:
                     System.out.println("Command not found");

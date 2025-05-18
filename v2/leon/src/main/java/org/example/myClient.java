@@ -3,6 +3,8 @@ package org.example;
 import com.google.protobuf.Empty;
 import io.grpc.stub.StreamObserver;
 
+import java.util.Scanner;
+
 public class myClient {
 
     private String userId;
@@ -15,7 +17,7 @@ public class myClient {
         this.myAsyncStub = asyncStub;
     }
 
-    public void addLog(String log){
+    public void addLog(){
         StreamObserver<Empty> responseObserver = new StreamObserver<Empty>() {
             //StreamObserver<Log> requestObserver =  myAsyncStub.addLog(responseObserver);
             @Override
@@ -30,13 +32,24 @@ public class myClient {
 
             @Override
             public void onCompleted() {
-
+                System.out.println("Client stopped streaming");
             }
         };
        StreamObserver<Log> requestObserver =  myAsyncStub.addLog(responseObserver);
+        Scanner scanner = new Scanner(System.in);
+        String in = scanner.nextLine();
+       while(true)
+       {
+           if(in.equals("exit")){
+               requestObserver.onCompleted();
+               break;
+           }
+            else {
 
-       requestObserver.onNext(Log.newBuilder().setUsrId(userId).setLogText(log).build());
-
+               requestObserver.onNext(Log.newBuilder().setUsrId(userId).setLogText(in).build());
+           }
+            in = scanner.nextLine();
+       }
 
 
     }
@@ -85,4 +98,16 @@ public class myClient {
     public String getUserId(){
         return this.userId;
     }
+
+    public void crashLog(String password) {
+        Password psw = Password.newBuilder().setPsw(password).build();
+        myBlockingStub.crashLog(psw);
+
+    }
+
+    public void restoreLog(String password) {
+        Password psw = Password.newBuilder().setPsw(password).build();
+        myBlockingStub.restoreLog(psw);
+    }
+
 }

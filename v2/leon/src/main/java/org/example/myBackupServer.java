@@ -2,12 +2,13 @@ package org.example;
 
 import com.google.protobuf.Empty;
 import io.grpc.stub.StreamObserver;
+import org.example.BackupServiceGrpc.BackupServiceImplBase;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class myBackupServer extends BackupServiceGrpc.BackupServiceImplBase {
+public class myBackupServer extends BackupServiceImplBase {
 
     private List<LoggedLog> loggedLogs = Collections.synchronizedList(new ArrayList<>());
 
@@ -19,7 +20,7 @@ public class myBackupServer extends BackupServiceGrpc.BackupServiceImplBase {
             public void onNext(LoggedLog loggedLog) {
                 loggedLogs.add(loggedLog);
                 System.out.println(myClient.logToString(loggedLog));
-                responseObserver.onNext(Empty.getDefaultInstance());
+
             }
 
             @Override
@@ -29,7 +30,7 @@ public class myBackupServer extends BackupServiceGrpc.BackupServiceImplBase {
 
             @Override
             public void onCompleted() {
-
+                responseObserver.onNext(Empty.getDefaultInstance());
                 responseObserver.onCompleted();
             }
         };
