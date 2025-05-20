@@ -40,20 +40,26 @@ public class ClientMain
     {
         switch (command)
         {
-            case "add":
+            case "AddLog":
                 System.out.println("Enter a Log Text: ");
                 Scanner scanner = new Scanner(System.in);
                 String log = scanner.nextLine();
                 client.addLog(log);
                 break;
-            case "get":
+            case "GetLog":
                 client.getLog();
                 break;
-            case "listen":
+            case "ListenLog":
                 client.listen();
                 break;
-            case "unlisten":
+            case "UnlistenLog":
                 client.unlisten();
+                break;
+            case "CrashLog":
+                client.crashLog();
+                break;
+            case "RestoreLog":
+                client.restoreLog();
                 break;
             default:
                 System.out.println("Command " + command + " not available");

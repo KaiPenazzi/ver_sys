@@ -11,8 +11,36 @@ public class LogServiceImpl extends LogServiceImplBase
 {
     private List<LoggedLog> log_list = Collections.synchronizedList(new ArrayList<LoggedLog>());
     private Map<String, StreamObserver<LoggedLog>> listener_map = Collections.synchronizedMap(new HashMap<String, StreamObserver<LoggedLog>>());
-
     private int linecounter = 1;
+    String password;
+
+    private final BackupServiceGrpc.BackupServiceStub backupServiceStub;
+    private final BackupServiceGrpc.BackupServiceBlockingStub backupServiceBlockingStub;
+    private final StreamObserver<LoggedLog> backupStream;
+
+    public LogServiceImpl (BackupServiceGrpc.BackupServiceStub backupServiceStub, BackupServiceGrpc.BackupServiceBlockingStub blockingStub,  String password)
+    {
+        this.backupServiceStub = backupServiceStub;
+        this.backupServiceBlockingStub = blockingStub;
+        this.password = password;
+        this.backupStream = backupServiceStub.addLog(new StreamObserver<Empty>() {
+            @Override
+            public void onNext(Empty empty) {
+                System.out.println("Backup server acknowledged logs.");
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                System.err.println("Error in backup stream: " + t.getMessage());
+            }
+
+            @Override
+            public void onCompleted() {
+                System.out.println("Backup stream completed.");
+            }
+        });
+
+    }
 
     @Override
     public StreamObserver<Log> addLog(StreamObserver<Empty> responseObserver)
@@ -29,6 +57,7 @@ public class LogServiceImpl extends LogServiceImplBase
                         .build();
 
                 log_list.add(logged);
+                backupStream.onNext(logged);
 
                 listener_map.forEach( (k,v) -> {
                     v.onNext(logged);
@@ -69,5 +98,28 @@ public class LogServiceImpl extends LogServiceImplBase
     @Override
     public void unlistenLog(User request, StreamObserver<Empty> responseObserver) {
         listener_map.remove(request.getUserId()).onCompleted();
+    }
+
+    @Override
+    public void crashLog(Password request, StreamObserver<Empty> responseObserver) {
+        if (request.getPsw().equals(password)) {
+            log_list.clear();
+            responseObserver.onNext(Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        }
+    }
+
+    @Override
+    public void restoreLog(Password request, StreamObserver<Empty> responseObserver) {
+        if (!request.getPsw().equals(password)) {
+            return;
+        }
+
+        ListLoggedLog backup = backupServiceBlockingStub.getBackup(Empty.newBuilder().build());
+        log_list.clear();
+        log_list.addAll(backup.getLogsList());
+
+        responseObserver.onNext(Empty.newBuilder().build());
+        responseObserver.onCompleted();
     }
 }

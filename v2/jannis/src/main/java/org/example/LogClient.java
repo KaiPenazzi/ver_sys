@@ -106,6 +106,48 @@ public class LogClient {
         activeListenObserver = null;
     }
 
+    public void crashLog()
+    {
+        StreamObserver<Empty> responseObserver = new StreamObserver<>() {
+            @Override
+            public void onNext(Empty empty) {
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                System.err.println("Fehler beim Abmelden: " + t.getMessage());
+            }
+
+            @Override
+            public void onCompleted() {
+            }
+        };
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Gebe das Passwort ein um die Logs zu löschen:");
+        String password = scanner.nextLine();
+
+        asyncStubb.crashLog(Password.newBuilder()
+                .setPsw(password)
+                .build(), responseObserver);
+    }
+
+    public void restoreLog()
+    {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Gib das Passwort ein, um die Logs wiederherzustellen:");
+        String password = scanner.nextLine();
+
+        try {
+            blockingStubb.restoreLog(Password.newBuilder()
+                    .setPsw(password)
+                    .build());
+            System.out.println("✅ Logs wurden erfolgreich wiederhergestellt.");
+        } catch (Exception e) {
+            System.err.println("❌ Fehler beim Wiederherstellen der Logs: " + e.getMessage());
+        }
+    }
+
     public static void printLog(LoggedLog log) {
         Instant instant = Instant.ofEpochSecond(log.getTimestamp().getSeconds());
         ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());

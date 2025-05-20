@@ -43,9 +43,10 @@ public class BackupServerImpl extends BackupServiceImplBase
 
     @Override
     public void getBackup(Empty request, StreamObserver<ListLoggedLog> responseObserver) {
-        ListLoggedLog.Builder builder = ListLoggedLog.newBuilder();
-        builder.addAllLogs(log_list);
-        responseObserver.onNext(builder.build());
+        ListLoggedLog list = ListLoggedLog.newBuilder()
+                .addAllLogs(log_list)
+                .build();
+        responseObserver.onNext(list);
         responseObserver.onCompleted();
     }
 
