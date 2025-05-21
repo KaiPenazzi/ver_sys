@@ -34,4 +34,12 @@ class Logger {
         }
         return builder.build();
     }
+
+    public void crash() {
+        logs.clear();
+    }
+
+    public void setLogs(List<LoggedLog> logs) {
+        this.logs = logs;
+    }
 }

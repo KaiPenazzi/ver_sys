@@ -41,6 +41,16 @@ public class Main {
                     client.unlistenLog();
                     break;
 
+                case "crash":
+                    System.out.println("Enter Password");
+                    client.crash(scanner.nextLine());
+                    break;
+
+                case "restore":
+                    System.out.println("Enter Password");
+                    client.restore(scanner.nextLine());
+                    break;
+
                 default:
                     System.out.println("Commands: add, get, listen, unlisten, exit");
                     break;

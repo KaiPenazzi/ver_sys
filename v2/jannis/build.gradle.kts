@@ -24,7 +24,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("org.example.ClientMain")  // Main-Client-Klasse
+    mainClass.set("org.example.LogServer")  // Main-Client-Klasse
 }
 
 protobuf {
@@ -74,22 +74,7 @@ tasks.register<JavaExec>("runClient") {
     }
 }
 
-tasks.register<Jar>("ClientJar") {
-    archiveBaseName.set("client")
-    manifest {
-        attributes["Main-Class"] = "org.example.ClientMain"
-    }
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from(sourceSets.main.get().output)
-    dependsOn(configurations.runtimeClasspath)
-    from({
-        configurations.runtimeClasspath.get()
-            .filter { it.name.endsWith("jar") }
-            .map { zipTree(it) }
-    })
-}
-
-tasks.shadowJar {
+/*tasks.shadowJar {
     archiveClassifier.set("client")
     mergeServiceFiles()
     manifest {
@@ -97,13 +82,24 @@ tasks.shadowJar {
             "Main-Class" to "org.example.ClientMain"
         )
     }
+}*/
+
+tasks.shadowJar {
+    archiveClassifier.set("server")
+    mergeServiceFiles()
+     manifest {
+         attributes(
+             "Main-Class" to "org.example.LogServer"
+         )
+     }
+ }
+
+tasks.shadowJar {
+    archiveClassifier.set("backupServer")
+    mergeServiceFiles()
+    manifest {
+        attributes(
+            "Main-Class" to "org.example.BackupServer"
+        )
+    }
 }
-// tasks.shadowJar {
-//     archiveClassifier.set("server")
-//     mergeServiceFiles()
-//     manifest {
-//         attributes(
-//             "Main-Class" to "org.example.LogServer"
-//         )
-//     }
-// }

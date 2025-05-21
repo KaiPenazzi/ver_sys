@@ -43,19 +43,6 @@ tasks.named<ProcessResources>("processResources") {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
-tasks.register<JavaExec>("runServer") {
-    group = "application"
-    mainClass.set("org.server.Main")
-    classpath = project(":server").sourceSets["main"].runtimeClasspath
-}
-
-tasks.register<JavaExec>("runClient") {
-    group = "application"
-    mainClass.set("org.client.Main")
-    classpath = sourceSets["main"].runtimeClasspath
-    classpath = project(":client").sourceSets["main"].runtimeClasspath
-}
-
 sourceSets {
     main {
         proto {
