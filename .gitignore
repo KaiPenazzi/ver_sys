@@ -11,6 +11,6 @@ bin
 .settings/
 
 .idea
-.iml
+*.iml
 .vs
 
