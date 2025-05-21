@@ -1,0 +1,18 @@
+begin: neigh_informed = 0, informed = false, sum = storage = X, initiator = false
+Initiator:  informed = true, initiator = true
+            sende i an alle Nachbarn
+
+Alle    Event: Empfange Nachricht
+        Action: neigh_informed ++;
+
+                if not informed
+                    informed = true, upward_node = N
+                    sende i an alle Nachbarn außer N
+                if E-Message
+                    self.sum += E.sum
+
+                if neigh_informed == anz Nachbarn
+                    if initiator
+                        sende Result
+                    else
+                        sende message e mit self.sum an upward_node
