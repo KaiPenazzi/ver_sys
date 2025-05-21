@@ -5,3 +5,7 @@
 build
 
 .class
+
+.classpath
+.project
+.settings/
