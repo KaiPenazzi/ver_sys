@@ -1,0 +1,55 @@
+java -jar -node.jar <storage int> <self ip:port> <logger ip:port> [<neighbors ip:port>]
+
+init.json
+{
+    nodes: [
+        {
+            address: <ip:port string>,
+            storage: int,
+            neighbors: [
+                <ip:port string>,
+            ]
+        }
+    ]
+}
+
+start
+{
+    type: "start",
+}
+
+result
+{
+    type: "result",
+    body: {
+        result: int,
+    }
+}
+
+logging
+{
+    type: "log",
+    body: {
+        timestamp: <timestamp: int>,
+        start_node: <ip:port string>,
+        end_node: <ip:port string>,
+        msg_type: <i | e string>,
+        sum: int,
+    }
+}
+
+info
+{
+    type: "i",
+    body: {
+        from: <ip:port string>,
+    }
+}
+
+echo
+{
+    type: "e",
+    body: {
+        sum: int,
+    }
+}
