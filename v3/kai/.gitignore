@@ -3,8 +3,7 @@
 
 # Ignore Gradle build output directory
 build
-
-.class
+bin
 
 .classpath
 .project
