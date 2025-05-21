@@ -5,6 +5,7 @@ import java.net.URI;
 import org.example.Log;
 import org.example.LogServiceGrpc;
 import org.example.LoggedLog;
+import org.example.Password;
 import org.example.User;
 import org.example.LogServiceGrpc.LogServiceBlockingV2Stub;
 import org.example.LogServiceGrpc.LogServiceStub;
@@ -121,5 +122,13 @@ public class MyClient {
                 System.out.println("Unlistening to logs...");
             }
         });
+    }
+
+    public void crash(String psw) {
+        sync_stub.crashLog(Password.newBuilder().setPsw(psw).build());
+    }
+
+    public void restore(String psw) {
+        sync_stub.restoreLog(Password.newBuilder().setPsw(psw).build());
     }
 }
