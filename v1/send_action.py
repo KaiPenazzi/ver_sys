@@ -15,11 +15,9 @@ def send_udp_message(x: int, y: int, usr: str = "tim"):
         # Erstelle die Nachricht als JSON-String
         message = json.dumps({
             "type": "action",
-            "data": {
-                "x": x,
-                "y": y,
-                "usr": usr,
-            }
+            "x": x,
+            "y": y,
+            "usr": usr,
         }).encode("utf-8")
 
         # Senden der Nachricht

@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+option java_package = "org.example"; // Dies gibt das Java-Package an
+option java_multiple_files = true;
+
+message User { string user_id = 1; }
+
+message Password { string psw = 1; }
+
+message Log {
+  string usr_id = 1;
+  string log_text = 2;
+}
+
+message LoggedLog {
+  Log log = 1;
+  int32 line_number = 2;
+  google.protobuf.Timestamp timestamp = 3;
+}
+
+message ListLoggedLog { repeated LoggedLog logs = 1; }
+
+service LogService {
+  rpc AddLog(stream Log) returns (google.protobuf.Empty);
+  rpc GetLog(google.protobuf.Empty) returns (ListLoggedLog);
+  rpc ListenLog(User) returns (stream LoggedLog);
+  rpc UnlistenLog(User) returns (google.protobuf.Empty);
+  rpc CrashLog(Password) returns (google.protobuf.Empty);
+  rpc RestoreLog(Password) returns (google.protobuf.Empty);
+}
+
+service BackupService {
+  rpc AddLog(stream LoggedLog) returns (google.protobuf.Empty);
+  rpc GetBackup(google.protobuf.Empty) returns (ListLoggedLog);
+}

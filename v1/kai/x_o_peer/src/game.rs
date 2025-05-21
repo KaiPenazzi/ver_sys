@@ -5,6 +5,8 @@ use druid::{Data, Lens};
 use field::GameField;
 use scores::GameScores;
 
+use crate::model::messages::InitData;
+
 #[derive(Clone, Data, Lens)]
 pub struct Game {
     pub field: GameField,
@@ -12,10 +14,17 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(usr: &String, x: u32, y: u32, k: u32) -> Self {
+    pub fn new(x: u32, y: u32, k: u32) -> Self {
         Self {
-            field: GameField::init(usr, x, y, k),
+            field: GameField::init(x, y, k),
             scores: GameScores::new(),
+        }
+    }
+
+    pub fn from_init(init: InitData) -> Self {
+        Self {
+            field: GameField::init_with_fields(init.field, init.k),
+            scores: GameScores::from_vec(init.score),
         }
     }
 
@@ -23,6 +32,15 @@ impl Game {
         match self.field.check() {
             Some(usr) => self.scores.add_point(usr),
             None => (),
+        }
+    }
+
+    pub fn to_init(&self) -> InitData {
+        InitData {
+            r#type: "init".to_string(),
+            field: self.field.to_vec(),
+            score: self.scores.to_vec(),
+            k: self.field.k,
         }
     }
 }

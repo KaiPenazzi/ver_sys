@@ -1,14 +1,14 @@
-use std::sync::Mutex;
 
 use druid::{AppDelegate, Command, DelegateCtx, Env, Handled, Selector, Target};
 
 use crate::{
-    model::messages::{ActionData, Message},
+    game::field::Cell,
+    model::com::RecvMsg,
     AppData,
 };
 
-pub const UDP_MSG_RECV: Selector<Message> = Selector::new("udp.rec");
-pub const CHECK_FIELD: Selector<()> = Selector::new("field.check");
+pub const UDP_MSG_RECV: Selector<RecvMsg> = Selector::new("udp.rec");
+pub const FIELD_CLICKED: Selector<Cell> = Selector::new("field.check");
 
 pub struct Delegate;
 impl AppDelegate<AppData> for Delegate {
@@ -26,8 +26,9 @@ impl AppDelegate<AppData> for Delegate {
 
             return Handled::Yes;
         }
-        if cmd.is(CHECK_FIELD) {
-            data.manager.game.check();
+        if cmd.is(FIELD_CLICKED) {
+            let cell = cmd.get(FIELD_CLICKED).unwrap();
+            data.manager.action(cell.x, cell.y)
         }
         Handled::No
     }
