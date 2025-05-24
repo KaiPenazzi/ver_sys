@@ -2,18 +2,17 @@ plugins {
     `java-library`
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(24))
-    }
-}
-
-repositories {
-    mavenCentral()
-}
+// repositories {
+//     mavenCentral()
+// }
 
 dependencies {
-    // Beispiel: JSON-Bibliothek, falls du Jackson nutzen willst
-    // implementation("com.fasterxml.jackson.core:jackson-databind:2.17.1")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.15.2")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
 }
+
+// tasks.named<Test>("test") {
+//     enabled = false
+// }
 
