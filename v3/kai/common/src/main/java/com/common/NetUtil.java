@@ -12,4 +12,8 @@ public class NetUtil {
         int port = Integer.parseInt(parts[1]);
         return new InetSocketAddress(host, port);
     }
+
+    public static String ToString(InetSocketAddress address) {
+        return address.getHostName() + ":" + address.getPort();
+    }
 }

@@ -10,7 +10,7 @@ public class EchoMessage implements Message {
     public EchoMessage() {
     }
 
-    public EchoMessage(int sum, String from) {
+    public EchoMessage(int sum) {
         this.body = new Body();
         this.body.sum = sum;
     }

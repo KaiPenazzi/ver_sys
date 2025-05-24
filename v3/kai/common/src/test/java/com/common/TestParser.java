@@ -1,5 +1,7 @@
 package com.common;
 
+import java.net.InetSocketAddress;
+
 import org.junit.jupiter.api.Test;
 
 import com.common.messages.EchoMessage;
@@ -25,7 +27,7 @@ public class TestParser {
 
     @Test
     public void testParseInfo() {
-        var info_msg = new InfoMessage("idk where im from");
+        var info_msg = new InfoMessage(new InetSocketAddress("123.1.2.3", 1234));
 
         String json = JsonUtil.toJson(info_msg);
         try {
@@ -38,7 +40,7 @@ public class TestParser {
 
     @Test
     public void testParseEcho() {
-        var echo_msg = new EchoMessage(5, "localhost:1225");
+        var echo_msg = new EchoMessage(5);
 
         String json = JsonUtil.toJson(echo_msg);
         try {
@@ -80,5 +82,4 @@ public class TestParser {
             e.printStackTrace();
         }
     }
-
 }

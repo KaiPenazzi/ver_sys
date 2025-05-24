@@ -12,4 +12,12 @@ class TestNetUtil {
         assert socketAddress.getHostName().equals("localhost");
         assert socketAddress.getPort() == 8080;
     }
+
+    @Test
+    public void testToString() {
+        String string_addr = "localhost:5001";
+        InetSocketAddress inet_addr = new InetSocketAddress("localhost", 5001);
+        String inet_str = NetUtil.ToString(inet_addr);
+        assert inet_str.equals(string_addr);
+    }
 }

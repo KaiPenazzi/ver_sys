@@ -1,5 +1,9 @@
 package com.common.messages;
 
+import java.net.InetSocketAddress;
+
+import com.common.NetUtil;
+
 public class InfoMessage implements Message {
     public Body body;
 
@@ -13,9 +17,9 @@ public class InfoMessage implements Message {
     public InfoMessage() {
     }
 
-    public InfoMessage(String from) {
+    public InfoMessage(InetSocketAddress from) {
         this.body = new Body();
-        this.body.from = from;
+        this.body.from = NetUtil.ToString(from);
     }
 
     public boolean equalMsg(InfoMessage o) {
