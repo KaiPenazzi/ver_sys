@@ -51,6 +51,5 @@ echo
     type: "e",
     body: {
         sum: int,
-        from: <ip:port string>,
     }
 }

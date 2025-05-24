@@ -5,7 +5,6 @@ public class EchoMessage implements Message {
 
     public static class Body {
         public int sum;
-        public String from;
     }
 
     public EchoMessage() {
@@ -14,7 +13,6 @@ public class EchoMessage implements Message {
     public EchoMessage(int sum, String from) {
         this.body = new Body();
         this.body.sum = sum;
-        this.body.from = from;
     }
 
 }
