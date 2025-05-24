@@ -11,6 +11,9 @@ bin
 .settings/
 
 .idea
+*.idea
 *.iml
 .vs
 
+*.zip
+*.jar
