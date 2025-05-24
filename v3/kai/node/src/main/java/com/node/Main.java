@@ -1,11 +1,36 @@
 package com.node;
 
-import com.common.messages.Message;
+import java.net.InetSocketAddress;
+import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.common.NetUtil;
 
 class Main {
     public static void main(String[] args) {
-        System.out.println("hello from node");
+        if (args.length < 3) {
+            System.err.println(
+                    "Usage: java -jar node.jar <storage:int> <self:ip:port> <logger:ip:port> [<neighbors:ip:port>...]");
+            System.exit(1);
+        }
 
-        Message message = new Message();
+        int storage = Integer.parseInt(args[0]);
+        InetSocketAddress self = NetUtil.parse(args[1]);
+        InetSocketAddress logger = NetUtil.parse(args[2]);
+
+        List<InetSocketAddress> neighbours = new ArrayList<>();
+        for (int i = 3; i < args.length; i++) {
+            neighbours.add(NetUtil.parse(args[i]));
+        }
+
+        try {
+            Node node = new Node(storage, self, logger, neighbours);
+            node.start();
+
+        } catch (SocketException e) {
+            System.out.println("could not create Node");
+            System.exit(2);
+        }
     }
 }
