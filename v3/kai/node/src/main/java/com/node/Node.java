@@ -13,6 +13,7 @@ import com.common.udp.Client;
 
 public class Node {
     private int storage;
+    private InetSocketAddress self;
     private Client upd_client;
     private InetSocketAddress logger;
     private List<InetSocketAddress> neighbours;
@@ -27,6 +28,7 @@ public class Node {
             throws SocketException {
 
         this.storage = storage;
+        this.self = address;
         this.sum = storage;
         this.logger = logger;
         this.neighbours = neighbours;
@@ -56,15 +58,17 @@ public class Node {
                     neighbours.forEach(
                             neighbour -> {
                                 if (!neighbour.equals(this.N)) {
-                                    InfoMessage info = new InfoMessage();
+                                    InfoMessage info = new InfoMessage(this.self);
                                     upd_client.send(info, neighbour);
                                 }
                             });
                 }
+                break;
 
             case "EchoMessage":
                 var sum = ((EchoMessage) msg).body.sum;
                 this.sum += sum;
+                break;
         }
 
         if (this.informed_neighbours == this.neighbours.size()) {

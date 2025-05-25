@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 
 import com.common.JsonUtil;
 import com.common.messages.Message;
@@ -29,10 +30,11 @@ public class Client {
             while (run) {
                 try {
                     socket.receive(packet);
-                    String json = packet.getData().toString();
+                    String json = new String(packet.getData(), 0, packet.getLength(), StandardCharsets.UTF_8);
                     try {
                         listener.onMessage(JsonUtil.parse(json));
                     } catch (Exception e) {
+                        e.printStackTrace();
                         System.out.println("could not parse: " + json);
                     }
                 } catch (IOException e) {
