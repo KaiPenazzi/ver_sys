@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 
 import com.common.JsonUtil;
 import com.common.messages.Message;
@@ -37,6 +38,10 @@ public class Client {
                         e.printStackTrace();
                         System.out.println("could not parse: " + json);
                     }
+                } catch (SocketException e) {
+                    if (run) {
+                        e.printStackTrace();
+                    }
                 } catch (IOException e) {
                     System.out.println("could not receive packet");
                     e.printStackTrace();
@@ -48,6 +53,12 @@ public class Client {
 
     public void stop() {
         this.run = false;
+        this.socket.close();
+        try {
+            t.join();
+        } catch (Exception e) {
+            System.out.println("could not terminate thread clean");
+        }
     }
 
     public void send(Message msg, InetSocketAddress to) {

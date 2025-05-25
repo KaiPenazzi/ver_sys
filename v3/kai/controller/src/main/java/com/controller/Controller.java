@@ -34,6 +34,7 @@ public class Controller {
 
     public void stop() {
         this.udp_client.stop();
+        this.nodes.stop();
     }
 
     private void recvMessage(Message msg) {

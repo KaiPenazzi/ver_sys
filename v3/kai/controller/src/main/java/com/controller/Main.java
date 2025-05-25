@@ -23,6 +23,8 @@ class Main {
 
             Scanner scanner = new Scanner(System.in);
             String input = "";
+
+            System.out.println("commands: init, exit");
             do {
                 input = scanner.nextLine();
 
@@ -38,15 +40,16 @@ class Main {
                         } catch (NumberFormatException e) {
                             System.out.println("number could not be parsed to a number");
                         }
+                        break;
 
                 }
             } while (!input.equals("exit"));
 
+            controller.stop();
         } catch (Exception e) {
             System.out.println("could not create controller");
             e.printStackTrace();
             System.exit(2);
         }
-
     }
 }

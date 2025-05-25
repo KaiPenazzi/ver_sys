@@ -15,6 +15,8 @@ import com.common.Config.Node;
 class NodesManager {
     private Config config;
 
+    private List<Process> processes = new ArrayList<>();
+
     public NodesManager(Path config) throws Exception {
         this.config = JsonUtil.parse_config(Files.readString(config));
     }
@@ -31,9 +33,9 @@ class NodesManager {
             command.addAll(node.neighbors);
 
             try {
-                new ProcessBuilder(command)
+                processes.add(new ProcessBuilder(command)
                         .inheritIO()
-                        .start();
+                        .start());
             } catch (IOException e) {
                 System.out.println("could not start node: " + node.address);
             }
@@ -46,5 +48,11 @@ class NodesManager {
 
     public Node getNode(int index) {
         return this.config.nodes.get(index);
+    }
+
+    public void stop() {
+        this.processes.forEach(process -> {
+            process.destroy();
+        });
     }
 }
