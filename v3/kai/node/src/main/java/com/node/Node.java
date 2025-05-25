@@ -7,33 +7,32 @@ import java.util.List;
 import com.common.NetUtil;
 import com.common.messages.EchoMessage;
 import com.common.messages.InfoMessage;
+import com.common.messages.LoggingMessage;
 import com.common.messages.Message;
 import com.common.messages.ResultMessage;
 import com.common.udp.Client;
 
 public class Node {
-    private int storage;
     private InetSocketAddress self;
     private Client upd_client;
     private InetSocketAddress logger;
-    private List<InetSocketAddress> neighbours;
+    private List<InetSocketAddress> neighbors;
 
-    private int informed_neighbours = 0;
+    private int informed_neighbors = 0;
     private boolean informed = false;
     private int sum = 0;
     private boolean initiator = false;
     private InetSocketAddress N;
 
-    public Node(int storage, InetSocketAddress address, InetSocketAddress logger, List<InetSocketAddress> neighbours)
+    public Node(int storage, InetSocketAddress address, InetSocketAddress logger, List<InetSocketAddress> neighbors)
             throws SocketException {
 
-        this.storage = storage;
         this.self = address;
         this.sum = storage;
         this.logger = logger;
-        this.neighbours = neighbours;
+        this.neighbors = neighbors;
 
-        upd_client = new Client(address, msg -> {
+        this.upd_client = new Client(address, msg -> {
             this.recvMessage(msg);
         });
     }
@@ -47,38 +46,61 @@ public class Node {
     }
 
     public void recvMessage(Message msg) {
-        this.informed_neighbours++;
 
         switch (msg.getClass().getSimpleName()) {
             case "InfoMessage":
+                this.informed_neighbors++;
+                InfoMessage info = (InfoMessage) msg;
                 if (!informed) {
                     this.informed = true;
-                    this.N = NetUtil.parse(((InfoMessage) msg).body.from);
+                    this.N = NetUtil.parse(info.body.from);
 
-                    neighbours.forEach(
+                    neighbors.forEach(
                             neighbour -> {
                                 if (!neighbour.equals(this.N)) {
-                                    InfoMessage info = new InfoMessage(this.self);
-                                    upd_client.send(info, neighbour);
+                                    InfoMessage new_info = new InfoMessage(this.self);
+                                    this.send(new_info, neighbour);
                                 }
                             });
                 }
                 break;
 
             case "EchoMessage":
+                this.informed_neighbors++;
                 var sum = ((EchoMessage) msg).body.sum;
                 this.sum += sum;
                 break;
+
+            case "StartMessage":
+                this.initiator = true;
+                this.informed = true;
+
+                neighbors.forEach(
+                        neighbour -> {
+                            InfoMessage new_info = new InfoMessage(this.self);
+                            this.send(new_info, neighbour);
+                        });
+                break;
         }
 
-        if (this.informed_neighbours == this.neighbours.size()) {
+        if (this.informed_neighbors == this.neighbors.size()) {
             if (this.initiator) {
                 ResultMessage result = new ResultMessage(this.sum);
-                upd_client.send(result, this.logger);
+                this.send(result, this.logger);
             } else {
                 EchoMessage result = new EchoMessage(this.sum);
-                upd_client.send(result, this.N);
+                this.send(result, this.N);
             }
         }
+    }
+
+    private void send(Message msg, InetSocketAddress to) {
+        this.log(msg.getClass().getSimpleName(), to);
+        this.upd_client.send(msg, to);
+    }
+
+    private void log(String type, InetSocketAddress to) {
+        LoggingMessage log = new LoggingMessage(this.self, to, type, this.sum);
+        upd_client.send(log, this.logger);
     }
 }

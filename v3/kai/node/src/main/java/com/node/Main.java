@@ -19,13 +19,13 @@ class Main {
         InetSocketAddress self = NetUtil.parse(args[1]);
         InetSocketAddress logger = NetUtil.parse(args[2]);
 
-        List<InetSocketAddress> neighbours = new ArrayList<>();
+        List<InetSocketAddress> neighbors = new ArrayList<>();
         for (int i = 3; i < args.length; i++) {
-            neighbours.add(NetUtil.parse(args[i]));
+            neighbors.add(NetUtil.parse(args[i]));
         }
 
         try {
-            Node node = new Node(storage, self, logger, neighbours);
+            Node node = new Node(storage, self, logger, neighbors);
             node.start();
 
         } catch (SocketException e) {

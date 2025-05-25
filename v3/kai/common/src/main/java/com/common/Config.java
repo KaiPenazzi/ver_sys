@@ -2,7 +2,7 @@ package com.common;
 
 import java.util.List;
 
-public class InitFile {
+public class Config {
     public List<Node> nodes;
 
     public static class Node {

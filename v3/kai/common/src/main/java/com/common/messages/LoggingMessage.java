@@ -1,5 +1,10 @@
 package com.common.messages;
 
+import java.net.InetSocketAddress;
+import java.util.Date;
+
+import com.common.NetUtil;
+
 public class LoggingMessage implements Message {
     public Body body;
 
@@ -19,6 +24,15 @@ public class LoggingMessage implements Message {
         this.body.timestamp = timestamp;
         this.body.start_node = start_node;
         this.body.end_node = end_node;
+        this.body.msg_type = msg_type;
+        this.body.sum = sum;
+    }
+
+    public LoggingMessage(InetSocketAddress from, InetSocketAddress to, String msg_type, int sum) {
+        this.body = new Body();
+        this.body.timestamp = (int) (System.currentTimeMillis() / 1000);
+        this.body.start_node = NetUtil.ToString(from);
+        this.body.end_node = NetUtil.ToString(to);
         this.body.msg_type = msg_type;
         this.body.sum = sum;
     }
