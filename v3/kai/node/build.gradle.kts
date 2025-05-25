@@ -1,5 +1,6 @@
 plugins {
     application
+    id("com.github.johnrengelman.shadow") version "7.1.0"
 }
 
 application {
@@ -8,4 +9,13 @@ application {
 
 dependencies {
     implementation(project(":common"))
+}
+
+tasks.shadowJar {
+    mergeServiceFiles()
+    manifest {
+        attributes(
+            "Main-Class" to "com.node.Main"
+        )
+    }
 }
