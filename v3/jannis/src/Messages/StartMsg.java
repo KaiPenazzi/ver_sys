@@ -20,5 +20,6 @@ public class StartMsg extends Message
     public void recv_JSON(String data) throws InterruptedException
     {
         Thread.sleep(getLatency());
+        System.out.println(data);
     }
 }

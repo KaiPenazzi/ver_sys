@@ -1,5 +1,7 @@
 package Messages;
 
+import org.json.JSONObject;
+
 public class EchoMsg extends Message
 {
     public EchoMsg()
@@ -7,13 +9,21 @@ public class EchoMsg extends Message
         super(MessageType.echo);
     }
 
-    public void build_JSON()
+    public String build_JSON(int sum)
     {
+        JSONObject obj = new JSONObject();
+        JSONObject body = new JSONObject();
 
+        obj.put("type", "e");
+        body.put("sum", sum);
+        obj.put("body", body);
+
+        return obj.toString();
     }
 
-    public void recv_JSON(String data)
+    public void recv_JSON(String data) throws InterruptedException
     {
-        //emtpy
+        Thread.sleep(getLatency());
+        System.out.println(data);
     }
 }

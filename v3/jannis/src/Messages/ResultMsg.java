@@ -1,5 +1,7 @@
 package Messages;
 
+import org.json.JSONObject;
+
 public class ResultMsg extends Message
 {
     public ResultMsg()
@@ -7,13 +9,22 @@ public class ResultMsg extends Message
         super(MessageType.result);
     }
 
-    public void build_JSON()
+    public String build_JSON(int result)
     {
+        JSONObject obj = new JSONObject();
+        JSONObject body = new JSONObject();
 
+        body.put("result", result);
+
+        obj.put("type", "result");
+        obj.put("body", body);
+
+        return obj.toString();
     }
 
-    public void recv_JSON(String data)
+    public void recv_JSON(String data) throws InterruptedException
     {
-        //emtpy
+        Thread.sleep(getLatency());
+        System.out.println(data);
     }
 }
