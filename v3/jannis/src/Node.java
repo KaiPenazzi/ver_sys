@@ -1,3 +1,4 @@
+import Messages.InfoMsg;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 import org.json.JSONTokener;
@@ -150,6 +151,11 @@ public class Node
         this.client = client;
     }
 
+    public String getInetAddress()
+    {
+        return this.getIp() + ":" + this.getPort();
+    }
+
     public void recMsg(String msg)
     {
         JSONObject obj = new JSONObject(new JSONTokener(msg));
@@ -170,6 +176,12 @@ public class Node
                 break;
             case "start":
                 System.out.println("Start");
+                InfoMsg infoMsg = new InfoMsg();
+                for (int i = 0; i < neighbors.size(); i++)
+                {
+                    client.sendMessage(infoMsg.build_JSON(getInetAddress()), neighbors.get(i));
+                }
+                break;
         }
     }
 }

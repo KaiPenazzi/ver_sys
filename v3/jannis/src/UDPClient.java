@@ -3,7 +3,10 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 public class UDPClient {
-    public void sendMessage(String message, String serverIP, int serverPort) {
+    public void sendMessage(String message, String serverIP) {
+        String ip = serverIP.split(":")[0];
+        int serverPort = Integer.parseInt(serverIP.split(":")[1]);
+
         try (DatagramSocket socket = new DatagramSocket()) {
             InetAddress address = InetAddress.getByName(serverIP);
             byte[] messageBytes = message.getBytes();

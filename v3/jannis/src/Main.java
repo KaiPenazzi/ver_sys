@@ -21,7 +21,7 @@ public class Main {
         Node node = new Node(ownIP, storeValue, neighIPs, loggerIP);
         LogMsg msg = new LogMsg();
 
-        node.getClient().sendMessage(msg.build_JSON("Start", "End", Message.MessageType.info, 4), "127.0.0.1", 1111);
+        node.getClient().sendMessage(msg.build_JSON("Start", "End", Message.MessageType.info, 4), "127.0.0.1:1111");
     }
 }
 

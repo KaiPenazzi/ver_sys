@@ -1,9 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="jannis:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/jannis_jar</output-path>
-    <root id="archive" name="jannis.jar">
-      <element id="module-output" name="jannis" />
-      <element id="extracted-dir" path="$USER_HOME$/Downloads/json-20250107.jar" path-in-jar="/" />
-    </root>
-  </artifact>
-</component>
