@@ -18,15 +18,17 @@ public class Node {
     private InetSocketAddress logger;
     private List<InetSocketAddress> neighbors;
 
+    private int storage;
     private int informed_neighbors = 0;
     private boolean informed = false;
-    private int sum = 0;
+    private int sum;
     private boolean initiator = false;
     private InetSocketAddress N;
 
     public Node(int storage, InetSocketAddress address, InetSocketAddress logger, List<InetSocketAddress> neighbors)
             throws SocketException {
 
+        this.storage = storage;
         this.self = address;
         this.sum = storage;
         this.logger = logger;
@@ -43,6 +45,14 @@ public class Node {
 
     public void stop() {
         this.upd_client.stop();
+    }
+
+    private void reset() {
+        this.informed_neighbors = 0;
+        this.informed = false;
+        this.sum = this.storage;
+        this.initiator = false;
+        this.N = null;
     }
 
     public void recvMessage(Message msg) {
@@ -91,6 +101,7 @@ public class Node {
                 EchoMessage result = new EchoMessage(this.sum);
                 this.send(result, this.N);
             }
+            this.reset();
         }
     }
 
