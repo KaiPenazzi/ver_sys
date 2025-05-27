@@ -24,7 +24,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("org.example.LogServer")  // Main-Client-Klasse
+    mainClass.set("org.example.ClientMain")  // Main-Client-Klasse
 }
 
 protobuf {
@@ -74,7 +74,7 @@ tasks.register<JavaExec>("runClient") {
     }
 }
 
-/*tasks.shadowJar {
+tasks.shadowJar {
     archiveClassifier.set("client")
     mergeServiceFiles()
     manifest {
@@ -82,8 +82,9 @@ tasks.register<JavaExec>("runClient") {
             "Main-Class" to "org.example.ClientMain"
         )
     }
-}*/
+}
 
+/*
 tasks.shadowJar {
     archiveClassifier.set("server")
     mergeServiceFiles()
@@ -94,6 +95,7 @@ tasks.shadowJar {
      }
  }
 
+
 tasks.shadowJar {
     archiveClassifier.set("backupServer")
     mergeServiceFiles()
@@ -103,3 +105,4 @@ tasks.shadowJar {
         )
     }
 }
+*/

@@ -1,5 +1,7 @@
+package Node;
+
 import Messages.LogMsg;
-import Messages.Message;
+import Messages.StartMsg;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,7 +23,10 @@ public class Main {
         Node node = new Node(ownIP, storeValue, neighIPs, loggerIP);
         LogMsg msg = new LogMsg();
 
-        node.getClient().sendMessage(msg.build_JSON("Start", "End", Message.MessageType.info, 4), "127.0.0.1:1111");
+        StartMsg startMsg = new StartMsg();
+
+        node.getClient().sendMessage(startMsg.build_JSON(), node.getInetAddress());
+        //node.getClient().sendMessage(msg.build_JSON("Start", "End", Message.MessageType.info, 4), "127.0.0.1:1111");
     }
 }
 

@@ -1,9 +1,11 @@
-import Messages.InfoMsg;
+package Node;
+
+import Messages.*;
+import communication.UDPClient;
+import communication.UDPServer;
 import org.json.JSONObject;
-import org.json.JSONStringer;
 import org.json.JSONTokener;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -156,9 +158,15 @@ public class Node
         return this.getIp() + ":" + this.getPort();
     }
 
-    public void recMsg(String msg)
-    {
+    public void sendLog(Message.MessageType type) throws InterruptedException {
+        LogMsg msg = new LogMsg(this.getInetAddress(), logger_ip, type, sum);
+        client.sendMessage(msg.build_JSON(), this.getInetAddress());
+    }
+
+    public void recMsg(String msg) throws InterruptedException {
+        System.out.println("Empfangen: " + msg);
         JSONObject obj = new JSONObject(new JSONTokener(msg));
+
 
         switch(obj.getString("type"))
         {
@@ -167,21 +175,68 @@ public class Node
                 break;
             case "result":
                 System.out.println("Result");
+                sendLog(Message.MessageType.result);
                 break;
             case "e":
+                JSONObject body = obj.getJSONObject("body");
                 System.out.println("Echo");
+                neigh_informed++;
+
+                int sum = body.getInt("sum");
+                this.sum += sum;
+
+                sendLog(Message.MessageType.echo);
                 break;
             case "i":
+                JSONObject body2 = obj.getJSONObject("body");
                 System.out.println("I");
+                neigh_informed++;
+
+                if (!informed)
+                {
+                    informed = true;
+                    upward_node_ip = body2.getString("from");
+
+                    InfoMsg infoMsg = new InfoMsg();
+                    for (int i = 0; i < neighbors.size(); i++)
+                    {
+                        if (!neighbors.get(i).equals(upward_node_ip))
+                        {
+                            client.sendMessage(infoMsg.build_JSON(this.getInetAddress()), neighbors.get(i));
+                        }
+
+                    }
+                }
+                sendLog(Message.MessageType.info);
                 break;
             case "start":
                 System.out.println("Start");
+
+                this.informed = true;
+                this.initiator = true;
+
+
                 InfoMsg infoMsg = new InfoMsg();
                 for (int i = 0; i < neighbors.size(); i++)
                 {
                     client.sendMessage(infoMsg.build_JSON(getInetAddress()), neighbors.get(i));
                 }
+                sendLog(Message.MessageType.start);
                 break;
+        }
+
+        if (neigh_informed == neighbors.size())
+        {
+            if(initiator)
+            {
+                ResultMsg resultMsg = new ResultMsg();
+                client.sendMessage(resultMsg.build_JSON(sum), logger_ip);
+            }
+            else
+            {
+                EchoMsg echoMsg = new EchoMsg();
+                client.sendMessage(echoMsg.build_JSON(sum), upward_node_ip);
+            }
         }
     }
 }
