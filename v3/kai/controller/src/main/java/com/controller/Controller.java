@@ -39,9 +39,9 @@ public class Controller {
     }
 
     private void recvMessage(Message msg) {
-        switch (msg.getMsgType()) {
-            case MessageType.RESULT:
-                System.out.println("got result sum: " + ((ResultMessage) msg).body.result);
+        switch (msg) {
+            case ResultMessage result:
+                System.out.println("got result sum: " + result.body.result);
                 break;
 
             default:

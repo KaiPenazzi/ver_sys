@@ -13,6 +13,4 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = EchoMessage.class, name = "e")
 })
 public interface Message {
-    @JsonIgnore
-    public MessageType getMsgType();
 }

@@ -11,6 +11,7 @@ import com.common.messages.LoggingMessage;
 import com.common.messages.Message;
 import com.common.messages.MessageType;
 import com.common.messages.ResultMessage;
+import com.common.messages.StartMessage;
 import com.common.udp.Client;
 
 public class Node {
@@ -57,11 +58,9 @@ public class Node {
     }
 
     public void recvMessage(Message msg) {
-
-        switch (msg.getMsgType()) {
-            case MessageType.INFO:
+        switch (msg) {
+            case InfoMessage info:
                 this.informed_neighbors++;
-                InfoMessage info = (InfoMessage) msg;
                 if (!informed) {
                     this.informed = true;
                     this.N = NetUtil.parse(info.body.from);
@@ -76,13 +75,12 @@ public class Node {
                 }
                 break;
 
-            case MessageType.ECHO:
+            case EchoMessage echo:
                 this.informed_neighbors++;
-                var sum = ((EchoMessage) msg).body.sum;
-                this.sum += sum;
+                this.sum += echo.body.sum;
                 break;
 
-            case MessageType.START:
+            case StartMessage start:
                 this.initiator = true;
                 this.informed = true;
 
@@ -92,6 +90,10 @@ public class Node {
                             this.send(new_info, neighbour);
                         });
                 break;
+
+            default:
+                System.err.println("Received unexpected message type: " + msg.getMsgType());
+                return;
         }
 
         if (this.informed_neighbors == this.neighbors.size()) {
