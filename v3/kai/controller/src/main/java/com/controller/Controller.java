@@ -9,7 +9,6 @@ import com.common.NetUtil;
 import com.common.Config.Node;
 import com.common.messages.LoggingMessage;
 import com.common.messages.Message;
-import com.common.messages.MessageType;
 import com.common.messages.ResultMessage;
 import com.common.messages.StartMessage;
 import com.common.udp.Client;

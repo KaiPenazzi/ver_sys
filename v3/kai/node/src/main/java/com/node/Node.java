@@ -9,7 +9,6 @@ import com.common.messages.EchoMessage;
 import com.common.messages.InfoMessage;
 import com.common.messages.LoggingMessage;
 import com.common.messages.Message;
-import com.common.messages.MessageType;
 import com.common.messages.ResultMessage;
 import com.common.messages.StartMessage;
 import com.common.udp.Client;
@@ -92,7 +91,7 @@ public class Node {
                 break;
 
             default:
-                System.err.println("Received unexpected message type: " + msg.getMsgType());
+                System.err.println("Received unexpected message type: " + msg.getClass().getSimpleName());
                 return;
         }
 
