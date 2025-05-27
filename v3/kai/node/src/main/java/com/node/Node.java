@@ -9,6 +9,7 @@ import com.common.messages.EchoMessage;
 import com.common.messages.InfoMessage;
 import com.common.messages.LoggingMessage;
 import com.common.messages.Message;
+import com.common.messages.MessageType;
 import com.common.messages.ResultMessage;
 import com.common.udp.Client;
 
@@ -57,8 +58,8 @@ public class Node {
 
     public void recvMessage(Message msg) {
 
-        switch (msg.getClass().getSimpleName()) {
-            case "InfoMessage":
+        switch (msg.getMsgType()) {
+            case MessageType.INFO:
                 this.informed_neighbors++;
                 InfoMessage info = (InfoMessage) msg;
                 if (!informed) {
@@ -75,13 +76,13 @@ public class Node {
                 }
                 break;
 
-            case "EchoMessage":
+            case MessageType.ECHO:
                 this.informed_neighbors++;
                 var sum = ((EchoMessage) msg).body.sum;
                 this.sum += sum;
                 break;
 
-            case "StartMessage":
+            case MessageType.START:
                 this.initiator = true;
                 this.informed = true;
 

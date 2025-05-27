@@ -9,6 +9,7 @@ import com.common.NetUtil;
 import com.common.Config.Node;
 import com.common.messages.LoggingMessage;
 import com.common.messages.Message;
+import com.common.messages.MessageType;
 import com.common.messages.ResultMessage;
 import com.common.messages.StartMessage;
 import com.common.udp.Client;
@@ -38,8 +39,8 @@ public class Controller {
     }
 
     private void recvMessage(Message msg) {
-        switch (msg.getClass().getSimpleName()) {
-            case "ResultMessage":
+        switch (msg.getMsgType()) {
+            case MessageType.RESULT:
                 System.out.println("got result sum: " + ((ResultMessage) msg).body.result);
                 break;
 

@@ -14,4 +14,9 @@ public class ResultMessage implements Message {
         this.body = new Body();
         this.body.result = result;
     }
+
+    @Override
+    public MessageType getMsgType() {
+        return MessageType.RESULT;
+    }
 }

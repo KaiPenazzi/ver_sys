@@ -15,4 +15,8 @@ public class EchoMessage implements Message {
         this.body.sum = sum;
     }
 
+    @Override
+    public MessageType getMsgType() {
+        return MessageType.ECHO;
+    }
 }

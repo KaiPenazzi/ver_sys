@@ -31,4 +31,9 @@ public class InfoMessage implements Message {
 
         return isEqual;
     }
+
+    @Override
+    public MessageType getMsgType() {
+        return MessageType.INFO;
+    }
 }

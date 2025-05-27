@@ -58,4 +58,9 @@ public class LoggingMessage implements Message {
 
         return isEqual;
     }
+
+    @Override
+    public MessageType getMsgType() {
+        return MessageType.LOG;
+    }
 }
