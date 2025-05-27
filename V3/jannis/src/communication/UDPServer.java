@@ -33,8 +33,8 @@ public class UDPServer {
                 socket.receive(packet);
 
                 String received = new String(packet.getData(), 0, packet.getLength());
-                if (node == null) {
-                    controller.recMsg();
+                if (node == null && controller != null) {
+                    controller.recMsg(received);
                 }
                 else
                 {
