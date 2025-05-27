@@ -10,17 +10,28 @@ import com.common.NetUtil;
 class Main {
     public static void main(String[] args) {
         if (args.length < 2) {
-            System.out.println("Usage: java -jar controller.jar <self:ip:port> <PathToIni.json:String>");
+            System.out.println("Usage: java -jar controller.jar <self:ip:port> <PathToIni.json:String> <PathToNode>");
             System.exit(1);
         }
 
         InetSocketAddress self = NetUtil.parse(args[0]);
         Path ini = Paths.get(args[1]);
+        Path node_path = Paths.get(args.length > 2 ? args[2] : ".");
 
         Controller controller = null;
+        NodesManager node_manager = null;
 
         try {
-            controller = new Controller(ini, self);
+            node_manager = new NodesManager(ini, node_path);
+        } catch (Exception e) {
+            node_manager.stop();
+            System.out.println("could not parse config file");
+            e.printStackTrace();
+            System.exit(2);
+        }
+
+        try {
+            controller = new Controller(node_manager, self);
             controller.start();
 
             Scanner scanner = new Scanner(System.in);
@@ -49,12 +60,10 @@ class Main {
 
             controller.stop();
         } catch (Exception e) {
-            System.out.println("could not create controller");
+            System.out.println("could not create controller\nmaybe ports are already in use");
             e.printStackTrace();
-        } finally {
-            if (controller != null) {
-                controller.stop();
-            }
+            controller.stop();
+            System.exit(3);
         }
     }
 }

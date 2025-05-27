@@ -1,10 +1,8 @@
 package com.controller;
 
 import java.net.InetSocketAddress;
-import java.nio.file.Path;
 import java.util.List;
 
-import com.common.JsonUtil;
 import com.common.NetUtil;
 import com.common.Config.Node;
 import com.common.PrintUtil;
@@ -19,9 +17,9 @@ public class Controller {
     private Client udp_client;
     private NodesManager nodes;
 
-    public Controller(Path config, InetSocketAddress self)
+    public Controller(NodesManager node_manager, InetSocketAddress self)
             throws Exception {
-        this.nodes = new NodesManager(config);
+        this.nodes = node_manager;
         this.self = self;
         this.udp_client = new Client(self, msg -> {
             this.recvMessage(msg);
