@@ -17,8 +17,10 @@ class Main {
         InetSocketAddress self = NetUtil.parse(args[0]);
         Path ini = Paths.get(args[1]);
 
+        Controller controller = null;
+
         try {
-            Controller controller = new Controller(ini, self);
+            controller = new Controller(ini, self);
             controller.start();
 
             Scanner scanner = new Scanner(System.in);
@@ -49,7 +51,10 @@ class Main {
         } catch (Exception e) {
             System.out.println("could not create controller");
             e.printStackTrace();
-            System.exit(2);
+        } finally {
+            if (controller != null) {
+                controller.stop();
+            }
         }
     }
 }

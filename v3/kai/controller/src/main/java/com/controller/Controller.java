@@ -7,6 +7,7 @@ import java.util.List;
 import com.common.JsonUtil;
 import com.common.NetUtil;
 import com.common.Config.Node;
+import com.common.PrintUtil;
 import com.common.messages.LoggingMessage;
 import com.common.messages.Message;
 import com.common.messages.ResultMessage;
@@ -53,7 +54,7 @@ public class Controller {
         StartMessage msg = new StartMessage();
         InetSocketAddress address = NetUtil.parse(this.nodes.getNode(Integer.parseInt(node)).address);
         this.udp_client.send(msg, address);
-        System.out.println(JsonUtil.toJson(new LoggingMessage(this.self, address, msg.getClass().getSimpleName(), -1)));
+        this.log(new LoggingMessage(this.self, address, msg.getClass().getSimpleName(), -1));
     }
 
     public List<Node> getNodes() {
@@ -61,7 +62,7 @@ public class Controller {
     }
 
     private void log(LoggingMessage msg) {
-        System.out.println(JsonUtil.toJson(msg));
+        PrintUtil.printLog(msg);
     }
 
 }
