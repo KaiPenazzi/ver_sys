@@ -164,22 +164,17 @@ public class Node
     }
 
     public void recMsg(String msg) throws InterruptedException {
-        System.out.println("Empfangen: " + msg);
+        //System.out.println("Empfangen: " + msg);
         JSONObject obj = new JSONObject(new JSONTokener(msg));
 
 
         switch(obj.getString("type"))
         {
-            case "log":
-                System.out.println("Log");
-                break;
             case "result":
-                System.out.println("Result");
                 sendLog(Message.MessageType.result);
                 break;
             case "e":
                 JSONObject body = obj.getJSONObject("body");
-                System.out.println("Echo");
                 neigh_informed++;
 
                 int sum = body.getInt("sum");
@@ -189,7 +184,6 @@ public class Node
                 break;
             case "i":
                 JSONObject body2 = obj.getJSONObject("body");
-                System.out.println("I");
                 neigh_informed++;
 
                 if (!informed)
@@ -210,7 +204,6 @@ public class Node
                 sendLog(Message.MessageType.info);
                 break;
             case "start":
-                System.out.println("Start");
 
                 this.informed = true;
                 this.initiator = true;

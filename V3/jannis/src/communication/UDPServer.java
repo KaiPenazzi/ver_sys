@@ -25,7 +25,6 @@ public class UDPServer {
 
     public void start() {
         try (DatagramSocket socket = new DatagramSocket(port)) {
-            System.out.println("UDP Server läuft auf Port " + port);
             byte[] buffer = new byte[1024];
 
             while (true) {

@@ -21,12 +21,10 @@ public class Main {
         List<String> neighIPs = Arrays.asList(args).subList(3, args.length);
 
         Node node = new Node(ownIP, storeValue, neighIPs, loggerIP);
-        LogMsg msg = new LogMsg();
 
         StartMsg startMsg = new StartMsg();
-
-        node.getClient().sendMessage(startMsg.build_JSON(), node.getInetAddress());
-        //node.getClient().sendMessage(msg.build_JSON("Start", "End", Message.MessageType.info, 4), "127.0.0.1:1111");
+        node.getClient().sendMessage(startMsg.build_JSON(), ownIP);
+        System.out.println("Node: " + node.getInetAddress() +  " storeval: " + node.getStorage_val());
     }
 }
 

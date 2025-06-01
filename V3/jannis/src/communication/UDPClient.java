@@ -20,7 +20,7 @@ public class UDPClient {
                     address, serverPort
             );
             socket.send(packet);
-            System.out.println("Gesendet: " + message + " an " + serverIP);
+            //System.out.println("Gesendet: " + message + " an " + serverIP);
 
         } catch (Exception e) {
             e.printStackTrace();
