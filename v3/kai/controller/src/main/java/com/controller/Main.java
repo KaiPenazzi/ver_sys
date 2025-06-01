@@ -10,7 +10,8 @@ import com.common.NetUtil;
 class Main {
     public static void main(String[] args) {
         if (args.length < 2) {
-            System.out.println("Usage: java -jar controller.jar <self:ip:port> <PathToIni.json:String> <PathToNode>");
+            System.out.println(
+                    "Usage: java -jar controller.jar <self:ip:port> <PathToIni.json:String> <PathToNode:String>");
             System.exit(1);
         }
 
