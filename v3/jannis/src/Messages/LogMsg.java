@@ -2,6 +2,10 @@ package Messages;
 
 import org.json.JSONObject;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 public class LogMsg extends Message
 {
     public int timestamp;
@@ -59,14 +63,21 @@ public class LogMsg extends Message
     }
 
     @Override
-    public String toString()
-    {
-        return timestamp + " " + start_node + " " + end_node + " " + msg_type + " " + sum;
-    }
+    public String toString() {
+        String formattedTime = Instant.ofEpochSecond(timestamp)
+                .atZone(ZoneId.systemDefault())
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-    public void recv_JSON(String data) throws InterruptedException
-    {
-        Thread.sleep(getLatency());
-        System.out.println(data);
+        if (msg_type == MessageType.info)
+        {
+            return formattedTime + "\t " + start_node + " -> " + end_node + "\t " + msg_type;
+
+        }
+
+        if (msg_type == MessageType.echo)
+        {
+            return formattedTime + "\t " + start_node + " -> " + end_node + "\t " + msg_type + " " + sum;
+        }
+        return null;
     }
 }

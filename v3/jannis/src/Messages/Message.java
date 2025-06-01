@@ -9,11 +9,6 @@ public abstract class Message
         this.type = type;
     }
 
-    public int getLatency()
-    {
-        return (int)(Math.random() * 99) + 1;
-    }
-
     public enum MessageType
     {
         start,

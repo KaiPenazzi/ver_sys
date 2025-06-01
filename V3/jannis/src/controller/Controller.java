@@ -161,12 +161,6 @@ public class Controller
         if (type.equals("result"))
         {
             result = body.getInt("result");
-
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
             running = false;
         }
 
@@ -190,13 +184,12 @@ public class Controller
                 iCounter++;
             }
             System.out.println(logMsg.toString());
-
-            if (!running)
-            {
-                printFinal();
-                System.out.println("Result: " + result);
-                stop();
-            }
+        }
+        if (!running)
+        {
+            printFinal();
+            System.out.println("Result: " + result);
+            stop();
         }
     }
 

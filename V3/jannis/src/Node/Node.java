@@ -171,8 +171,7 @@ public class Node
     public void recMsg(String msg) throws InterruptedException {
         //System.out.println("Empfangen: " + msg);
         JSONObject obj = new JSONObject(new JSONTokener(msg));
-
-        
+        Thread.sleep(getLatency());
         switch(obj.getString("type"))
         {
             case "result":
@@ -216,7 +215,7 @@ public class Node
                 for (int i = 0; i < neighbors.size(); i++)
                 {
                     client.sendMessage(infoMsg.build_JSON(getInetAddress()), neighbors.get(i));
-                    sendLog(Message.MessageType.start, neighbors.get(i));
+                    sendLog(Message.MessageType.info, neighbors.get(i));
                 }
                 break;
         }
