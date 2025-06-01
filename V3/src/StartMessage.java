@@ -3,13 +3,18 @@ import org.json.JSONObject;
 public class StartMessage extends Message {
 
     public StartMessage() {
-        messageType = MessageType.start;
+        messageType = "start";
+    }
+    public StartMessage(String json) {
+        JSONObject obj = new JSONObject(json);
+        this.messageType = obj.getString("type");
+        // Kein body, daher nichts weiter
     }
 
     @Override
-    public String JsonFromMessage() {
-        JSONObject msg = new JSONObject();
-
-        return super.JsonFromMessage();
+    public String toJSONString() {
+        JSONObject obj = new JSONObject();
+        obj.put("type", messageType);
+        return obj.toString(2);
     }
 }

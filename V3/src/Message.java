@@ -1,22 +1,10 @@
-import org.json.JSONObject;
-
 public abstract class Message {
 
-    enum MessageType {
-        i,
-        e,
-        start,
-        result,
-        log,
-    }
+    String messageType;
 
-    MessageType messageType;
+    abstract public  String toJSONString() ;
 
-    public String JsonFromMessage() {
-        JSONObject msg = new JSONObject();
 
-        return "";
-    }
 
 
 }

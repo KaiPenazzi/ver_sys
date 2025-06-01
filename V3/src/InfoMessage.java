@@ -5,20 +5,35 @@ public class InfoMessage extends Message {
     String from;
 
     public InfoMessage() {
-        messageType = MessageType.i;
+        this.messageType = "i";
+
     }
 
     public InfoMessage(String fromJSON) {
-        messageType = MessageType.i;
+        JSONObject obj = new JSONObject(fromJSON);
+        this.messageType = obj.getString("type");
+        this.from = obj.getJSONObject("body").getString("from");
 
     }
 
     @Override
-    public String JsonFromMessage(){
-        JSONObject msg = new JSONObject();
+    public String toJSONString(){
+        JSONObject body = new JSONObject();
+        body.put("from", from);
 
-        return "";
+        JSONObject obj = new JSONObject();
+        obj.put("type", messageType);
+        obj.put("body", body);
+
+        return obj.toString(2);
     }
 
 
+    public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
+    }
 }
