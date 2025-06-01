@@ -7,7 +7,16 @@ public class EMessage extends Message {
     public EMessage() {
         messageType = "e";
     }
+    public EMessage(int sum){
+        messageType = "e";
+        this.sum = sum;
+    }
+    public EMessage(String fromJSON){
+        JSONObject obj = new JSONObject(fromJSON);
+        this.messageType = obj.getString("type");
+        this.sum = obj.getJSONObject("body").getInt("sum");
 
+    }
     @Override
     public String toJSONString() {
         JSONObject body = new JSONObject();
