@@ -26,8 +26,13 @@ public class Controller
     public UDPClient client;
     public final List<configNode> nodes;
     private List<Process> processes = new ArrayList<>();
+
     int iCounter = 0;
     int eCounter = 0;
+    boolean running = true;
+    int result;
+    int nodesCount;
+    int edgesCount;
 
     public Controller(String ownIP, String configFile)
     {
@@ -70,8 +75,9 @@ public class Controller
 
     public void sendStart()
     {
-        Scanner scanner = new Scanner(System.in);
+        System.out.println("Das Netztwerk besteht aus " + nodesCount + " Knoten und " + edgesCount + " Kanten");
 
+        Scanner scanner = new Scanner(System.in);
         System.out.println("Gebe den Index des Initiators ein: ");
         int initiator = scanner.nextInt();
 
@@ -122,6 +128,9 @@ public class Controller
         JSONObject root = new JSONObject(content);
         JSONArray nodes = root.getJSONArray("nodes");
 
+        nodesCount = nodes.length();
+
+        int countEdges = 0;
         for (int i = 0; i < nodes.length(); i++)
         {
             JSONObject node = nodes.getJSONObject(i);
@@ -130,6 +139,7 @@ public class Controller
             JSONArray neigh = node.getJSONArray("neighbors");
             List<String> neighbours = new ArrayList<>();
 
+            countEdges += neigh.length();
             for (int j = 0; j < neigh.length(); j++)
             {
                 neighbours.add(neigh.getString(j));
@@ -138,6 +148,7 @@ public class Controller
             configNode newNode = new configNode(ip, storageVal, neighbours);
             this.nodes.add(newNode);
         }
+        edgesCount = countEdges / 2;
     }
 
     // Logger functionality
@@ -149,9 +160,14 @@ public class Controller
         String type = obj.getString("type");
         if (type.equals("result"))
         {
-            int restult = body.getInt("result");
-            printFinal();
-            System.out.println("Result: " + restult);
+            result = body.getInt("result");
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            running = false;
         }
 
         if (type.equals("log"))
@@ -174,10 +190,14 @@ public class Controller
                 iCounter++;
             }
             System.out.println(logMsg.toString());
+
+            if (!running)
+            {
+                printFinal();
+                System.out.println("Result: " + result);
+                stop();
+            }
         }
-
-
-
     }
 
     public Message.MessageType getMsgType(String msg)

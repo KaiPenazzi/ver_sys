@@ -163,11 +163,16 @@ public class Node
         client.sendMessage(msg.build_JSON(), logger_ip);
     }
 
+    public int getLatency()
+    {
+        return (int)(Math.random() * 99) + 1;
+    }
+
     public void recMsg(String msg) throws InterruptedException {
         //System.out.println("Empfangen: " + msg);
         JSONObject obj = new JSONObject(new JSONTokener(msg));
 
-
+        
         switch(obj.getString("type"))
         {
             case "result":
