@@ -158,9 +158,9 @@ public class Node
         return this.getIp() + ":" + this.getPort();
     }
 
-    public void sendLog(Message.MessageType type) throws InterruptedException {
-        LogMsg msg = new LogMsg(this.getInetAddress(), logger_ip, type, sum);
-        client.sendMessage(msg.build_JSON(), this.getInetAddress());
+    public void sendLog(Message.MessageType type, String to) throws InterruptedException {
+        LogMsg msg = new LogMsg(this.getInetAddress(), to, type, sum);
+        client.sendMessage(msg.build_JSON(), logger_ip);
     }
 
     public void recMsg(String msg) throws InterruptedException {
@@ -171,7 +171,6 @@ public class Node
         switch(obj.getString("type"))
         {
             case "result":
-                sendLog(Message.MessageType.result);
                 break;
             case "e":
                 JSONObject body = obj.getJSONObject("body");
@@ -180,7 +179,6 @@ public class Node
                 int sum = body.getInt("sum");
                 this.sum += sum;
 
-                sendLog(Message.MessageType.echo);
                 break;
             case "i":
                 JSONObject body2 = obj.getJSONObject("body");
@@ -197,11 +195,11 @@ public class Node
                         if (!neighbors.get(i).equals(upward_node_ip))
                         {
                             client.sendMessage(infoMsg.build_JSON(this.getInetAddress()), neighbors.get(i));
+                            sendLog(Message.MessageType.info, neighbors.get(i));
                         }
 
                     }
                 }
-                sendLog(Message.MessageType.info);
                 break;
             case "start":
 
@@ -213,8 +211,8 @@ public class Node
                 for (int i = 0; i < neighbors.size(); i++)
                 {
                     client.sendMessage(infoMsg.build_JSON(getInetAddress()), neighbors.get(i));
+                    sendLog(Message.MessageType.start, neighbors.get(i));
                 }
-                sendLog(Message.MessageType.start);
                 break;
         }
 
@@ -229,6 +227,7 @@ public class Node
             {
                 EchoMsg echoMsg = new EchoMsg();
                 client.sendMessage(echoMsg.build_JSON(sum), upward_node_ip);
+                sendLog(Message.MessageType.echo, upward_node_ip);
             }
         }
     }

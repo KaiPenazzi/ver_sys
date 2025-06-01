@@ -26,6 +26,8 @@ public class Controller
     public UDPClient client;
     public final List<configNode> nodes;
     private List<Process> processes = new ArrayList<>();
+    int iCounter = 0;
+    int eCounter = 0;
 
     public Controller(String ownIP, String configFile)
     {
@@ -93,6 +95,11 @@ public class Controller
         }
     }
 
+    public void printFinal()
+    {
+        System.out.println("Anzahl echos: " + eCounter + " Anzahl info: " + iCounter);
+    }
+
     // java -jar node.jar <storage int> <self ip:port> <logger ip:port> [<neighbors ip:port>]
     public List<String> buildCmd(configNode node)
     {
@@ -136,7 +143,6 @@ public class Controller
     // Logger functionality
     public void recMsg(String msg)
     {
-        System.out.println("Controller rec function");
         JSONObject obj = new JSONObject(new JSONTokener(msg));
         JSONObject body = obj.getJSONObject("body");
 
@@ -144,17 +150,29 @@ public class Controller
         if (type.equals("result"))
         {
             int restult = body.getInt("result");
+            printFinal();
             System.out.println("Result: " + restult);
         }
-        else
+
+        if (type.equals("log"))
         {
             int timestamp = body.getInt("timestamp");
             String start_node = body.getString("start_node");
             String end_node = body.getString("end_node");
             int sum = body.getInt("sum");
+            String msgType = body.getString("msg_type");
 
-            LogMsg logMsg = new LogMsg(start_node, end_node, getMsgType(type), sum);
+            LogMsg logMsg = new LogMsg(start_node, end_node, getMsgType(msgType), sum);
 
+            if (msgType.equals("e"))
+            {
+                eCounter++;
+            }
+
+            if (msgType.equals("i"))
+            {
+                iCounter++;
+            }
             System.out.println(logMsg.toString());
         }
 

@@ -22,9 +22,7 @@ public class Main {
 
         Node node = new Node(ownIP, storeValue, neighIPs, loggerIP);
 
-        StartMsg startMsg = new StartMsg();
-        node.getClient().sendMessage(startMsg.build_JSON(), ownIP);
-        System.out.println("Node: " + node.getInetAddress() +  " storeval: " + node.getStorage_val());
+        //System.out.println("Node: " + node.getInetAddress() +  " storeval: " + node.getStorage_val());
     }
 }
 
