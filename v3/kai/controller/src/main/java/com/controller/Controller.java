@@ -17,6 +17,9 @@ public class Controller {
     private Client udp_client;
     private NodesManager nodes;
 
+    private int count_e = 0;
+    private int count_i = 0;
+
     public Controller(NodesManager node_manager, InetSocketAddress self)
             throws Exception {
         this.nodes = node_manager;
@@ -39,7 +42,12 @@ public class Controller {
     private void recvMessage(Message msg) {
         switch (msg) {
             case ResultMessage result:
+                System.out.println("Total Messages: " + (this.count_i + this.count_e));
+                System.out.println("Info: " + this.count_i);
+                System.out.println("Echo: " + this.count_e);
                 System.out.println("got result sum: " + result.body.result);
+                this.count_e = 0;
+                this.count_i = 0;
                 break;
 
             default:
@@ -60,6 +68,14 @@ public class Controller {
     }
 
     private void log(LoggingMessage msg) {
+        switch (msg.body.msg_type) {
+            case "EchoMessage":
+                this.count_e++;
+                break;
+            case "InfoMessage":
+                this.count_i++;
+                break;
+        }
         PrintUtil.printLog(msg);
     }
 

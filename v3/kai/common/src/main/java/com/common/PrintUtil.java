@@ -1,9 +1,12 @@
 package com.common;
 
+import com.common.Config.Node;
 import com.common.messages.LoggingMessage;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.Set;
 
 public class PrintUtil {
 
@@ -50,4 +53,31 @@ public class PrintUtil {
         System.out.println("\033[0m");
     }
 
+    public static void printConfig(Config config) {
+        var edges = edges(config);
+
+        System.out.println("Nodes: " + config.nodes.size());
+        System.out.println("Edges: " + edges.size());
+
+        edges.forEach((edge) -> {
+            System.out.println(edge);
+        });
+        System.out.println();
+
+    }
+
+    public static Set<String> edges(Config config) {
+        Set pairs = new HashSet<String>();
+        for (Node node : config.nodes) {
+            for (String neighbor : node.neighbors) {
+                pairs.add(makeKey(node.address, neighbor));
+            }
+        }
+
+        return pairs;
+    }
+
+    private static String makeKey(String a, String b) {
+        return a.compareTo(b) < 0 ? a + "|" + b : b + "|" + a;
+    }
 }

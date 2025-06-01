@@ -10,6 +10,7 @@ import java.util.List;
 import com.common.Config;
 import com.common.JsonUtil;
 import com.common.NetUtil;
+import com.common.PrintUtil;
 import com.common.Config.Node;
 
 class NodesManager {
@@ -20,6 +21,7 @@ class NodesManager {
 
     public NodesManager(Path config, Path node) throws Exception {
         this.config = JsonUtil.parse_config(Files.readString(config));
+        PrintUtil.printConfig(this.config);
         this.node = node;
     }
 
