@@ -3,6 +3,7 @@ package com.node;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import com.common.NetUtil;
 import com.common.messages.EchoMessage;
@@ -109,6 +110,12 @@ public class Node {
 
     private void send(Message msg, InetSocketAddress to) {
         this.log(msg.getClass().getSimpleName(), to);
+        int sleepTime = ThreadLocalRandom.current().nextInt(10, 500);
+        try {
+            Thread.sleep(sleepTime);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         this.upd_client.send(msg, to);
     }
 
