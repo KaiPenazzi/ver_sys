@@ -69,10 +69,10 @@ public class Controller {
 
     private void log(LoggingMessage msg) {
         switch (msg.body.msg_type) {
-            case "EchoMessage":
+            case "e":
                 this.count_e++;
                 break;
-            case "InfoMessage":
+            case "i":
                 this.count_i++;
                 break;
         }
