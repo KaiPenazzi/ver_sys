@@ -1,7 +1,6 @@
 package com.common.messages;
 
 import java.net.InetSocketAddress;
-import java.util.Date;
 
 import com.common.NetUtil;
 
@@ -33,7 +32,7 @@ public class LoggingMessage implements Message {
         this.body.timestamp = (int) (System.currentTimeMillis() / 1000);
         this.body.start_node = NetUtil.ToString(from);
         this.body.end_node = NetUtil.ToString(to);
-        this.body.msg_type = msg_type;
+        this.body.msg_type = this.convert_type(msg_type);
         this.body.sum = sum;
     }
 
@@ -57,5 +56,23 @@ public class LoggingMessage implements Message {
         }
 
         return isEqual;
+    }
+
+    private String convert_type(String type) {
+        switch (type) {
+            case "InfoMessage":
+                return "i";
+
+            case "EchoMessage":
+                return "e";
+
+            case "ResultMessage":
+                return "result";
+
+            case "StartMessage":
+                return "start";
+        }
+
+        return "unknown";
     }
 }

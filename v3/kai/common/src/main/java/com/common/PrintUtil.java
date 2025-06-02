@@ -23,12 +23,16 @@ public class PrintUtil {
         String color = "\033[32m";
 
         switch (body.msg_type) {
-            case "StartMessage":
-            case "ResultMessage":
+            case "start":
+            case "result":
                 color = "\033[34m";
                 break;
 
-            case "EchoMessage":
+            case "e":
+                color = "\033[33m";
+                break;
+
+            case "unknown":
                 color = "\033[33m";
                 break;
         }
