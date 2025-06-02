@@ -4,6 +4,7 @@
 # Ignore Gradle build output directory
 build
 bin
+out
 
 *.class
 .classpath
@@ -16,4 +17,4 @@ bin
 .vs
 
 *.zip
-*.jar
+.jar
