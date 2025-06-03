@@ -79,6 +79,6 @@ public class Controller {
         for (Node node : nodes) {
             edges += node.getNeighbours().size();
         }
-        return edges;
+        return edges / 2;
     }
 }
