@@ -112,7 +112,8 @@ public class Controller
         List<String> cmd = new ArrayList<>();
         cmd.add("java");
         cmd.add("-jar");
-        cmd.add("out/artifacts/Node_jar/Node.jar");
+        //cmd.add("out/artifacts/Node_jar/Node.jar");
+        cmd.add("Node.jar");
         cmd.add(node.getStorageVal() + "");
         cmd.add(node.getIp());
         cmd.add(this.ownIP);
