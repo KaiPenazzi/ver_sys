@@ -29,7 +29,12 @@ class Main {
             node.start();
 
         } catch (SocketException e) {
-            System.out.println("could not create Node");
+            System.out.println("could not create Node, maybe the ports are already in use");
+            for (String arg : args) {
+                System.out.print(arg + " ");
+            }
+            System.out.println();
+            e.printStackTrace();
             System.exit(2);
         }
     }
