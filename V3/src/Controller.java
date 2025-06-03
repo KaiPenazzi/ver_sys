@@ -12,12 +12,10 @@ public class Controller {
 
     public static void main(String[] args) throws SocketException {
 
-        String jarPath = "C:\\Users\\leonk\\IdeaProjects\\ver_sys\\V3\\out\\artifacts\\node_jar\\node.jar";
-
         Scanner scanner;
         scanner = new Scanner(System.in);
         System.out.println("enter Logger Address");
-        //UDPCon.loggerAddress = scanner.nextLine();
+        UDPCon.loggerAddress = scanner.nextLine();
         Logger logger = new Logger(UDPCon.loggerAddress);
         UDPCon udpCon = new UDPCon();
         udpCon.socketInitializer(Operations.getPort(UDPCon.loggerAddress));
@@ -45,15 +43,16 @@ public class Controller {
                 Node node = new Node(storage,address,UDPCon.loggerAddress, neighbors);
                 nodes.add(node);
             }
-            Deployer deployer = new Deployer(nodes,UDPCon.loggerAddress,jarPath);
+            Deployer deployer = new Deployer(nodes,UDPCon.loggerAddress,"node.jar");
             deployer.deploy();
             System.out.println("Anzahl Nodes: " + nodes.size());
             System.out.println("Anzahl der Kanten:" + countEdges(nodes));
 
             System.out.println("Initiatorknoten angeben: ");
-            scanner = new Scanner(System.in);
+
             String initiatorNode = scanner.nextLine();
             Message startMessage = new StartMessage();
+            System.out.println("sende startmessage");
             udpCon.sendToAddress(startMessage,initiatorNode, logger.getAddress());
             while(true){
                Message msg =  logger.recv();
@@ -72,8 +71,8 @@ public class Controller {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
 
+    }
 
     public static int countEdges(List<Node> nodes) {
         int edges = 0;

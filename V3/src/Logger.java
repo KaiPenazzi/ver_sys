@@ -22,7 +22,7 @@ public class Logger {
     }
 
     public Message recv(){
-        //System.out.println("logger recv aufgerufen");
+
         Message msg = null;
             try {
                 msg = UDPCon.recvMessage();
