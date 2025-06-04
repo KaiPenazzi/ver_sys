@@ -26,33 +26,36 @@ class NodesManager {
     }
 
     public void start_nodes(InetSocketAddress controller) {
-        for (Node node : this.config.nodes) {
-            List<String> command = new ArrayList<>();
-            String addr = node.getAddr().getHostString();
+        new Thread(() -> {
+            for (Node node : this.config.nodes) {
+                List<String> command = new ArrayList<>();
+                String addr = node.getAddr().getHostString();
 
-            if (!addr.equals("localhost") && !addr.equals("127.0.0.1")) {
-                command.add("ssh");
-                command.add("osboxes@" + addr);
-                command.add("-o StrictHostKeyChecking=no");
+                if (!addr.equals("localhost") && !addr.equals("127.0.0.1")) {
+                    command.add("ssh");
+                    command.add("osboxes@" + addr);
+                    command.add("-o StrictHostKeyChecking=no");
+                }
+
+                command.add("java");
+                command.add("-jar");
+                command.add(this.node.toString());
+                command.add(String.valueOf(node.storage));
+                command.add(node.address);
+                command.add(NetUtil.ToString(controller));
+                command.addAll(node.neighbors);
+
+                try {
+                    processes.add(new ProcessBuilder(command)
+                            .inheritIO()
+                            .start());
+                } catch (IOException e) {
+                    System.out.println("could not start node: " + node.address);
+                    e.printStackTrace();
+                }
             }
-
-            command.add("java");
-            command.add("-jar");
-            command.add(this.node.toString());
-            command.add(String.valueOf(node.storage));
-            command.add(node.address);
-            command.add(NetUtil.ToString(controller));
-            command.addAll(node.neighbors);
-
-            try {
-                processes.add(new ProcessBuilder(command)
-                        .inheritIO()
-                        .start());
-            } catch (IOException e) {
-                System.out.println("could not start node: " + node.address);
-                e.printStackTrace();
-            }
-        }
+            System.out.println("all nodes started");
+        });
     }
 
     public List<Node> getNodes() {
