@@ -14,6 +14,6 @@ public class NetUtil {
     }
 
     public static String ToString(InetSocketAddress address) {
-        return address.getHostName() + ":" + address.getPort();
+        return address.getHostString() + ":" + address.getPort();
     }
 }

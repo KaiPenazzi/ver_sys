@@ -28,11 +28,12 @@ class NodesManager {
     public void start_nodes(InetSocketAddress controller) {
         for (Node node : this.config.nodes) {
             List<String> command = new ArrayList<>();
-            String addr = node.getAddr().getHostName();
+            String addr = node.getAddr().getHostString();
 
             if (!addr.equals("localhost") && !addr.equals("127.0.0.1")) {
                 command.add("ssh");
-                command.add(node.getAddr().getHostName());
+                command.add("osboxes@" + addr);
+                command.add("-o StrictHostKeyChecking=no");
             }
 
             command.add("java");
