@@ -32,6 +32,15 @@ public class Deployer {
         String storage = String.valueOf(node.getSum());
 
         List<String> command = new ArrayList<>();
+
+        //Versuch teil 2 hinzu:
+        //an command für processbuilder vornedran setzen: ssh student@
+
+        if (!node.getIp().equals("127.0.0.1")) {
+            command.add("ssh");
+            command.add("student@" + node.getIp());
+        }
+
         command.add("java");
         command.add("-jar");
         command.add(jarPath);
@@ -46,7 +55,6 @@ public class Deployer {
         try {
             Process process = pb.start();
             startedProcesses.add(process);
-
 
         } catch (IOException e) {
             System.err.println("Fehler beim Starten von Node: " + self);

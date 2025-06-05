@@ -12,6 +12,13 @@ public class Controller {
 
     public static void main(String[] args) throws SocketException {
 
+        //Teil 2 hinzugefügt: nodes.jar wird per args beim start übergeben
+        if(args.length < 1){
+            System.err.println("Arg count wrong, please enter name of node.jar file");
+            System.exit(1);
+        }
+        String nodePath = args[0];
+
         Scanner scanner;
         scanner = new Scanner(System.in);
         System.out.println("enter Logger Address");
@@ -43,7 +50,7 @@ public class Controller {
                 Node node = new Node(storage,address,UDPCon.loggerAddress, neighbors);
                 nodes.add(node);
             }
-            Deployer deployer = new Deployer(nodes,UDPCon.loggerAddress,"node.jar");
+            Deployer deployer = new Deployer(nodes,UDPCon.loggerAddress,nodePath);
             deployer.deploy();
             System.out.println("Anzahl Nodes: " + nodes.size());
             System.out.println("Anzahl der Kanten:" + countEdges(nodes));
@@ -64,9 +71,6 @@ public class Controller {
                 }
 
             }
-
-
-
 
         } catch (Exception e) {
             e.printStackTrace();
