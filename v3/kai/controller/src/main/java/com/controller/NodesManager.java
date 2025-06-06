@@ -16,13 +16,13 @@ import com.common.Config.Node;
 class NodesManager {
     private Config config;
     private Path node;
+    private String user;
 
-    private List<Process> processes = new ArrayList<>();
-
-    public NodesManager(Path config, Path node) throws Exception {
+    public NodesManager(Path config, Path node, String user) throws Exception {
         this.config = JsonUtil.parse_config(Files.readString(config));
         PrintUtil.printConfig(this.config);
         this.node = node;
+        this.user = user;
     }
 
     public void start_nodes(InetSocketAddress controller) {
@@ -33,7 +33,7 @@ class NodesManager {
 
                 if (!addr.equals("localhost") && !addr.equals("127.0.0.1")) {
                     command.add("ssh");
-                    command.add("osboxes@" + addr);
+                    command.add(this.user + "@" + addr);
                     command.add("-o StrictHostKeyChecking=no");
                 }
 
@@ -46,16 +46,14 @@ class NodesManager {
                 command.addAll(node.neighbors);
 
                 try {
-                    processes.add(new ProcessBuilder(command)
-                            .inheritIO()
-                            .start());
+                    new ProcessBuilder(command)
+                            .start();
                 } catch (IOException e) {
                     System.out.println("could not start node: " + node.address);
                     e.printStackTrace();
                 }
             }
-            System.out.println("all nodes started");
-        });
+        }).start();
     }
 
     public List<Node> getNodes() {
@@ -67,8 +65,29 @@ class NodesManager {
     }
 
     public void stop() {
-        this.processes.forEach(process -> {
-            process.destroy();
-        });
+        new Thread(() -> {
+            for (Node node : this.config.nodes) {
+                List<String> command = new ArrayList<>();
+                String addr = node.getAddr().getHostString();
+
+                if (!addr.equals("localhost") && !addr.equals("127.0.0.1")) {
+                    command.add("ssh");
+                    command.add(this.user + "@" + addr);
+                    command.add("-o StrictHostKeyChecking=no");
+                }
+
+                command.add("pkill");
+                command.add("-f");
+                command.add("node.jar");
+
+                try {
+                    new ProcessBuilder(command)
+                            .start();
+                } catch (IOException e) {
+                    System.out.println("could not kill jars");
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 }

@@ -11,7 +11,7 @@ class Main {
     public static void main(String[] args) {
         if (args.length < 2) {
             System.out.println(
-                    "Usage: java -jar controller.jar <self:ip:port> <PathToIni.json:String> <PathToNode:String>");
+                    "Usage: java -jar controller.jar <self:ip:port> <PathToIni.json:String> <PathToNode:String> <optional User:String");
             System.exit(1);
         }
 
@@ -23,7 +23,7 @@ class Main {
         NodesManager node_manager = null;
 
         try {
-            node_manager = new NodesManager(ini, node_path);
+            node_manager = new NodesManager(ini, node_path, args.length > 3 ? args[3] : "");
         } catch (Exception e) {
             node_manager.stop();
             System.out.println("could not parse config file");
