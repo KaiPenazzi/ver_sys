@@ -25,9 +25,9 @@ class Main {
         try {
             node_manager = new NodesManager(ini, node_path, args.length > 3 ? args[3] : "");
         } catch (Exception e) {
-            node_manager.stop();
             System.out.println("could not parse config file");
             e.printStackTrace();
+            node_manager.stop();
             System.exit(2);
         }
 
